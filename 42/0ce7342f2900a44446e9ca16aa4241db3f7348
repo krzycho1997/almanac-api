@@ -1,0 +1,19 @@
+leaktest.env
+  s_ac08c55301f6b2::t_14db076a00674f 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "420ce7342f2900a44446e9ca16aa4241db3f7348",
+  "prompts": {},
+  "sessions": {
+    "s_ac08c55301f6b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "183767d4-4ac2-49f4-83a1-ebc0de5caa5d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
