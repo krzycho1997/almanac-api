@@ -1,0 +1,7 @@
+#!/bin/sh
+subject=$(git stripspace --strip-comments < "$1" | head -n1)
+case "$subject" in Merge\ *|Revert\ *|fixup!\ *|squash!\ *|amend!\ *) exit 0;; esac
+re='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\((briefing|bookmark|identity|shared|docker|deps|deps-dev)\))?!?: [a-z].*[^.]$'
+printf '%s\n' "$subject" | grep -Eq "$re" || { echo "commit-msg: not Conventional Commits: $subject" >&2; exit 1; }
+length=$(printf '%s' "$subject" | LC_ALL=C.UTF-8 wc -m | tr -d ' ')
+[ "$length" -le 72 ] || { echo "commit-msg: subject longer than 72 chars" >&2; exit 1; }
