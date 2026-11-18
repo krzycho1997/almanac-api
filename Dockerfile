@@ -42,4 +42,4 @@ RUN composer dump-autoload --no-dev --classmap-authoritative \
     && php bin/console cache:warmup \
     && chown -R www-data:www-data var
 
-USER www-data
+USER 82:82
