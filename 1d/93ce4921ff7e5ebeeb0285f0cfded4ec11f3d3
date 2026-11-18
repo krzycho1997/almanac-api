@@ -1,0 +1,21 @@
+src/Shared/Controller/HealthController.php
+  s_c7c8959ef044d8::t_490958bc1fb0ab 1-17
+tests/Shared/Functional/HealthControllerTest.php
+  s_c7c8959ef044d8::t_971d00d1509b3e 1-30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1d93ce4921ff7e5ebeeb0285f0cfded4ec11f3d3",
+  "prompts": {},
+  "sessions": {
+    "s_c7c8959ef044d8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dd74c7db-ee8a-4cad-8133-624d225528b2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
