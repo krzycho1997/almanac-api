@@ -1,0 +1,21 @@
+.github/workflows/ci.yaml
+  s_ac08c55301f6b2::t_19361f3dc32704 80
+.gitleaks.toml
+  s_ac08c55301f6b2::t_b4cb9558940f32 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4b4016846dc0c50e35203411ac445566bac6f21c",
+  "prompts": {},
+  "sessions": {
+    "s_ac08c55301f6b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "183767d4-4ac2-49f4-83a1-ebc0de5caa5d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
