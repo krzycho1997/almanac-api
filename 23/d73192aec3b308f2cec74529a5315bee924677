@@ -1,0 +1,60 @@
+.editorconfig
+  s_74d8db3d771921::t_fc1354dcd9f004 1-17
+config/packages/cache.yaml
+  s_74d8db3d771921::t_fc1354dcd9f004 1-19
+src/Kernel.php
+  s_74d8db3d771921::t_fc1354dcd9f004 1-2,5-21
+  s_74d8db3d771921::t_ab94ce7ba7abc0 3-4
+config/preload.php
+  s_74d8db3d771921::t_fc1354dcd9f004 1-2,5-7
+  s_74d8db3d771921::t_ab94ce7ba7abc0 3-4
+.gitignore
+  s_74d8db3d771921::t_fc1354dcd9f004 1-10
+  s_74d8db3d771921::t_ab94ce7ba7abc0 11-12
+  s_74d8db3d771921::t_725a14092ec579 13
+public/index.php
+  s_74d8db3d771921::t_fc1354dcd9f004 1-2,5-11
+  s_74d8db3d771921::t_ab94ce7ba7abc0 3-4
+.env.dev
+  s_74d8db3d771921::t_fc1354dcd9f004 1-4
+composer.json
+  s_74d8db3d771921::t_fc1354dcd9f004 1-77
+config/bundles.php
+  s_74d8db3d771921::t_fc1354dcd9f004 1-2,5-7
+  s_74d8db3d771921::t_ab94ce7ba7abc0 3-4
+.env
+  s_74d8db3d771921::t_fc1354dcd9f004 1-27
+config/routes/framework.yaml
+  s_74d8db3d771921::t_fc1354dcd9f004 1-4
+config/packages/framework.yaml
+  s_74d8db3d771921::t_fc1354dcd9f004 1-15
+config/packages/routing.yaml
+  s_74d8db3d771921::t_fc1354dcd9f004 1-10
+config/routes.yaml
+  s_74d8db3d771921::t_fc1354dcd9f004 1-11
+bin/console
+  s_74d8db3d771921::t_ab94ce7ba7abc0 4-5
+  s_74d8db3d771921::t_fc1354dcd9f004 1-3,6-23
+config/services.yaml
+  s_74d8db3d771921::t_fc1354dcd9f004 1-23
+composer.lock
+  s_74d8db3d771921::t_995c2553dd8153 1-2642
+symfony.lock
+  s_74d8db3d771921::t_cb0313c04836fb 1-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "23d73192aec3b308f2cec74529a5315bee924677",
+  "prompts": {},
+  "sessions": {
+    "s_74d8db3d771921": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "24851822-6492-4435-9cae-d5b0d5d7567c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
