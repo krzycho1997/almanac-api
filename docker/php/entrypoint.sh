@@ -10,7 +10,7 @@ install_dependencies() {
 }
 
 database_ready() {
-    pg_isready -h database -q 2>&1
+    bin/console dbal:run-sql --quiet "SELECT 1" 2>&1
 }
 
 wait_for_database() {

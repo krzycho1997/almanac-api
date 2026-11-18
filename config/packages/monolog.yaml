@@ -10,13 +10,13 @@ when@dev: &stderr_json
                 path: php://stderr
                 level: '%env(LOG_LEVEL)%'
                 formatter: monolog.formatter.json
-                channels: ['!event', '!request', '!deprecation']
+                channels: ['!event', '!request', '!doctrine', '!deprecation']
             request:
                 type: stream
                 path: php://stderr
                 level: warning
                 formatter: monolog.formatter.json
-                channels: [request]
+                channels: [request, doctrine]
             deprecation:
                 type: stream
                 path: php://stderr
@@ -34,7 +34,7 @@ when@test:
                 level: debug
             request:
                 type: 'null'
-                channels: [request]
+                channels: [request, doctrine]
             deprecation:
                 type: 'null'
                 channels: [deprecation]

@@ -9,6 +9,9 @@
         "php": ">=8.5",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "doctrine/doctrine-bundle": "^3.4",
+        "doctrine/doctrine-migrations-bundle": "^4.0",
+        "doctrine/orm": "^3.8",
         "symfony/clock": "8.1.*",
         "symfony/console": "8.1.*",
         "symfony/dotenv": "8.1.*",
@@ -19,11 +22,13 @@
         "symfony/yaml": "8.1.*"
     },
     "require-dev": {
+        "dama/doctrine-test-bundle": "^8.8",
         "friendsofphp/php-cs-fixer": "^3.95",
         "osteel/openapi-httpfoundation-testing": "^0.15",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.3",
         "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-doctrine": "^2.0",
         "phpstan/phpstan-phpunit": "^2.1",
         "phpstan/phpstan-strict-rules": "^2.1",
         "phpstan/phpstan-symfony": "^2.1",
@@ -83,6 +88,7 @@
             "bin/console lint:yaml config --parse-tags",
             "@cs-check",
             "bin/console lint:container",
+            "bin/console doctrine:schema:validate --skip-sync",
             "@phpstan",
             "@composer audit --locked",
             "@test:unit"
@@ -94,11 +100,21 @@
         "cs-check": "php-cs-fixer check --diff",
         "cs-fix": "php-cs-fixer fix",
         "phpstan": "phpstan analyse --no-progress --memory-limit=1G",
-        "test": "phpunit",
+        "test": [
+            "@test:unit",
+            "@test:db",
+            "phpunit --testsuite integration,functional,e2e"
+        ],
         "test:unit": "phpunit --testsuite unit",
         "test:integration": "phpunit --testsuite integration --do-not-fail-on-empty-test-suite",
         "test:functional": "phpunit --testsuite functional,e2e",
-        "test:live": "phpunit --testsuite live --do-not-fail-on-empty-test-suite"
+        "test:live": "phpunit --testsuite live --do-not-fail-on-empty-test-suite",
+        "test:db": [
+            "bin/console doctrine:database:drop --env=test --force --if-exists --no-interaction",
+            "bin/console doctrine:database:create --env=test --no-interaction",
+            "bin/console doctrine:migrations:migrate --env=test --no-interaction --allow-no-migration",
+            "bin/console doctrine:schema:validate --env=test"
+        ]
     },
     "conflict": {
         "symfony/symfony": "*"

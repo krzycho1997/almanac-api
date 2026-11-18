@@ -6,8 +6,7 @@ FROM docker.io/library/php:8.5.12-fpm-alpine AS base
 COPY --from=php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 COPY --from=composer /usr/bin/composer /usr/local/bin/composer
 
-RUN install-php-extensions apcu intl pdo_pgsql redis \
-    && apk add --no-cache postgresql18-client
+RUN install-php-extensions apcu intl pdo_pgsql redis
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 WORKDIR /srv/app
