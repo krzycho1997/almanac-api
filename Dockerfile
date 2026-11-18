@@ -12,6 +12,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 WORKDIR /srv/app
 
 COPY docker/php/conf.d/app.ini $PHP_INI_DIR/conf.d/zz-app.ini
+RUN printf '[www]\naccess.log = /dev/null\n' > /usr/local/etc/php-fpm.d/zz-app.conf
 
 
 FROM base AS dev
