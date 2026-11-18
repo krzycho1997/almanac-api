@@ -18,6 +18,8 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - .:/srv/app:z
 
@@ -34,6 +36,14 @@ services:
       retries: 30
     volumes:
       - database_data:/var/lib/postgresql
+
+  redis:
+    image: docker.io/library/redis:8-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
 
 volumes:
   database_data:
