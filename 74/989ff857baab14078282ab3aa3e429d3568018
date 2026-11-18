@@ -1,0 +1,19 @@
+.github/dependabot.yml
+  s_7a94fda8d25c46::t_6d9d75b48b65f0 1-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "74989ff857baab14078282ab3aa3e429d3568018",
+  "prompts": {},
+  "sessions": {
+    "s_7a94fda8d25c46": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a7e0b8c6-535c-4b63-bcd7-487c85fe33bc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
