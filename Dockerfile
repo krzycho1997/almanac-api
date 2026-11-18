@@ -6,13 +6,18 @@ FROM docker.io/library/php:8.5.12-fpm-alpine AS base
 COPY --from=php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 COPY --from=composer /usr/bin/composer /usr/local/bin/composer
 
-RUN install-php-extensions apcu intl pdo_pgsql redis
+RUN install-php-extensions apcu intl pdo_pgsql redis \
+    && apk add --no-cache postgresql18-client
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 WORKDIR /srv/app
 
 COPY docker/php/conf.d/app.ini $PHP_INI_DIR/conf.d/zz-app.ini
 RUN printf '[www]\naccess.log = /dev/null\n' > /usr/local/etc/php-fpm.d/zz-app.conf
+COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint
+
+ENTRYPOINT ["entrypoint"]
+CMD ["php-fpm"]
 
 
 FROM base AS dev
