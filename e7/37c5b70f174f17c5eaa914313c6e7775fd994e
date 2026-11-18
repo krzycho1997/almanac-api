@@ -1,0 +1,76 @@
+tests/Shared/Functional/FrozenClockTest.php
+  s_ac08c55301f6b2::t_ec8fdb887679a9 1-24
+tests/PHPStan/Unit/Fixtures/strict-types-upper-case.php
+  s_ac08c55301f6b2::t_ec8fdb887679a9 1-5
+tests/PHPStan/Unit/Fixtures/declare-in-comment.php
+  s_ac08c55301f6b2::t_ec8fdb887679a9 1-5
+tests/PHPStan/Unit/Fixtures/inline-html.php
+  s_ac08c55301f6b2::t_ec8fdb887679a9 1
+tests/PHPStan/Unit/DeclareStrictTypesRuleTest.php
+  s_ac08c55301f6b2::t_ec8fdb887679a9 47-73
+  s_ac08c55301f6b2::t_ca61903aafb619 1-46,74-75
+tests/PHPStan/Unit/Fixtures/strict-types-after-another-directive.php
+  s_ac08c55301f6b2::t_ec8fdb887679a9 1-5
+composer.json
+  s_ac08c55301f6b2::t_ec8fdb887679a9 98-100
+  s_ac08c55301f6b2::t_f815b8017ea227 12,22-31,37-38,44-45,79-97,101
+phpunit.dist.xml
+  s_ac08c55301f6b2::t_ec8fdb887679a9 51-55
+  s_ac08c55301f6b2::t_10724df2873583 1-50,56-60
+.env.example
+  s_ac08c55301f6b2::t_5a18043b95b169 1-6
+.env.test
+  s_ac08c55301f6b2::t_5e4ad3671d9c0d 1-2
+.gitignore
+  s_ac08c55301f6b2::t_b3d1e27261eb98 14-23
+.php-cs-fixer.dist.php
+  s_ac08c55301f6b2::t_d1e6fcd7ff0e0e 1-25
+bin/check-env-keys
+  s_ac08c55301f6b2::t_2a5aa8aff26e2b 1-16
+bin/console
+  s_ac08c55301f6b2::t_ffb2da2fbdfc99 19
+composer.lock
+  s_ac08c55301f6b2::t_11d3ea7415f531 7,165-213,551-628,3018-7956
+config/preload.php
+  s_ac08c55301f6b2::t_4a67260173597b 5-7
+phpstan.dist.neon
+  s_ac08c55301f6b2::t_36756ee16fa7a0 1-19
+public/index.php
+  s_ac08c55301f6b2::t_c4d4e04185f157 9
+symfony.lock
+  s_ac08c55301f6b2::t_f6c1791f3d8483 2-43
+tests/PHPStan/DeclareStrictTypesRule.php
+  s_ac08c55301f6b2::t_4c15bb6d71a770 1-59
+tests/PHPStan/Unit/Fixtures/no-declare.php
+  s_ac08c55301f6b2::t_9a2dad9ca48ffc 1-7
+tests/PHPStan/Unit/Fixtures/other-declare.php
+  s_ac08c55301f6b2::t_55b70f07337c9b 1-5
+tests/PHPStan/Unit/Fixtures/shebang.php
+  s_ac08c55301f6b2::t_7e877bd1632dce 1-6
+tests/PHPStan/Unit/Fixtures/strict-types-zero.php
+  s_ac08c55301f6b2::t_788f4c46b1e01c 1-5
+tests/PHPStan/Unit/Fixtures/strict-types.php
+  s_ac08c55301f6b2::t_0cf8641ee34e05 1-5
+tests/Support/FunctionalTestCase.php
+  s_ac08c55301f6b2::t_5d7c110e039b3a 1-26
+tests/bootstrap.php
+  s_ac08c55301f6b2::t_24a9186ba71280 1-9
+tests/console-application.php
+  s_ac08c55301f6b2::t_5ddcd7f97272ac 1-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e737c5b70f174f17c5eaa914313c6e7775fd994e",
+  "prompts": {},
+  "sessions": {
+    "s_ac08c55301f6b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "183767d4-4ac2-49f4-83a1-ebc0de5caa5d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
