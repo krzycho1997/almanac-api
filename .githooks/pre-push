@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+
+if ! command -v docker >/dev/null 2>&1; then
+    echo "pre-push: docker not found, skipping checks (CI will run them)" >&2
+    exit 0
+fi
+
+if ! docker image inspect localhost/almanac-php:dev >/dev/null 2>&1; then
+    echo "pre-push: image localhost/almanac-php:dev not built, skipping checks (CI will run them)" >&2
+    exit 0
+fi
+
+if [ -n "$(docker compose ps --status running --quiet php 2>/dev/null)" ]; then
+    exec docker compose exec -T php composer check:fast
+fi
+
+exec docker compose run --rm --no-deps -T php composer check:fast
