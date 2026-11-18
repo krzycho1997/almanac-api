@@ -1,0 +1,34 @@
+compose.yaml
+  s_74d8db3d771921::t_00e8088943ede5 7
+  s_74d8db3d771921::t_b67b789efea2bc 1-6,8-39
+docker/nginx/security-headers.conf
+  s_74d8db3d771921::t_b67b789efea2bc 1-5
+.gitattributes
+  s_74d8db3d771921::t_00e8088943ede5 1
+docker/php/conf.d/app.ini
+  s_74d8db3d771921::t_b67b789efea2bc 1-7
+docker/nginx/default.conf
+  s_74d8db3d771921::t_43d60f2aa01878 1
+  s_74d8db3d771921::t_b67b789efea2bc 2-33
+.dockerignore
+  s_74d8db3d771921::t_b67b789efea2bc 1-10
+Dockerfile
+  s_74d8db3d771921::t_00e8088943ede5 20-23
+  s_74d8db3d771921::t_b67b789efea2bc 1-19,24-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "59bca9a872b4807e20e02051b5b4ba33c2428cb8",
+  "prompts": {},
+  "sessions": {
+    "s_74d8db3d771921": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "24851822-6492-4435-9cae-d5b0d5d7567c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
