@@ -19,6 +19,6 @@ final class FrozenClockTest extends FunctionalTestCase
 
         // Then
         self::assertSame(self::NOW, $now->format('Y-m-d H:i:s'));
-        self::assertSame('UTC', $now->getTimezone()->getName());
+        self::assertSame(self::TIMEZONE, $now->getTimezone()->getName());
     }
 }

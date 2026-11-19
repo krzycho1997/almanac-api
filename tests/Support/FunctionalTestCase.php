@@ -13,6 +13,7 @@ abstract class FunctionalTestCase extends WebTestCase
     use ClockSensitiveTrait;
 
     protected const string NOW = '2026-11-18 12:00:00';
+    protected const string TIMEZONE = 'UTC';
 
     protected KernelBrowser $client;
 
@@ -20,7 +21,7 @@ abstract class FunctionalTestCase extends WebTestCase
     {
         parent::setUp();
 
-        self::mockTime(new \DateTimeImmutable(self::NOW, new \DateTimeZone('UTC')));
+        self::mockTime(new \DateTimeImmutable(self::NOW, new \DateTimeZone(self::TIMEZONE)));
         $this->client = self::createClient();
     }
 }
