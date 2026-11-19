@@ -1,0 +1,20 @@
+CLAUDE.md
+  s_f27af18559dff4::t_15ab5a9449c3a4 52
+  s_f27af18559dff4::t_6475fd2f230929 51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3ae4e95a4f4e3dffaf9cfa92f7869eccac839d7c",
+  "prompts": {},
+  "sessions": {
+    "s_f27af18559dff4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "72b0fb97-a8d1-40f8-8417-a35bc90c6063",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
