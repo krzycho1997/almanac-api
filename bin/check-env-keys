@@ -1,0 +1,16 @@
+#!/bin/sh
+set -eu
+
+keys() {
+    sed -n 's/^\([A-Z_][A-Z0-9_]*\)=.*/\1/p' "$1" | sort -u
+}
+
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+keys .env > "$tmp/.env"
+keys .env.example > "$tmp/.env.example"
+
+if ! diff -u "$tmp/.env" "$tmp/.env.example" >&2; then
+    echo "check-env-keys: .env and .env.example define different keys" >&2
+    exit 1
+fi

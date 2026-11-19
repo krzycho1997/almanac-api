@@ -1,0 +1,40 @@
+monolog:
+    channels:
+        - deprecation
+
+when@dev: &stderr_json
+    monolog:
+        handlers:
+            main:
+                type: stream
+                path: php://stderr
+                level: '%env(LOG_LEVEL)%'
+                formatter: monolog.formatter.json
+                channels: ['!event', '!request', '!doctrine', '!deprecation']
+            request:
+                type: stream
+                path: php://stderr
+                level: warning
+                formatter: monolog.formatter.json
+                channels: [request, doctrine]
+            deprecation:
+                type: stream
+                path: php://stderr
+                level: '%env(LOG_LEVEL)%'
+                formatter: monolog.formatter.json
+                channels: [deprecation]
+
+when@prod: *stderr_json
+
+when@test:
+    monolog:
+        handlers:
+            main:
+                type: test
+                level: debug
+            request:
+                type: 'null'
+                channels: [request, doctrine]
+            deprecation:
+                type: 'null'
+                channels: [deprecation]

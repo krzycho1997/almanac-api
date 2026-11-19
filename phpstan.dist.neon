@@ -1,0 +1,21 @@
+parameters:
+    level: 9
+    paths:
+        - .php-cs-fixer.dist.php
+        - bin/console
+        - config
+        - public
+        - src
+        - tests
+    excludePaths:
+        - config/reference.php
+        - tests/PHPStan/Unit/Fixtures
+    tmpDir: var/phpstan
+    symfony:
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+        consoleApplicationLoader: tests/console-application.php
+    doctrine:
+        objectManagerLoader: tests/object-manager.php
+
+rules:
+    - App\Tests\PHPStan\DeclareStrictTypesRule

@@ -1,0 +1,6 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Symfony recipe commits a random APP_SECRET for the dev environment"
+paths = ['''^\.env\.dev$''']
