@@ -1,0 +1,22 @@
+phpstan.dist.neon
+  s_f0ac9461d0892d::t_80eda9f27bc2b1 31-34
+tests/Architecture/LayerTest.php
+  s_f0ac9461d0892d::t_80eda9f27bc2b1 1-23,25-28,30-44,46-48,50-73,75-78,80-137
+  s_f0ac9461d0892d::t_7faa296e64efc2 24,29,45,49,74,79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7d242d46e622308e0a70a38653afc674d7f7e97e",
+  "prompts": {},
+  "sessions": {
+    "s_f0ac9461d0892d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9342050c-030b-4c8e-b2e8-a3c4df4fda88",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
