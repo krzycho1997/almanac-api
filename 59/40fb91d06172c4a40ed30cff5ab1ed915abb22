@@ -1,0 +1,19 @@
+config/packages/monolog.yaml
+  s_a20ae2c0e93b08::t_bc1a0aecefcb3f 69-74,79,98-101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5940fb91d06172c4a40ed30cff5ab1ed915abb22",
+  "prompts": {},
+  "sessions": {
+    "s_a20ae2c0e93b08": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "062714c5-5148-43cf-9a89-057891122668",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
