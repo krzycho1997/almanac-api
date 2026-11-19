@@ -48,7 +48,9 @@ Custom PHPStan rules and loaders live in `tools/phpstan/` (`App\PHPStan`).
 ## Code
 
 - `declare(strict_types=1);` in every PHP file, including `bin/`, `public/`, `config/` and migrations.
-- No comments that explain what the code does; only facts the code cannot express.
+- No comments in code, not even for facts the code cannot express: put reasons, upgrade notes and links in the commit message, the PR description or `docs/`. Allowed: PHPDoc types for static analysis, `// Given` / `// When` / `// Then` in tests, and generated files.
+- Classes follow SOLID (one reason to change, depend on interfaces where one exists, extend by decorating or tagging rather than editing) and SLAP: a public method reads as a list of steps at one level of abstraction, and details such as header arrays, JSON decoding or loops go into named private methods.
+- Name repeated or meaningful literals with constants, and use the framework's own first (`Request::METHOD_*`, `Response::HTTP_*`, `JsonEncoder::FORMAT`, `ProblemNormalizer::TYPE`); define `private const` only where none exists. Prefer early returns to compound conditions and nested `if`/`else`, and write conditions positively: no `!` or `!==` in an `if`; invert the check (`if ($x instanceof Foo) { return …; } return …;`, `$level->includes(…)` instead of `!…->isLowerThan(…)`) or name the helper for the case it detects (`isOutsideClientErrors()`).
 - No new dependencies without asking. No API Platform, no MySQL or SQLite.
 
 ## Commits and branches

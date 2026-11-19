@@ -17,7 +17,6 @@ final class ModuleBoundaryTest
     public function modulesUseOtherModulesOnlyThroughContracts(): iterable
     {
         foreach (Codebase::modules() as $module) {
-            // phpat strips ':' from rule names, so the dot keeps the module readable in "…Contracts.Briefing".
             yield ".{$module}" => PHPat::rule()
                 ->classes(Codebase::namespaceOf($module))
                 ->canOnly()
