@@ -1,0 +1,65 @@
+tests/Support/EndToEnd/HttpProbe.php
+  s_19699a07889cad::t_d421287ab4d249 1-12,17,19,27-35,37-47,49-54,58,60,62-63
+  s_19699a07889cad::t_53fc00e545f469 13-16,18,20-26,36,48,55-57,59,61
+docker/nginx/default.conf
+  s_19699a07889cad::t_555d75e79f4f23 1-9,20,26,32,38,46
+  s_19699a07889cad::t_54f68eaafabd1f 40
+phpunit.dist.xml
+  s_19699a07889cad::t_5b316895cc2167 24
+tests/EndToEnd/NginxRequestIdTest.php
+  s_cfa33f4979cb4d::t_aaaf30e6db301c 1
+  s_19699a07889cad::t_d421287ab4d249 2-20,22-30,32-40,42-60,62-86
+  s_19699a07889cad::t_53fc00e545f469 21,31,41,61
+compose.yaml
+  s_19699a07889cad::t_555d75e79f4f23 12
+tests/Shared/Functional/RequestIdTest.php
+  s_19699a07889cad::t_e675b8c5b47ebe 8,11,18,20,26,30-34,37,40-51
+  s_19699a07889cad::t_0904c3a75140ae 1-6,9-10,12-17,19,21-25,27-29,35-36,38-39,65-77
+  s_19699a07889cad::t_93caebafa0cd97 7,52-64
+src/Shared/Logging/RequestIdProcessor.php
+  s_19699a07889cad::t_54f68eaafabd1f 1-34
+tests/Support/EndToEnd/ProbedResponse.php
+  s_19699a07889cad::t_53fc00e545f469 9,15,23-31,36,38-39,41-44,46-48,50-57
+  s_19699a07889cad::t_d421287ab4d249 1-8,10-14,16-21,32-35,37,40,45,49,58-59
+  s_19699a07889cad::t_e9a9f1fb694672 22
+src/Shared/RequestId/RequestIdHolder.php
+  s_19699a07889cad::t_b9f0f64e55cb13 1-27
+src/Shared/RequestId/RequestIdListener.php
+  s_19699a07889cad::t_b9f0f64e55cb13 1-7,9-35,43-44,47,50-53,55-58,71-72
+  s_19699a07889cad::t_54f68eaafabd1f 8,36-42,45-46,48-49,54,59-70
+docker/nginx/request-id.conf
+  s_19699a07889cad::t_555d75e79f4f23 1
+CLAUDE.md
+  s_19699a07889cad::t_c00544131e58b2 45
+.github/workflows/ci.yaml
+  s_19699a07889cad::t_5b316895cc2167 44-45
+tests/Shared/Unit/RequestIdListenerTest.php
+  s_19699a07889cad::t_e675b8c5b47ebe 1-101,103-106,108-109,111-112,126-143
+  s_19699a07889cad::t_14c4f8850571df 102,107,110,113-125
+tests/Shared/Unit/RequestIdProcessorTest.php
+  s_19699a07889cad::t_e675b8c5b47ebe 1-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "25bb55ee3bdae18836a8b38a7aab297ecf2b93e4",
+  "prompts": {},
+  "sessions": {
+    "s_19699a07889cad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "400d57f3-76ee-47c1-9ac8-c08de4ffde0e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    },
+    "s_cfa33f4979cb4d": {
+      "agent_id": {
+        "tool": "github-copilot-jetbrains",
+        "id": "1795095217413",
+        "model": "unknown"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
