@@ -1,0 +1,45 @@
+tools/phpstan/console-application.php
+  s_f0ac9461d0892d::t_da5aabdc3c1a62 1-10
+composer.json
+  s_f0ac9461d0892d::t_09216e5d07b4d9 59-61
+phpstan.dist.neon
+  s_f0ac9461d0892d::t_09216e5d07b4d9 10,13,17,19,22
+.dockerignore
+  s_f0ac9461d0892d::t_09216e5d07b4d9 24
+tools/phpstan/tests/Rule/DeclareStrictTypesRuleTest.php
+  s_cfa33f4979cb4d::t_47320bef64f6cc 5
+  s_f0ac9461d0892d::t_da5aabdc3c1a62 1-4,6-75
+tools/phpstan/object-manager.php
+  s_f0ac9461d0892d::t_da5aabdc3c1a62 1-12
+phpunit.dist.xml
+  s_f0ac9461d0892d::t_6347e0d8f3924b 45
+  s_f0ac9461d0892d::t_09216e5d07b4d9 29,43-44,56,59
+.php-cs-fixer.dist.php
+  s_f0ac9461d0892d::t_09216e5d07b4d9 7
+tools/phpstan/src/Rule/DeclareStrictTypesRule.php
+  s_f0ac9461d0892d::t_da5aabdc3c1a62 1-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7f2ee28a09b24ad76d6da29cbd74e00f450d0662",
+  "prompts": {},
+  "sessions": {
+    "s_cfa33f4979cb4d": {
+      "agent_id": {
+        "tool": "github-copilot-jetbrains",
+        "id": "1795095217413",
+        "model": "unknown"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    },
+    "s_f0ac9461d0892d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9342050c-030b-4c8e-b2e8-a3c4df4fda88",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
