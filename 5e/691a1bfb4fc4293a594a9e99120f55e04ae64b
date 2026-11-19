@@ -1,0 +1,50 @@
+tests/Architecture/LayerTest.php
+  s_a20ae2c0e93b08::t_abda60de14d037 33,109
+tests/Shared/Functional/RequestIdTest.php
+  s_a20ae2c0e93b08::t_fc81d92772ef03 7,75
+  s_a20ae2c0e93b08::t_a7b305f53d6a1b 11,23,26-27,41
+tests/Support/RequestIds.php
+  s_a20ae2c0e93b08::t_a7b305f53d6a1b 1-12
+tests/Shared/Unit/RequestIdProcessorTest.php
+  s_a20ae2c0e93b08::t_a7b305f53d6a1b 9,20,33
+  s_a20ae2c0e93b08::t_fc81d92772ef03 26
+tools/phpstan/tests/Architecture/ArchitectureRulesTest.php
+  s_a20ae2c0e93b08::t_abda60de14d037 22
+src/Shared/Logging/RequestIdProcessor.php
+  s_a20ae2c0e93b08::t_4e8e8a22af33d9 30
+  s_a20ae2c0e93b08::t_a7b305f53d6a1b 15
+src/Shared/RequestId/RequestIdListener.php
+  s_a20ae2c0e93b08::t_a7b305f53d6a1b 16
+docker/nginx/default.conf
+  s_a20ae2c0e93b08::t_b9665062bbe426 6-12
+tools/phpstan/tests/Architecture/Fixtures/Shared/RequestId/ProbeListenerReadsRequest.php
+  s_a20ae2c0e93b08::t_abda60de14d037 1-14
+CLAUDE.md
+  s_a20ae2c0e93b08::t_f0516cce1c2221 30
+tests/EndToEnd/NginxRequestIdTest.php
+  s_a20ae2c0e93b08::t_a7b305f53d6a1b 9,25,31,34,44,54-55,66
+.github/workflows/ci.yaml
+  s_a20ae2c0e93b08::t_b9665062bbe426 52-53
+bin/check-request-id-in-logs
+  s_a20ae2c0e93b08::t_8d738450d9d2ef 1-23
+tests/Shared/Unit/RequestIdListenerTest.php
+  s_a20ae2c0e93b08::t_a7b305f53d6a1b 9,38,40,57,69-70,92,99,106
+tools/phpstan/tests/Architecture/Fixtures/Shared/ErrorHandler/ProbeListenerUsesDoctrine.php
+  s_a20ae2c0e93b08::t_abda60de14d037 1-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5e691a1bfb4fc4293a594a9e99120f55e04ae64b",
+  "prompts": {},
+  "sessions": {
+    "s_a20ae2c0e93b08": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "062714c5-5148-43cf-9a89-057891122668",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
