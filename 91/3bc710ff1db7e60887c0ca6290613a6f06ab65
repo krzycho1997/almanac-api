@@ -1,0 +1,29 @@
+composer.json
+  s_a20ae2c0e93b08::t_5c3776ce7492a0 23
+tests/Shared/Unit/ProblemJsonErrorRendererTest.php
+  s_a20ae2c0e93b08::t_190b765f1bdc5a 41-45,47-49
+  s_a20ae2c0e93b08::t_a8c254da4eacb6 16,46
+src/Briefing/Exception/InvalidLocationException.php
+  s_a20ae2c0e93b08::t_bead7c64ff77f9 1-6,8-28
+  s_a20ae2c0e93b08::t_320177b0c5387c 7
+src/Shared/ErrorHandler/ProblemJsonErrorRenderer.php
+  s_a20ae2c0e93b08::t_190b765f1bdc5a 17-18
+composer.lock
+  s_a20ae2c0e93b08::t_2551eb829522ca 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "913bc710ff1db7e60887c0ca6290613a6f06ab65",
+  "prompts": {},
+  "sessions": {
+    "s_a20ae2c0e93b08": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "062714c5-5148-43cf-9a89-057891122668",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
