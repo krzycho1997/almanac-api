@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\PHPStan;
+namespace App\PHPStan\Rule;
 
 use PhpParser\Node;
 use PhpParser\Node\Scalar\Int_;
