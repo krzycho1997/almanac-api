@@ -32,6 +32,10 @@ jobs:
         run: docker compose run --rm --no-deps -T php composer install --no-interaction --no-progress
       - name: Run fast checks
         run: docker compose run --rm --no-deps -T php composer check:fast
+      - name: Build the prod image
+        run: docker build --target prod --tag almanac-php:prod .
+      - name: Check the prod image
+        run: bin/check-prod-image almanac-php:prod
 
   tests:
     runs-on: ubuntu-24.04

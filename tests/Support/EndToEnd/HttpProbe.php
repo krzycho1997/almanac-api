@@ -31,7 +31,23 @@ final readonly class HttpProbe
      */
     public function get(string $path, array $headers = []): ProbedResponse
     {
-        file_get_contents($this->baseUrl.$path, false, self::context($headers));
+        return $this->request(Request::METHOD_GET, $path, $headers, '');
+    }
+
+    /**
+     * @param array<string, string> $headers
+     */
+    public function post(string $path, string $content, array $headers = []): ProbedResponse
+    {
+        return $this->request(Request::METHOD_POST, $path, $headers, $content);
+    }
+
+    /**
+     * @param array<string, string> $headers
+     */
+    public function request(string $method, string $path, array $headers = [], string $content = ''): ProbedResponse
+    {
+        file_get_contents($this->baseUrl.$path, false, self::context($method, $headers, $content));
 
         return ProbedResponse::fromRawHeaders(http_get_last_response_headers() ?? []);
     }
@@ -41,11 +57,12 @@ final readonly class HttpProbe
      *
      * @return resource
      */
-    private static function context(array $headers)
+    private static function context(string $method, array $headers, string $content)
     {
         return stream_context_create(['http' => [
-            'method' => Request::METHOD_GET,
+            'method' => $method,
             'header' => self::headerLines($headers),
+            'content' => $content,
             'ignore_errors' => true,
             'follow_location' => 0,
         ]]);

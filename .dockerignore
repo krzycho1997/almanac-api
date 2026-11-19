@@ -13,6 +13,7 @@
 .gitignore
 .gitleaks.toml
 bin/check-env-keys
+bin/check-prod-image
 compose.yaml
 Dockerfile
 docker/nginx
@@ -23,3 +24,4 @@ var
 vendor
 tools
 CLAUDE.md
+.env.local.php
