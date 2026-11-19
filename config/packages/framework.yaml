@@ -4,3 +4,7 @@ framework:
 when@test:
     framework:
         test: true
+        exceptions:
+            App\Tests\Support\Controller\ExplicitlyLoggedConflict:
+                status_code: 409
+                log_level: warning

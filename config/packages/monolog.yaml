@@ -14,9 +14,15 @@ when@dev: &stderr_json
             request:
                 type: stream
                 path: php://stderr
+                level: notice
+                formatter: monolog.formatter.json
+                channels: [request]
+            doctrine:
+                type: stream
+                path: php://stderr
                 level: warning
                 formatter: monolog.formatter.json
-                channels: [request, doctrine]
+                channels: [doctrine]
             deprecation:
                 type: stream
                 path: php://stderr
@@ -34,7 +40,10 @@ when@test:
                 level: debug
             request:
                 type: 'null'
-                channels: [request, doctrine]
+                channels: [request]
+            doctrine:
+                type: 'null'
+                channels: [doctrine]
             deprecation:
                 type: 'null'
                 channels: [deprecation]
