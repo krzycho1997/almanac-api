@@ -1,0 +1,19 @@
+.github/pull_request_template.md
+  s_ac08c55301f6b2::t_ed9f0d4edcb1b3 1-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bdefd33737a0cfc7399f3c321e19a5a8e219bb37",
+  "prompts": {},
+  "sessions": {
+    "s_ac08c55301f6b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "183767d4-4ac2-49f4-83a1-ebc0de5caa5d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
