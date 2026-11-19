@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Kernel;
 
-require __DIR__.'/bootstrap.php';
+require dirname(__DIR__, 2).'/tests/bootstrap.php';
 
 $kernel = new Kernel('dev', true);
 $kernel->boot();

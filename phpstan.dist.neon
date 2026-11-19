@@ -7,15 +7,29 @@ parameters:
         - public
         - src
         - tests
+        - tools
     excludePaths:
         - config/reference.php
-        - tests/PHPStan/Unit/Fixtures
+        - tools/phpstan/tests/Architecture/Fixtures
+        - tools/phpstan/tests/Rule/Fixtures
     tmpDir: var/phpstan
+    phpat:
+        show_rule_names: true
     symfony:
         containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
-        consoleApplicationLoader: tests/console-application.php
+        consoleApplicationLoader: tools/phpstan/console-application.php
     doctrine:
-        objectManagerLoader: tests/object-manager.php
+        objectManagerLoader: tools/phpstan/object-manager.php
 
 rules:
-    - App\Tests\PHPStan\DeclareStrictTypesRule
+    - App\PHPStan\Rule\DeclareStrictTypesRule
+
+services:
+    -
+        class: App\Tests\Architecture\ModuleBoundaryTest
+        tags:
+            - phpat.test
+    -
+        class: App\Tests\Architecture\LayerTest
+        tags:
+            - phpat.test

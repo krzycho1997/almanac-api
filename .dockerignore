@@ -21,3 +21,5 @@ phpunit.dist.xml
 tests
 var
 vendor
+tools
+CLAUDE.md

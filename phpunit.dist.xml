@@ -26,6 +26,7 @@
     <testsuites>
         <testsuite name="unit">
             <directory>tests/*/Unit</directory>
+            <directory>tools/phpstan/tests</directory>
         </testsuite>
         <testsuite name="integration">
             <directory>tests/*/Integration</directory>
@@ -39,6 +40,21 @@
         <testsuite name="live">
             <directory>tests/Live</directory>
         </testsuite>
+        <testsuite name="phpstan">
+            <directory>tools/phpstan/tests</directory>
+        </testsuite>
+        <testsuite name="briefing">
+            <directory>tests/Briefing</directory>
+        </testsuite>
+        <testsuite name="identity">
+            <directory>tests/Identity</directory>
+        </testsuite>
+        <testsuite name="bookmark">
+            <directory>tests/Bookmark</directory>
+        </testsuite>
+        <testsuite name="shared">
+            <directory>tests/Shared</directory>
+        </testsuite>
     </testsuites>
 
     <source ignoreSuppressionOfDeprecations="true"
@@ -49,9 +65,11 @@
         <include>
             <directory>src</directory>
             <directory>tests</directory>
+            <directory>tools/phpstan</directory>
         </include>
         <exclude>
-            <directory>tests/PHPStan/Unit/Fixtures</directory>
+            <directory>tools/phpstan/tests/Architecture/Fixtures</directory>
+            <directory>tools/phpstan/tests/Rule/Fixtures</directory>
         </exclude>
         <deprecationTrigger>
             <method>Doctrine\Deprecations\Deprecation::trigger</method>

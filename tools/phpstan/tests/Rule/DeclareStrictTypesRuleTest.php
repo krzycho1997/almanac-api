@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\PHPStan\Unit;
+namespace App\PHPStan\Tests\Rule;
 
-use App\Tests\PHPStan\DeclareStrictTypesRule;
+use App\PHPStan\Rule\DeclareStrictTypesRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Testing\RuleTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
