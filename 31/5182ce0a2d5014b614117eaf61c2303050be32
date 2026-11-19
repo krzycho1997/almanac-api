@@ -1,0 +1,176 @@
+tests/Support/FunctionalTestCase.php
+  s_b6039d0ef75e59::t_2c833510a2b76a 14
+tests/Shared/Integration/LogRedactionTest.php
+  s_b6039d0ef75e59::t_a2a0bf5c7a0d0d 267-268,270
+  s_b6039d0ef75e59::t_2c2a75e49d540a 1-6,9,11-18,24-31,33-39,42-62,73-74,193-195,197-199,207-210,214-215,237-238,263-266,269,271-272
+  s_b6039d0ef75e59::t_9e69364a0be353 72
+  s_b6039d0ef75e59::t_037c647dad8888 40,63-71,206,211,216-220,222-233,235-236
+  s_a20ae2c0e93b08::t_f9770dff1b8464 7-8,10,19-23,32,41,75-123
+  s_a20ae2c0e93b08::t_de3a1d3ec19743 241
+  s_a20ae2c0e93b08::t_5defe5f95f699d 7-8,19-23,32,41,75-192,196,200-204,212,221,234,239-240,242-261
+  s_a20ae2c0e93b08::t_a7b305f53d6a1b 10,205,213
+  s_a20ae2c0e93b08::t_1275100f2d6293 262
+composer.json
+  s_a20ae2c0e93b08::t_d5bd611c1a1073 15
+  s_a20ae2c0e93b08::t_5c3776ce7492a0 23
+config/packages/monolog.yaml
+  s_b6039d0ef75e59::t_8eb403cf852247 53
+  s_b6039d0ef75e59::t_1361e04b35af33 4-5,19-20,22,24,26,35-36,38-39,42,46-50,52,54,56
+  s_b6039d0ef75e59::t_fe5d6336dd0299 7,13-15,17-18,21,28,30-31,34,37,41,43-45,51,66,78,84,95
+  s_b6039d0ef75e59::t_48ff2b69110bb1 6
+  s_a20ae2c0e93b08::t_f9770dff1b8464 8-12,16,23,25,27,29,32-33,40,55,57
+  s_a20ae2c0e93b08::t_a9485eabdfc152 8-12,16,23,25,27,29,32-33,40,55
+  s_a20ae2c0e93b08::t_2abf6edcfeae6c 57
+  s_a20ae2c0e93b08::t_bc1a0aecefcb3f 69-74,79,98-101
+src/Shared/Logging/AllowedLogContextProcessor.php
+  s_b6039d0ef75e59::t_190e62b758d24d 1-11,13-39
+  s_a20ae2c0e93b08::t_f9770dff1b8464 12
+  s_a20ae2c0e93b08::t_a9485eabdfc152 12
+tests/Shared/Integration/MonologHandlersTest.php
+  s_b6039d0ef75e59::t_e681abdc21a420 85-87,89,91,98
+  s_b6039d0ef75e59::t_599d6c0f5ad32f 1-6,9-10,15-17,21,26-30,32-33,35-45,65-67,69,71,75,100-102,104,150,152,160-161
+  s_a20ae2c0e93b08::t_f9770dff1b8464 7-8,11-14,18-20,22-25,31,34,46-64,68,70,72-74,76-77
+  s_a20ae2c0e93b08::t_de3a1d3ec19743 11,59,64,137,143,145
+  s_a20ae2c0e93b08::t_f4e70f8a2a62c9 7-8,12-14,18-20,22-25,31,34,46-58,60-63,68,70,72-74,76-84,88,90,92-97,99,103,105-136,138-142,144,146-149,151,153-159
+CLAUDE.md
+  s_b6039d0ef75e59::t_77f2e39e56d4d9 55
+  s_a20ae2c0e93b08::t_f0516cce1c2221 30
+config/services.yaml
+  s_b6039d0ef75e59::t_1361e04b35af33 23-26,28-29
+  s_a20ae2c0e93b08::t_f9770dff1b8464 27
+  s_a20ae2c0e93b08::t_cdacac20f21e92 15
+  s_a20ae2c0e93b08::t_3164d389ec97e6 16,21-22
+  s_a20ae2c0e93b08::t_65891d4812492e 10-14,17-20
+  s_a20ae2c0e93b08::t_4e8e8a22af33d9 27
+tests/Support/InteractsWithLogs.php
+  s_b6039d0ef75e59::t_2c833510a2b76a 1-25
+src/Shared/Logging/LogContextKey.php
+  s_b6039d0ef75e59::t_190e62b758d24d 1-29
+tests/Shared/Unit/AllowedLogContextProcessorTest.php
+  s_b6039d0ef75e59::t_599d6c0f5ad32f 1-45,49-59
+  s_a20ae2c0e93b08::t_f9770dff1b8464 46-48
+  s_a20ae2c0e93b08::t_e10bd8247cda6b 46-48
+tests/Shared/Integration/AllowedLogContextTest.php
+  s_b6039d0ef75e59::t_599d6c0f5ad32f 1-6,8-33,53-59,61-67,69-87
+  s_a20ae2c0e93b08::t_f9770dff1b8464 7,34-52,60
+  s_a20ae2c0e93b08::t_e10bd8247cda6b 7,34-49,60,68
+  s_a20ae2c0e93b08::t_de3a1d3ec19743 50-52
+src/Briefing/Location.php
+  s_a20ae2c0e93b08::t_65891d4812492e 1-6,9-27,29,31-39,41-43,45-55,57-62,74-75,77-79,85,87-97
+  s_a20ae2c0e93b08::t_c2b1aed6e97571 8,28,30,63-64,66-69,80-84,86
+  s_a20ae2c0e93b08::t_320177b0c5387c 7,40,44,56,65,73
+  s_a20ae2c0e93b08::t_97a8ffa9e36483 70-72,76
+.env.example
+  s_a20ae2c0e93b08::t_3164d389ec97e6 10
+  s_a20ae2c0e93b08::t_65891d4812492e 8-9
+tests/Briefing/Integration/DefaultLocationTest.php
+  s_a20ae2c0e93b08::t_cdacac20f21e92 15
+  s_a20ae2c0e93b08::t_b6e82fceca684d 1-14,16-17,19-20
+  s_a20ae2c0e93b08::t_d720f15f5a138b 18
+.env
+  s_a20ae2c0e93b08::t_3164d389ec97e6 18
+  s_a20ae2c0e93b08::t_65891d4812492e 15-17
+tests/Briefing/Unit/LocationTest.php
+  s_a20ae2c0e93b08::t_8bbd4c7001d1ed 79-84,140-145,157-162,165-183,185-203
+  s_a20ae2c0e93b08::t_e0a8d4d46c2722 1-6,8-13,18-35,37-65,67-78,85-89,91-97,99-103,105-109,111-118,121-134,136-137,204-205
+  s_a20ae2c0e93b08::t_b0994d4c751e75 36
+  s_a20ae2c0e93b08::t_d720f15f5a138b 110,135,138-139,147,164
+  s_a20ae2c0e93b08::t_320177b0c5387c 7,66,119,146,163,184
+  s_a20ae2c0e93b08::t_97a8ffa9e36483 14-17,90,98,104,120,148-156
+src/Briefing/Exception/InvalidLocationException.php
+  s_a20ae2c0e93b08::t_c2b1aed6e97571 1-6,8-28
+  s_a20ae2c0e93b08::t_bead7c64ff77f9 1-6,8-28
+  s_a20ae2c0e93b08::t_19c3d88ee3175d 7
+tests/Shared/Unit/ProblemJsonErrorRendererTest.php
+  s_a20ae2c0e93b08::t_190b765f1bdc5a 41-45,47-49
+  s_a20ae2c0e93b08::t_a8c254da4eacb6 16,46
+src/Shared/ErrorHandler/ProblemJsonErrorRenderer.php
+  s_a20ae2c0e93b08::t_190b765f1bdc5a 17-18
+composer.lock
+  s_a20ae2c0e93b08::t_2551eb829522ca 7
+tests/Support/ErrorHandler/ClientErrorInheritingTheErrorLevel.php
+  s_a20ae2c0e93b08::t_7cff579a950411 1-9
+tests/Support/ErrorHandler/LoggedAsError.php
+  s_a20ae2c0e93b08::t_7cff579a950411 1-13
+tests/Shared/Functional/ErrorFormatTest.php
+  s_a20ae2c0e93b08::t_9232153ae93af6 17-18
+  s_a20ae2c0e93b08::t_190b765f1bdc5a 7,39,58,83,113,117,124,128
+tests/Support/ErrorHandler/ClientErrorsLoggedAsError.php
+  s_a20ae2c0e93b08::t_7cff579a950411 1-19
+tests/Support/ErrorHandler/ClientErrorLoggedAsError.php
+  s_a20ae2c0e93b08::t_f5aa2a694d623b 1-19
+tests/Support/ErrorHandler/ClientErrorImplementingTheErrorLevel.php
+  s_a20ae2c0e93b08::t_7cff579a950411 1-16
+src/Kernel.php
+  s_a20ae2c0e93b08::t_e1a522e7ffd408 23-28,31-34
+tests/Shared/Unit/ClientErrorLevelErrorListenerTest.php
+  s_a20ae2c0e93b08::t_f5aa2a694d623b 10,32,53,56-58,61,65
+  s_a20ae2c0e93b08::t_7cff579a950411 8-9,59-60
+src/Shared/ErrorHandler/ClientErrorLevelErrorListener.php
+  s_a20ae2c0e93b08::t_f5aa2a694d623b 10,19,23,26,28,35,38,52-95
+tests/Architecture/LayerTest.php
+  s_a20ae2c0e93b08::t_abda60de14d037 33,109
+tests/Shared/Functional/RequestIdTest.php
+  s_a20ae2c0e93b08::t_fc81d92772ef03 7,75
+  s_a20ae2c0e93b08::t_a7b305f53d6a1b 11,23,26-27,41
+tests/Support/RequestIds.php
+  s_a20ae2c0e93b08::t_a7b305f53d6a1b 1-12
+tests/Shared/Unit/RequestIdProcessorTest.php
+  s_a20ae2c0e93b08::t_a7b305f53d6a1b 9,20,33
+  s_a20ae2c0e93b08::t_fc81d92772ef03 26
+tools/phpstan/tests/Architecture/ArchitectureRulesTest.php
+  s_a20ae2c0e93b08::t_abda60de14d037 22
+src/Shared/Logging/RequestIdProcessor.php
+  s_a20ae2c0e93b08::t_4e8e8a22af33d9 30
+  s_a20ae2c0e93b08::t_a7b305f53d6a1b 15
+src/Shared/RequestId/RequestIdListener.php
+  s_a20ae2c0e93b08::t_a7b305f53d6a1b 16
+docker/nginx/default.conf
+  s_a20ae2c0e93b08::t_b9665062bbe426 6-12
+tools/phpstan/tests/Architecture/Fixtures/Shared/RequestId/ProbeListenerReadsRequest.php
+  s_a20ae2c0e93b08::t_abda60de14d037 1-14
+tests/EndToEnd/NginxRequestIdTest.php
+  s_a20ae2c0e93b08::t_a7b305f53d6a1b 9,25,31,34,44,54-55,66
+.github/workflows/ci.yaml
+  s_a20ae2c0e93b08::t_b9665062bbe426 52-53
+bin/check-request-id-in-logs
+  s_a20ae2c0e93b08::t_8d738450d9d2ef 1-23
+tests/Shared/Unit/RequestIdListenerTest.php
+  s_a20ae2c0e93b08::t_a7b305f53d6a1b 9,38,40,57,69-70,92,99,106
+tools/phpstan/tests/Architecture/Fixtures/Shared/ErrorHandler/ProbeListenerUsesDoctrine.php
+  s_a20ae2c0e93b08::t_abda60de14d037 1-14
+.dockerignore
+  s_a20ae2c0e93b08::t_edab16bd810561 27
+Dockerfile
+  s_a20ae2c0e93b08::t_5c3776ce7492a0 40,49
+bin/check-prod-image
+  s_a20ae2c0e93b08::t_5c3776ce7492a0 17-19
+tests/Support/InspectedContainer.php
+  s_a20ae2c0e93b08::t_d316ba0acf29a3 1-33
+phpunit.dist.xml
+  s_a20ae2c0e93b08::t_d720f15f5a138b 25-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "315182ce0a2d5014b614117eaf61c2303050be32",
+  "prompts": {},
+  "sessions": {
+    "s_a20ae2c0e93b08": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "062714c5-5148-43cf-9a89-057891122668",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    },
+    "s_b6039d0ef75e59": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ede66ba3-bae7-47ab-843e-e3afbd8ed5c1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
