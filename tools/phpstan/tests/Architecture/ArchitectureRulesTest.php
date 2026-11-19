@@ -17,6 +17,16 @@ final class ArchitectureRulesTest extends TestCase
             'Briefing/ProbeUsesOtherModule.php' => ['phpat.modulesUseOtherModulesOnlyThroughContracts.Briefing'],
             'Briefing/ProbeUsesTestContract.php' => ['phpat.modulesUseOtherModulesOnlyThroughContracts.Briefing'],
             'Shared/ProbeUsesModule.php' => ['phpat.sharedDependsOnNoModule'],
+            'Briefing/Controller/ProbeControllerUsesDoctrine.php' => ['phpat.edgeOnlyTranslatesInputAndOutput'],
+            'Bookmark/Controller/ProbeControllerUsesDoctrineBridge.php' => ['phpat.edgeOnlyTranslatesInputAndOutput'],
+            'Briefing/ProbeServiceUsesHttp.php' => ['phpat.servicesAndExceptionsDoNotKnowHttp'],
+            'Briefing/ProbeServiceUsesEdge.php' => ['phpat.servicesAndExceptionsDoNotKnowHttp'],
+            'Identity/Exception/ProbeHttpException.php' => ['phpat.servicesAndExceptionsDoNotKnowHttp'],
+            'Bookmark/Contract/ProbeContractUsesInternal.php' => ['phpat.contractsDependOnlyOnContracts'],
+            'Bookmark/Contract/ProbeContractUsesDoctrineBridge.php' => ['phpat.modelAndContractsStayPure'],
+            'Briefing/Model/ProbeDayIdType.php' => ['phpat.modelAndContractsStayPure'],
+            'Briefing/Model/ProbeModelUsesEntity.php' => ['phpat.modelAndContractsStayPure'],
+            'Shared/ProbeNotFinal.php' => ['phpat.classesAreFinal'],
         ];
 
         // When

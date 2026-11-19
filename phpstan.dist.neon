@@ -29,3 +29,7 @@ services:
         class: App\Tests\Architecture\ModuleBoundaryTest
         tags:
             - phpat.test
+    -
+        class: App\Tests\Architecture\LayerTest
+        tags:
+            - phpat.test

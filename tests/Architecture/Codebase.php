@@ -45,6 +45,11 @@ final class Codebase
         return Selector::inNamespace(\sprintf('/^App\\\\%s\\\\%s(\\\\|$)/', self::alternation(self::topLevelNamespaces()), self::alternation($layers)), regex: true);
     }
 
+    public static function moduleRoot(): SelectorInterface
+    {
+        return Selector::inNamespace(\sprintf('/^App\\\\%s$/', self::alternation(self::topLevelNamespaces())), regex: true);
+    }
+
     /**
      * @return list<string>
      */
