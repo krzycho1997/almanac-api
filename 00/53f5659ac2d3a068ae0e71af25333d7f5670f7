@@ -1,0 +1,19 @@
+src/Shared/ErrorHandler/ProblemJsonErrorRenderer.php
+  s_19699a07889cad::t_32df2313d7fdcb 30-31,34,37,39-43,46,49,54-55,58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0053f5659ac2d3a068ae0e71af25333d7f5670f7",
+  "prompts": {},
+  "sessions": {
+    "s_19699a07889cad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "400d57f3-76ee-47c1-9ac8-c08de4ffde0e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
