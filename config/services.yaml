@@ -7,3 +7,10 @@ services:
 
     App\:
         resource: '../src/'
+
+    App\Shared\Logging\AllowedLogContextProcessor:
+        autoconfigure: false
+        tags:
+            - { name: monolog.processor, channel: app }
+            - { name: monolog.processor, channel: briefing }
+            - { name: monolog.processor, channel: identity }

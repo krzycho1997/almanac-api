@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Support;
 
-use Monolog\Handler\TestHandler;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
@@ -12,6 +11,7 @@ use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 abstract class FunctionalTestCase extends WebTestCase
 {
     use ClockSensitiveTrait;
+    use InteractsWithLogs;
 
     protected const string NOW = '2026-11-18 12:00:00';
     protected const string TIMEZONE = 'UTC';
@@ -24,16 +24,5 @@ abstract class FunctionalTestCase extends WebTestCase
 
         self::mockTime(new \DateTimeImmutable(self::NOW, new \DateTimeZone(self::TIMEZONE)));
         $this->client = self::createClient();
-    }
-
-    protected static function logHandler(): TestHandler
-    {
-        foreach (self::getContainer()->get('logger')->getHandlers() as $handler) {
-            if ($handler instanceof TestHandler) {
-                return $handler;
-            }
-        }
-
-        self::fail('The test environment logs to no Monolog TestHandler.');
     }
 }
