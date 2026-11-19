@@ -1,0 +1,57 @@
+tools/phpstan/tests/Architecture/ArchitectureRulesTest.php
+  s_f0ac9461d0892d::t_7b4319a816f7f6 20-29
+tools/phpstan/tests/Architecture/Fixtures/Tests/ProbeHelper.php
+  s_f0ac9461d0892d::t_312876350212b5 1-14
+tools/phpstan/tests/Architecture/Fixtures/Identity/Contract/ProbeUserIdType.php
+  s_f0ac9461d0892d::t_312876350212b5 1-11
+tools/phpstan/tests/Architecture/Fixtures/Shared/ProbeNotFinal.php
+  s_f0ac9461d0892d::t_312876350212b5 1-9
+tools/phpstan/tests/Architecture/Fixtures/Identity/Exception/ProbeHttpException.php
+  s_f0ac9461d0892d::t_312876350212b5 1-11
+tools/phpstan/tests/Architecture/Fixtures/Briefing/ProbeServiceUsesEdge.php
+  s_f0ac9461d0892d::t_312876350212b5 1-14
+tests/Architecture/LayerTest.php
+  s_f0ac9461d0892d::t_cbd1a8580cdfd4 20,24-27,29,38-43,46-50,59,62,71-72,75-78,80-81,94,104,106,109,111,114,116,119-120,123,125,128
+tests/Architecture/Codebase.php
+  s_f0ac9461d0892d::t_7ccedbb97a9011 48-52
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Command/ProbeCommand.php
+  s_f0ac9461d0892d::t_312876350212b5 1-9
+tools/phpstan/tests/Architecture/Fixtures/Identity/Contract/ProbeInterface.php
+  s_f0ac9461d0892d::t_312876350212b5 1-9
+tools/phpstan/tests/Architecture/Fixtures/Bookmark/Contract/ProbeContractUsesInternal.php
+  s_f0ac9461d0892d::t_312876350212b5 1-14
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Controller/ProbeControllerUsesDoctrine.php
+  s_f0ac9461d0892d::t_312876350212b5 1-14
+tools/phpstan/tests/Architecture/Fixtures/Bookmark/Controller/ProbeControllerUsesDoctrineBridge.php
+  s_f0ac9461d0892d::t_312876350212b5 1-14
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Model/ProbeModelUsesEntity.php
+  s_f0ac9461d0892d::t_312876350212b5 1-14
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Model/ProbeDayIdType.php
+  s_f0ac9461d0892d::t_312876350212b5 1-11
+tools/phpstan/tests/Architecture/Fixtures/Bookmark/Contract/ProbeContractUsesDoctrineBridge.php
+  s_f0ac9461d0892d::t_312876350212b5 1-14
+tools/phpstan/tests/Architecture/Fixtures/Shared/ProbeAbstract.php
+  s_f0ac9461d0892d::t_312876350212b5 1-9
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Entity/ProbeEntity.php
+  s_f0ac9461d0892d::t_312876350212b5 1-9
+tools/phpstan/tests/Architecture/Fixtures/Briefing/ProbeServiceUsesHttp.php
+  s_f0ac9461d0892d::t_312876350212b5 1-14
+tools/phpstan/tests/Architecture/Fixtures/Tests/Security/ProbeHelper.php
+  s_f0ac9461d0892d::t_312876350212b5 1-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7d19b3cbdc5686d901ab2ad7d117c727b179b25d",
+  "prompts": {},
+  "sessions": {
+    "s_f0ac9461d0892d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9342050c-030b-4c8e-b2e8-a3c4df4fda88",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
