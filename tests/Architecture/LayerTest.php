@@ -30,7 +30,7 @@ final class LayerTest
                 self::httpClient(),
                 Selector::classname('/^App\\\\Briefing\\\\Source\\\\.+Client$/', regex: true),
             )
-            ->because('controllers, commands, handlers, resolvers and security adapters call services, not storage or upstream clients')
+            ->because('controllers, commands, handlers, resolvers, security adapters and HTTP listeners call services, not storage or upstream clients')
             ->nonIgnorable();
     }
 
@@ -106,7 +106,7 @@ final class LayerTest
 
     private static function edge(): SelectorInterface
     {
-        return Codebase::layer('Controller', 'Command', 'MessageHandler', 'ValueResolver', 'Security');
+        return Codebase::layer('Controller', 'Command', 'MessageHandler', 'ValueResolver', 'Security', 'ErrorHandler', 'RequestId');
     }
 
     private static function doctrine(): SelectorInterface

@@ -45,6 +45,8 @@ jobs:
         run: docker compose up --build --wait --wait-timeout 300
       - name: Check the running app
         run: curl --fail-with-body --silent --show-error http://127.0.0.1:8080/api/health
+      - name: Check that the app logs carry the request id from nginx
+        run: bin/check-request-id-in-logs http://127.0.0.1:8080
       - name: Run all tests
         run: docker compose exec -T php composer test
       - name: Show container state and logs

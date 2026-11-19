@@ -27,7 +27,7 @@ Everything runs in the `php` container.
 
 ## Layers
 
-- Edge (`Controller`, `Command`, `MessageHandler`, `ValueResolver`, `Security`): input and output only, no repositories, Doctrine or upstream clients. Exception: `AccessTokenHandler`.
+- Edge (`Controller`, `Command`, `MessageHandler`, `ValueResolver`, `Security`, `ErrorHandler`, `RequestId`): input and output only, no repositories, Doctrine or upstream clients. Exception: `AccessTokenHandler`.
 - Services in the module root, `Briefing\CircuitBreaker`, `Briefing\Discovery` and every module's `Exception` know nothing about HTTP or the edge; status codes come from `framework.exceptions`, response bodies from `Mapper`.
 - Contracts depend only on contracts. `Briefing\Model` and contracts stay free of Doctrine (including `Symfony\Bridge\Doctrine`), HTTP, entities and sources; Doctrine `*IdType` classes in `Contract` are the exception.
 - Every class in `App` is `final`, except entities, abstract classes, interfaces, enums, traits and `Kernel`.
@@ -42,6 +42,7 @@ Custom PHPStan rules and loaders live in `tools/phpstan/` (`App\PHPStan`).
 - Every PHPUnit test has `// Given`, `// When`, `// Then` sections. Merge them where a split would be artificial (`// Given / When`, `// When / Then`, `// Then / When` for `expectException()`); drop `// Given` when there is nothing to prepare. phpat classes in `tests/Architecture/` are rule declarations, not PHPUnit tests, so they have no sections.
 - Write the functional test for an endpoint before the endpoint.
 - Upstream HTTP is always mocked (`MockHttpClient`); tests never hit the network, except the `live` suite.
+- The `e2e` suite sends real HTTP requests from the `php` container to nginx (`E2E_BASE_URL`, default `http://nginx`), so it needs the running stack; nginx behaviour (headers, limits) is tested there, not in CI scripts.
 - Use `ClockInterface` instead of `new \DateTimeImmutable()` in application code; functional tests freeze the clock in `FunctionalTestCase`.
 - Never delete, skip or weaken a test to make it pass. If a test looks wrong, stop and ask.
 

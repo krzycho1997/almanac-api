@@ -9,6 +9,7 @@ services:
     volumes:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro,z
       - ./docker/nginx/security-headers.conf:/etc/nginx/snippets/security-headers.conf:ro,z
+      - ./docker/nginx/request-id.conf:/etc/nginx/snippets/request-id.conf:ro,z
       - ./public:/srv/app/public:ro,z
 
   php:
