@@ -1,0 +1,59 @@
+tests/Support/FunctionalTestCase.php
+  s_b6039d0ef75e59::t_2c833510a2b76a 14
+tests/Shared/Integration/LogRedactionTest.php
+  s_b6039d0ef75e59::t_a2a0bf5c7a0d0d 118-119,121
+  s_b6039d0ef75e59::t_2c2a75e49d540a 1-32,34-55,66-79,82-85,87,89-90,112-117,120,122-123
+  s_b6039d0ef75e59::t_9e69364a0be353 65
+  s_b6039d0ef75e59::t_037c647dad8888 33,56-64,80-81,86,88,91-111
+composer.json
+  s_a20ae2c0e93b08::t_d5bd611c1a1073 15
+config/packages/monolog.yaml
+  s_b6039d0ef75e59::t_8eb403cf852247 41
+  s_b6039d0ef75e59::t_1361e04b35af33 4-5,14-15,17-19,24-25,27-28,30,34-38,40,42-44
+  s_b6039d0ef75e59::t_fe5d6336dd0299 7-13,16,20-23,26,29,31-33,39,45,54,60,66,77
+  s_b6039d0ef75e59::t_48ff2b69110bb1 6
+src/Shared/Logging/AllowedLogContextProcessor.php
+  s_b6039d0ef75e59::t_190e62b758d24d 1-39
+tests/Shared/Integration/MonologHandlersTest.php
+  s_b6039d0ef75e59::t_513f6d3851f106 42,46-48,50,69,71
+  s_b6039d0ef75e59::t_e681abdc21a420 49,51,54-65
+  s_b6039d0ef75e59::t_599d6c0f5ad32f 1-41,43-45,52-53,66-68,70,72-77
+CLAUDE.md
+  s_b6039d0ef75e59::t_77f2e39e56d4d9 55
+config/services.yaml
+  s_b6039d0ef75e59::t_1361e04b35af33 10-15
+tests/Support/InteractsWithLogs.php
+  s_b6039d0ef75e59::t_2c833510a2b76a 1-25
+src/Shared/Logging/LogContextKey.php
+  s_b6039d0ef75e59::t_190e62b758d24d 1-29
+tests/Shared/Unit/AllowedLogContextProcessorTest.php
+  s_b6039d0ef75e59::t_599d6c0f5ad32f 1-59
+tests/Shared/Integration/AllowedLogContextTest.php
+  s_b6039d0ef75e59::t_599d6c0f5ad32f 1-67
+composer.lock
+  s_a20ae2c0e93b08::t_b5992877297059 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b7a9bd45d07bfa1644ddd43f322a5869229a840d",
+  "prompts": {},
+  "sessions": {
+    "s_a20ae2c0e93b08": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "062714c5-5148-43cf-9a89-057891122668",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    },
+    "s_b6039d0ef75e59": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ede66ba3-bae7-47ab-843e-e3afbd8ed5c1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
