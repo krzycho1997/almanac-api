@@ -1,0 +1,56 @@
+tests/Support/FunctionalTestCase.php
+  s_b6039d0ef75e59::t_2c833510a2b76a 14
+tests/Shared/Integration/LogRedactionTest.php
+  s_b6039d0ef75e59::t_a2a0bf5c7a0d0d 267-268,270
+  s_b6039d0ef75e59::t_2c2a75e49d540a 1-6,9,11-18,24-31,33-39,42-62,73-74,193-195,197-199,207-210,214-215,237-238,263-266,269,271-272
+  s_b6039d0ef75e59::t_9e69364a0be353 72
+  s_b6039d0ef75e59::t_037c647dad8888 40,63-71,206,211,216-220,222-233,235-236
+composer.json
+  s_a20ae2c0e93b08::t_d5bd611c1a1073 15
+config/packages/monolog.yaml
+  s_b6039d0ef75e59::t_8eb403cf852247 53
+  s_b6039d0ef75e59::t_1361e04b35af33 4-5,19-20,22,24,26,35-36,38-39,42,46-50,52,54,56
+  s_b6039d0ef75e59::t_fe5d6336dd0299 7,13-15,17-18,21,28,30-31,34,37,41,43-45,51,66,72,78,89
+  s_b6039d0ef75e59::t_48ff2b69110bb1 6
+src/Shared/Logging/AllowedLogContextProcessor.php
+  s_b6039d0ef75e59::t_190e62b758d24d 1-11,13-39
+tests/Shared/Integration/MonologHandlersTest.php
+  s_b6039d0ef75e59::t_e681abdc21a420 85-87,89,91,98
+  s_b6039d0ef75e59::t_599d6c0f5ad32f 1-6,9-10,15-17,21,26-30,32-33,35-45,65-67,69,71,75,100-102,104,150,152,160-161
+CLAUDE.md
+  s_b6039d0ef75e59::t_77f2e39e56d4d9 55
+config/services.yaml
+  s_b6039d0ef75e59::t_1361e04b35af33 10-13,15-16
+tests/Support/InteractsWithLogs.php
+  s_b6039d0ef75e59::t_2c833510a2b76a 1-25
+src/Shared/Logging/LogContextKey.php
+  s_b6039d0ef75e59::t_190e62b758d24d 1-29
+tests/Shared/Unit/AllowedLogContextProcessorTest.php
+  s_b6039d0ef75e59::t_599d6c0f5ad32f 1-45,49-59
+tests/Shared/Integration/AllowedLogContextTest.php
+  s_b6039d0ef75e59::t_599d6c0f5ad32f 1-6,8-33,53-59,61-67,69-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7df110035d9d76a166322f916b03beff4a9ad488",
+  "prompts": {},
+  "sessions": {
+    "s_a20ae2c0e93b08": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "062714c5-5148-43cf-9a89-057891122668",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    },
+    "s_b6039d0ef75e59": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ede66ba3-bae7-47ab-843e-e3afbd8ed5c1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}

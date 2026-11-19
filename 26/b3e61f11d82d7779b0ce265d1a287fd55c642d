@@ -1,0 +1,47 @@
+src/Kernel.php
+  s_19699a07889cad::t_a1798988e6e5f7 7,19,35
+tests/Support/FunctionalTestCase.php
+  s_f27af18559dff4::t_7708624b625f54 7,28-37
+  s_f27af18559dff4::t_9709886b714a38 38
+config/packages/framework.yaml
+  s_19699a07889cad::t_7d18e86db5cbd9 7-10
+src/Shared/ErrorHandler/ClientErrorLevelErrorListener.php
+  s_19699a07889cad::t_a1798988e6e5f7 1-9,11-18,20-22,24-25,27,29-34,36-37,39-51,96
+tests/Support/Controller/HttpErrorController.php
+  s_19699a07889cad::t_a6e0873ef1b270 1-20
+tests/Support/Controller/ExplicitlyLoggedConflict.php
+  s_19699a07889cad::t_7d18e86db5cbd9 1-9
+tests/Support/Controller/ExplicitlyLoggedConflictController.php
+  s_19699a07889cad::t_7d18e86db5cbd9 1-18
+tests/Shared/Functional/ErrorFormatTest.php
+  s_f27af18559dff4::t_946224b579c1bf 9-10,63-66,68-72,75-82,84-85,88-89,142-146,148,152
+  s_19699a07889cad::t_7d18e86db5cbd9 100-109
+  s_19699a07889cad::t_332f922dc300dc 21-22,67,73-74,86-87,90-99,130-141,147,149-151
+tests/Shared/Unit/ClientErrorLevelErrorListenerTest.php
+  s_19699a07889cad::t_23569b0a9ad5a3 23,63
+  s_19699a07889cad::t_7d18e86db5cbd9 1-7,11-22,24-31,33-52,54-55,62,64,66-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "26b3e61f11d82d7779b0ce265d1a287fd55c642d",
+  "prompts": {},
+  "sessions": {
+    "s_19699a07889cad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "400d57f3-76ee-47c1-9ac8-c08de4ffde0e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    },
+    "s_f27af18559dff4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "72b0fb97-a8d1-40f8-8417-a35bc90c6063",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}

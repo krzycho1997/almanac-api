@@ -1,0 +1,44 @@
+Dockerfile
+  s_19699a07889cad::t_e242c5c6c79e60 7-8
+  s_19699a07889cad::t_14e304c3a3b606 38
+  s_19699a07889cad::t_1876d70d9253a4 4,20,22-23,30,32-33,42-48,50-51
+.github/workflows/ci.yaml
+  s_19699a07889cad::t_7aaf621b82fbc9 35-38
+tests/Support/EndToEnd/HttpProbe.php
+  s_19699a07889cad::t_05ce8a52c222bc 34,42,48
+  s_19699a07889cad::t_5eaad7984ac660 35-41,43-47,49-50,60,63,65
+.dockerignore
+  s_19699a07889cad::t_7aaf621b82fbc9 16
+docker/nginx/default.conf
+  s_19699a07889cad::t_690e6fff9e03bf 28-30
+bin/check-prod-image
+  s_19699a07889cad::t_3184d6c6299441 1-16,20-23
+compose.yaml
+  s_19699a07889cad::t_14e304c3a3b606 3-4
+  s_19699a07889cad::t_9a9c51b4bb2893 18-19,39-40,55-56
+tests/EndToEnd/NginxHardeningTest.php
+  s_19699a07889cad::t_d0542434df1b22 24-25,71,77,81-90
+  s_19699a07889cad::t_4cd41bc1267682 1-9,11-22,26,30,32-33,35-43,45-47,53-70,72-73,74-76,78-80,91-92
+  s_19699a07889cad::t_05ce8a52c222bc 10,23,27-29,31,34,44,48-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1eb4e3a3e57259c4358e90075c104020ee762b54",
+  "prompts": {},
+  "humans": {
+    "h_2da2cad4b4f8df": {
+      "author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  },
+  "sessions": {
+    "s_19699a07889cad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "400d57f3-76ee-47c1-9ac8-c08de4ffde0e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
