@@ -43,6 +43,18 @@
         <testsuite name="phpstan">
             <directory>tools/phpstan/tests</directory>
         </testsuite>
+        <testsuite name="briefing">
+            <directory>tests/Briefing</directory>
+        </testsuite>
+        <testsuite name="identity">
+            <directory>tests/Identity</directory>
+        </testsuite>
+        <testsuite name="bookmark">
+            <directory>tests/Bookmark</directory>
+        </testsuite>
+        <testsuite name="shared">
+            <directory>tests/Shared</directory>
+        </testsuite>
     </testsuites>
 
     <source ignoreSuppressionOfDeprecations="true"
