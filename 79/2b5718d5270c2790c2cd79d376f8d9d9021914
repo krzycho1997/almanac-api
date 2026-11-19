@@ -1,0 +1,30 @@
+phpunit.dist.xml
+  s_a20ae2c0e93b08::t_d720f15f5a138b 25-27
+src/Briefing/Location.php
+  s_a20ae2c0e93b08::t_320177b0c5387c 7,40,44,56,65,73
+  s_a20ae2c0e93b08::t_97a8ffa9e36483 70-72,76
+tests/Briefing/Unit/LocationTest.php
+  s_a20ae2c0e93b08::t_d720f15f5a138b 110,135,138-139,147,164
+  s_a20ae2c0e93b08::t_320177b0c5387c 7,66,119,146,163,184
+  s_a20ae2c0e93b08::t_97a8ffa9e36483 14-17,90,98,104,120,148-156
+tests/Briefing/Integration/DefaultLocationTest.php
+  s_a20ae2c0e93b08::t_d720f15f5a138b 18
+src/Briefing/Exception/InvalidLocationException.php
+  s_a20ae2c0e93b08::t_19c3d88ee3175d 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "792b5718d5270c2790c2cd79d376f8d9d9021914",
+  "prompts": {},
+  "sessions": {
+    "s_a20ae2c0e93b08": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "062714c5-5148-43cf-9a89-057891122668",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
