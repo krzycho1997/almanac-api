@@ -1,0 +1,51 @@
+tools/phpstan/tests/Architecture/Fixtures/Bookmark/ProbeUsesAllowed.php
+  s_f0ac9461d0892d::t_fc154ba9029a84 1-15
+tests/Architecture/Codebase.php
+  s_f0ac9461d0892d::t_7ccedbb97a9011 1-65
+tools/phpstan/tests/Architecture/Fixtures/Bookmark/ProbeSibling.php
+  s_f0ac9461d0892d::t_fc154ba9029a84 1-9
+tools/phpstan/tests/Architecture/Fixtures/Tests/Contract/ProbeFake.php
+  s_f0ac9461d0892d::t_fc154ba9029a84 1-9
+tests/Architecture/ModuleBoundaryTest.php
+  s_f0ac9461d0892d::t_5f4073860ddb71 19-20,22,26-29,40,43
+tools/phpstan/tests/Architecture/Fixtures/Identity/Contract/ProbeUserId.php
+  s_f0ac9461d0892d::t_fc154ba9029a84 1-9
+tools/phpstan/tests/Architecture/phpstan.neon
+  s_f0ac9461d0892d::t_fc154ba9029a84 1-6,10
+  s_f0ac9461d0892d::t_044f1b42dc32b2 7-9
+tools/phpstan/tests/Architecture/ArchitectureRulesTest.php
+  s_f0ac9461d0892d::t_19a516bd55c2d8 59
+  s_f0ac9461d0892d::t_c0fcea757ffd4b 1-58,60-70
+tools/phpstan/tests/Architecture/Fixtures/Identity/ProbeInternal.php
+  s_f0ac9461d0892d::t_fc154ba9029a84 1-9
+tools/phpstan/tests/Architecture/Fixtures/Briefing/ProbeUsesOtherModule.php
+  s_f0ac9461d0892d::t_fc154ba9029a84 1-14
+phpunit.dist.xml
+  s_f0ac9461d0892d::t_19a516bd55c2d8 71
+.php-cs-fixer.dist.php
+  s_f0ac9461d0892d::t_19a516bd55c2d8 7
+phpstan.dist.neon
+  s_f0ac9461d0892d::t_19a516bd55c2d8 13
+tools/phpstan/tests/Architecture/Fixtures/Shared/ProbeValue.php
+  s_f0ac9461d0892d::t_fc154ba9029a84 1-9
+tools/phpstan/tests/Architecture/Fixtures/Briefing/ProbeUsesTestContract.php
+  s_f0ac9461d0892d::t_fc154ba9029a84 1-14
+tools/phpstan/tests/Architecture/Fixtures/Shared/ProbeUsesModule.php
+  s_f0ac9461d0892d::t_fc154ba9029a84 1-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bfd194fe0c25fafacf690ce06d0fda4fb9399a91",
+  "prompts": {},
+  "sessions": {
+    "s_f0ac9461d0892d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9342050c-030b-4c8e-b2e8-a3c4df4fda88",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
