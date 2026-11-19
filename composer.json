@@ -25,6 +25,7 @@
         "dama/doctrine-test-bundle": "^8.8",
         "friendsofphp/php-cs-fixer": "^3.95",
         "osteel/openapi-httpfoundation-testing": "^0.15",
+        "phpat/phpat": "^0.12",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.3",
         "phpstan/phpstan-deprecation-rules": "^2.0",

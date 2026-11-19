@@ -10,8 +10,11 @@ parameters:
         - tools
     excludePaths:
         - config/reference.php
+        - tools/phpstan/tests/Architecture/Fixtures
         - tools/phpstan/tests/Rule/Fixtures
     tmpDir: var/phpstan
+    phpat:
+        show_rule_names: true
     symfony:
         containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
         consoleApplicationLoader: tools/phpstan/console-application.php
@@ -20,3 +23,9 @@ parameters:
 
 rules:
     - App\PHPStan\Rule\DeclareStrictTypesRule
+
+services:
+    -
+        class: App\Tests\Architecture\ModuleBoundaryTest
+        tags:
+            - phpat.test

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 $finder = new PhpCsFixer\Finder()
     ->in(__DIR__)
-    ->exclude(['var', 'vendor', 'tools/phpstan/tests/Rule/Fixtures'])
+    ->exclude(['var', 'vendor', 'tools/phpstan/tests/Architecture/Fixtures', 'tools/phpstan/tests/Rule/Fixtures'])
     ->notPath(['config/reference.php'])
     ->append([__DIR__.'/bin/console']);
 

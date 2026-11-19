@@ -1,0 +1,10 @@
+includes:
+    - ../../../../phpstan.dist.neon
+
+parameters:
+    paths!:
+        - Fixtures
+    excludePaths!:
+        analyse: []
+        analyseAndScan: []
+    tmpDir: ../../../../var/phpstan-architecture

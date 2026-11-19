@@ -68,6 +68,7 @@
             <directory>tools/phpstan</directory>
         </include>
         <exclude>
+            <directory>tools/phpstan/tests/Architecture/Fixtures</directory>
             <directory>tools/phpstan/tests/Rule/Fixtures</directory>
         </exclude>
         <deprecationTrigger>
