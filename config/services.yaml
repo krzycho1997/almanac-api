@@ -46,6 +46,10 @@ when@test:
         app.briefing.retry_delay_ms: 0
 
     services:
+        test.App\Briefing\Source\UpstreamResponseDecoder:
+            alias: App\Briefing\Source\UpstreamResponseDecoder
+            public: true
+
         App\Tests\Support\Briefing\UpstreamMockResponseFactory:
             public: true
             arguments:
