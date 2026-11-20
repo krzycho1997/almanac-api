@@ -29,11 +29,13 @@ final class BriefingControllerTest extends FunctionalTestCase
     private const string CONTENT_TYPE = 'Content-Type';
     private const string URN = 'urn:uuid:';
     private const string BRIEFING_CHANNEL = 'briefing';
+    private const string HISTORY_DAY = '03-15';
+    private const array FRESH = ['status' => 'ok', 'fetchedAt' => '2026-11-18T12:00:00Z', 'stale' => false];
 
     public function testBuildsTheBriefingFromThePictureOfTheDay(): void
     {
         // Given
-        self::upstream()->respondWith(UpstreamMock::create()->apod()->fixture('apod/passthrough-2024-03-15.json'));
+        self::upstream()->respondWith(self::scenario()->apod()->fixture('apod/passthrough-2024-03-15.json'));
 
         // When
         $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
@@ -44,7 +46,7 @@ final class BriefingControllerTest extends FunctionalTestCase
         $briefing = self::json($this->client->getResponse()->getContent());
         self::assertSame(self::PICTURE_DAY, $briefing['date']);
         self::assertSame(['latitude' => 48.86, 'longitude' => 2.35, 'name' => 'Paris', 'isDefault' => true], $briefing['location']);
-        self::assertSame(['apod' => ['status' => 'ok', 'fetchedAt' => '2026-11-18T12:00:00Z', 'stale' => false]], $briefing['sources']);
+        self::assertSame(['apod' => self::FRESH, 'onThisDay' => self::FRESH], $briefing['sources']);
         self::assertSame([], $briefing['missing']);
         self::assertSame(
             [
@@ -60,10 +62,28 @@ final class BriefingControllerTest extends FunctionalTestCase
         self::assertStringStartsWith('Big, beautiful spiral galaxy NGC 1055', self::apodExplanation($briefing));
     }
 
+    public function testBuildsTheBriefingWithThisDayInHistory(): void
+    {
+        // Given
+        self::upstream()->respondWith(self::scenario()->apod()->fixture('apod/passthrough-2024-03-15.json'));
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        /** @var array{events: list<array{year: int, text: string, pages: list<array{title: string, url: string, thumbnail: ?string}>}>, births: list<array{year: int, name: string, description: ?string, url: string, thumbnail: ?string}>, deaths: list<array{year: int, name: string, description: ?string, url: string, thumbnail: ?string}>} $history */
+        $history = self::json($this->client->getResponse()->getContent());
+        self::assertSame([20, 20, 20], [\count($history['events']), \count($history['births']), \count($history['deaths'])]);
+        self::assertSame([1990, 'Farzad Bazoft', 'https://en.wikipedia.org/wiki/Farzad_Bazoft'], [$history['events'][0]['year'], $history['events'][0]['pages'][0]['title'], $history['events'][0]['pages'][0]['url']]);
+        self::assertSame([2005, 'Rodri Mendoza', 'Spanish footballer', 'https://en.wikipedia.org/wiki/Rodri_Mendoza'], [$history['births'][0]['year'], $history['births'][0]['name'], $history['births'][0]['description'], $history['births'][0]['url']]);
+        self::assertSame([-44, 'Julius Caesar'], [$history['deaths'][19]['year'], $history['deaths'][19]['name']]);
+    }
+
     public function testBuildsTheBriefingForAPictureWithoutMediaOrCredit(): void
     {
         // Given
-        self::upstream()->respondWith(UpstreamMock::create()->apod()->fixture('apod/passthrough-first-picture-1995-06-16.json'));
+        self::upstream()->respondWith(self::scenario()->apod()->fixture('apod/passthrough-first-picture-1995-06-16.json'));
 
         // When
         $this->client->request(Request::METHOD_GET, self::BRIEFING.'1995-06-16');
@@ -79,7 +99,7 @@ final class BriefingControllerTest extends FunctionalTestCase
     public function testBuildsTheBriefingForTheGivenPlace(string $query, float $latitude, float $longitude): void
     {
         // Given
-        self::upstream()->respondWith(UpstreamMock::create()->apod()->fixture('apod/passthrough-2024-03-15.json'));
+        self::upstream()->respondWith(self::scenario()->apod()->fixture('apod/passthrough-2024-03-15.json'));
 
         // When
         $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY.$query);
@@ -176,7 +196,7 @@ final class BriefingControllerTest extends FunctionalTestCase
     public function testSendsLinksAndAccentsWithoutEscaping(string $fixture, string $date, string $text): void
     {
         // Given
-        self::upstream()->respondWith(UpstreamMock::create()->apod()->fixture($fixture));
+        self::upstream()->respondWith(self::scenario()->apod()->fixture($fixture));
 
         // When
         $this->client->request(Request::METHOD_GET, self::BRIEFING.$date);
@@ -197,8 +217,9 @@ final class BriefingControllerTest extends FunctionalTestCase
     public function testServesSeveralRequestsFromOneUpstreamScenario(): void
     {
         // Given
-        self::upstream()->respondWith(UpstreamMock::create()
+        self::upstream()->respondWith(self::scenario()
             ->apod()->fixture('apod/passthrough-2024-03-15.json')
+            ->onThisDayFrom(self::HISTORY_DAY)
             ->apod()->fixture('apod/passthrough-first-picture-1995-06-16.json'));
         $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
 
@@ -207,7 +228,7 @@ final class BriefingControllerTest extends FunctionalTestCase
 
         // Then
         self::assertResponseIsSuccessful();
-        self::assertCount(2, self::upstream()->served());
+        self::assertCount(8, self::upstream()->served());
     }
 
     #[DataProvider('briefingsWithoutData')]
@@ -230,8 +251,8 @@ final class BriefingControllerTest extends FunctionalTestCase
      */
     public static function briefingsWithoutData(): iterable
     {
-        yield 'picture unavailable' => [self::PICTURE_DAY, UpstreamMock::create()->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)];
-        yield 'day the picture does not cover yet' => ['2026-11-25', UpstreamMock::create()];
+        yield 'picture and history unavailable' => [self::PICTURE_DAY, self::onThisDayRejected()->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)];
+        yield 'picture not published yet, history unavailable' => ['2026-11-25', self::onThisDayRejected()];
     }
 
     /**
@@ -259,19 +280,22 @@ final class BriefingControllerTest extends FunctionalTestCase
      */
     public static function failedPictures(): iterable
     {
-        yield 'server error twice' => [UpstreamMock::create()->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE), Level::Warning, 'Source apod fetch failed: unavailable', ['kind' => 'unavailable', 'httpStatus' => 503]];
-        yield 'refused key' => [UpstreamMock::create()->apod()->status(Response::HTTP_FORBIDDEN), Level::Error, 'Source apod fetch failed: misconfigured', ['kind' => 'misconfigured', 'httpStatus' => 403]];
-        yield 'rejected date' => [UpstreamMock::create()->apod()->fixture('apod/date-out-of-range.json')->status(Response::HTTP_BAD_REQUEST), Level::Notice, 'Source apod fetch failed: rejected', ['kind' => 'rejected', 'httpStatus' => 400]];
-        yield 'NASA placeholder' => [UpstreamMock::create()->apod()->fixture('apod/placeholder-2026-11-18.json'), Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['title'], 'reason' => 'placeholder']];
-        yield 'picture of another date' => [UpstreamMock::create()->apod()->fixture('apod/passthrough-first-picture-1995-06-16.json'), Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['date'], 'reason' => 'other_date']];
-        yield 'title without text' => [UpstreamMock::create()->apod()->json('{"date":"2024-03-15","title":"<b> </b>","explanation":"Gas","media_type":"image"}'), Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['title'], 'reason' => 'no_text']];
-        yield 'date that is not a calendar date' => [UpstreamMock::create()->apod()->json('{"date":"2024-02-30","title":"Pillars","explanation":"Gas","media_type":"image"}'), Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['date'], 'reason' => 'invalid_value']];
-        yield 'body of the wrong shape' => [UpstreamMock::create()->apod(), Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['date', 'title', 'explanation', 'mediaType'], 'reason' => 'wrong_shape']];
-        yield 'network error twice' => [UpstreamMock::create()->apod()->networkError()->apod()->networkError(), Level::Warning, 'Source apod fetch failed: unavailable', ['kind' => 'unavailable', 'errorType' => 'TransportException']];
+        yield 'server error twice' => [self::scenario()->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE), Level::Warning, 'Source apod fetch failed: unavailable', ['kind' => 'unavailable', 'httpStatus' => 503]];
+        yield 'refused key' => [self::scenario()->apod()->status(Response::HTTP_FORBIDDEN), Level::Error, 'Source apod fetch failed: misconfigured', ['kind' => 'misconfigured', 'httpStatus' => 403]];
+        yield 'rejected date' => [self::scenario()->apod()->fixture('apod/date-out-of-range.json')->status(Response::HTTP_BAD_REQUEST), Level::Notice, 'Source apod fetch failed: rejected', ['kind' => 'rejected', 'httpStatus' => 400]];
+        yield 'NASA placeholder' => [self::scenario()->apod()->fixture('apod/placeholder-2026-11-18.json'), Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['title'], 'reason' => 'placeholder']];
+        yield 'picture of another date' => [self::scenario()->apod()->fixture('apod/passthrough-first-picture-1995-06-16.json'), Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['date'], 'reason' => 'other_date']];
+        yield 'title without text' => [self::scenario()->apod()->json('{"date":"2024-03-15","title":"<b> </b>","explanation":"Gas","media_type":"image"}'), Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['title'], 'reason' => 'no_text']];
+        yield 'date that is not a calendar date' => [self::scenario()->apod()->json('{"date":"2024-02-30","title":"Pillars","explanation":"Gas","media_type":"image"}'), Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['date'], 'reason' => 'invalid_value']];
+        yield 'body of the wrong shape' => [self::scenario()->apod(), Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['date', 'title', 'explanation', 'mediaType'], 'reason' => 'wrong_shape']];
+        yield 'network error twice' => [self::scenario()->apod()->networkError()->apod()->networkError(), Level::Warning, 'Source apod fetch failed: unavailable', ['kind' => 'unavailable', 'errorType' => 'TransportException']];
     }
 
-    public function testLogsNothingOnTheBriefingChannelForADayNoSourceCovers(): void
+    public function testLogsNothingOnTheBriefingChannelForADayThePictureDoesNotCover(): void
     {
+        // Given
+        self::upstream()->respondWith(self::scenario());
+
         // When
         $this->client->request(Request::METHOD_GET, self::BRIEFING.'2026-11-25');
 
@@ -401,5 +425,18 @@ final class BriefingControllerTest extends FunctionalTestCase
         self::assertIsString($briefing['apod']['explanation']);
 
         return $briefing['apod']['explanation'];
+    }
+
+    private static function scenario(): UpstreamMock
+    {
+        return UpstreamMock::create()->onThisDayFrom(self::HISTORY_DAY);
+    }
+
+    private static function onThisDayRejected(): UpstreamMock
+    {
+        return UpstreamMock::create()
+            ->onThisDay()->status(Response::HTTP_NOT_FOUND)
+            ->onThisDay()->status(Response::HTTP_NOT_FOUND)
+            ->onThisDay()->status(Response::HTTP_NOT_FOUND);
     }
 }

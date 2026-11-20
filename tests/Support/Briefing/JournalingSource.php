@@ -49,7 +49,7 @@ final readonly class JournalingSource implements Source, SourceClient
         $this->journal->record(self::REQUEST.$this->name->value);
         $response = new MockHttpClient(new MockResponse(self::BODY))->request(Request::METHOD_GET, self::URL);
 
-        return new PendingFetch($response, $this->settle(...), $this->clock);
+        return new PendingFetch([$response], $this->settle(...), $this->clock);
     }
 
     private function settle(): SourcePayload

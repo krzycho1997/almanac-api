@@ -20,6 +20,8 @@ final readonly class UpstreamMock
     private const string FIXTURES = __DIR__.'/../../Fixtures/upstream/';
     private const string CONTENT_TYPE = 'Content-Type';
     private const string JSON = 'application/json';
+    private const array ON_THIS_DAY_LISTS = ['selected', 'births', 'deaths'];
+    private const string ON_THIS_DAY_FIXTURE = 'on_this_day/%s-%s.json';
     private const string PICK_THE_UPSTREAM_FIRST = 'Pick the upstream first, e.g. UpstreamMock::create()->apod().';
 
     /**
@@ -44,6 +46,17 @@ final readonly class UpstreamMock
     public function onThisDay(): self
     {
         return $this->nextResponseFrom(SourceName::OnThisDay);
+    }
+
+    public function onThisDayFrom(string $monthDay): self
+    {
+        $scenario = $this;
+
+        foreach (self::ON_THIS_DAY_LISTS as $list) {
+            $scenario = $scenario->onThisDay()->fixture(\sprintf(self::ON_THIS_DAY_FIXTURE, $list, $monthDay));
+        }
+
+        return $scenario;
     }
 
     public function weather(): self

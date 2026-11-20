@@ -13,4 +13,5 @@ enum PayloadDefect: string
     case OtherDate = 'other_date';
     case NoText = 'no_text';
     case NotACalendarDate = 'not_a_calendar_date';
+    case NoEntries = 'no_entries';
 }

@@ -19,10 +19,11 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 final readonly class PendingFetch
 {
     /**
-     * @param \Closure(ResponseInterface): SourcePayload $map
+     * @param non-empty-list<ResponseInterface> $responses
+     * @param \Closure(): SourcePayload         $map
      */
     public function __construct(
-        private ResponseInterface $response,
+        private array $responses,
         private \Closure $map,
         private ClockInterface $clock,
     ) {
@@ -31,29 +32,44 @@ final readonly class PendingFetch
     public function resolve(SourceName $source): SourceResult
     {
         try {
-            return $this->resultFor($source, $this->response->getStatusCode());
+            return $this->firstFailure($source) ?? $this->mapped($source);
         } catch (TransportExceptionInterface $exception) {
             return SourceResult::failed($source, FailureKind::Unavailable, cause: FailureCause::of($exception));
+        } finally {
+            $this->cancelAll();
         }
     }
 
-    private function resultFor(SourceName $source, int $status): SourceResult
+    private function firstFailure(SourceName $source): ?SourceResult
     {
-        if (self::isSuccessful($status)) {
-            return $this->mapped($source, $status);
+        foreach ($this->responses as $response) {
+            $status = $response->getStatusCode();
+
+            if (self::isSuccessful($status)) {
+                continue;
+            }
+
+            return $this->failure($source, $response, $status);
         }
 
+        return null;
+    }
+
+    private function failure(SourceName $source, ResponseInterface $response, int $status): SourceResult
+    {
         if (Response::HTTP_TOO_MANY_REQUESTS === $status) {
-            return SourceResult::failed($source, FailureKind::RateLimited, $status, $this->retryAt());
+            return SourceResult::failed($source, FailureKind::RateLimited, $status, $this->retryAt($response));
         }
 
         return SourceResult::failed($source, self::failureKindFor($status), $status);
     }
 
-    private function mapped(SourceName $source, int $status): SourceResult
+    private function mapped(SourceName $source): SourceResult
     {
+        $status = $this->commonStatus();
+
         try {
-            return SourceResult::ok($source, ($this->map)($this->response));
+            return SourceResult::ok($source, ($this->map)());
         } catch (DecodingExceptionInterface|InvalidUpstreamPayloadException|\JsonException $exception) {
             return SourceResult::failed($source, FailureKind::InvalidPayload, $status, cause: FailureCause::of($exception));
         }
@@ -95,9 +111,27 @@ final readonly class PendingFetch
         return $status >= Response::HTTP_MULTIPLE_CHOICES && $status < Response::HTTP_BAD_REQUEST;
     }
 
-    private function retryAt(): ?\DateTimeImmutable
+    private function commonStatus(): ?int
     {
-        $retryAfter = $this->retryAfterHeader();
+        $statuses = array_unique(array_map(static fn (ResponseInterface $response): int => $response->getStatusCode(), $this->responses));
+
+        if (1 === \count($statuses)) {
+            return array_first($statuses);
+        }
+
+        return null;
+    }
+
+    private function cancelAll(): void
+    {
+        foreach ($this->responses as $response) {
+            $response->cancel();
+        }
+    }
+
+    private function retryAt(ResponseInterface $response): ?\DateTimeImmutable
+    {
+        $retryAfter = self::retryAfterHeader($response);
 
         if (null === $retryAfter) {
             return null;
@@ -106,8 +140,8 @@ final readonly class PendingFetch
         return RetryAfter::parse($retryAfter, $this->clock->now());
     }
 
-    private function retryAfterHeader(): ?string
+    private static function retryAfterHeader(ResponseInterface $response): ?string
     {
-        return $this->response->getHeaders(false)[RetryAfter::HEADER][0] ?? null;
+        return $response->getHeaders(false)[RetryAfter::HEADER][0] ?? null;
     }
 }

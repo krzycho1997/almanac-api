@@ -8,6 +8,7 @@ final readonly class SourcesDto
 {
     public function __construct(
         public SourceStatusDto $apod,
+        public SourceStatusDto $onThisDay,
     ) {
     }
 }

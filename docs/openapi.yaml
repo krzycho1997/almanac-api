@@ -132,7 +132,7 @@ components:
     Briefing:
       type: object
       additionalProperties: false
-      required: [date, location, sources, missing, apod]
+      required: [date, location, sources, missing, apod, events, births, deaths]
       properties:
         date:
           type: string
@@ -142,9 +142,11 @@ components:
         sources:
           type: object
           additionalProperties: false
-          required: [apod]
+          required: [apod, onThisDay]
           properties:
             apod:
+              $ref: '#/components/schemas/SourceStatus'
+            onThisDay:
               $ref: '#/components/schemas/SourceStatus'
         missing:
           type: array
@@ -157,6 +159,21 @@ components:
           allOf:
             - $ref: '#/components/schemas/Apod'
           nullable: true
+        events:
+          type: array
+          description: Selected events of this day in history, in the order Wikipedia lists them; empty when On This Day has no data.
+          items:
+            $ref: '#/components/schemas/Event'
+        births:
+          type: array
+          description: People born on this day, as Wikipedia lists them; empty when On This Day has no data.
+          items:
+            $ref: '#/components/schemas/Person'
+        deaths:
+          type: array
+          description: People who died on this day, as Wikipedia lists them; empty when On This Day has no data.
+          items:
+            $ref: '#/components/schemas/Person'
     Location:
       type: object
       additionalProperties: false
@@ -177,7 +194,7 @@ components:
           type: boolean
     SourceKey:
       type: string
-      enum: [apod]
+      enum: [apod, onThisDay]
     SourceStatus:
       type: object
       oneOf:
@@ -250,6 +267,58 @@ components:
           nullable: true
         credit:
           type: string
+          nullable: true
+    Event:
+      type: object
+      additionalProperties: false
+      required: [year, text, pages]
+      properties:
+        year:
+          type: integer
+          description: Negative for years BC.
+          example: 1990
+        text:
+          type: string
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Page'
+    Person:
+      type: object
+      additionalProperties: false
+      required: [year, name, description, url, thumbnail]
+      properties:
+        year:
+          type: integer
+          description: Negative for years BC.
+          example: 1947
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        url:
+          type: string
+          format: uri
+          nullable: true
+          description: The person's Wikipedia page; null when no page of the entry is about this person.
+        thumbnail:
+          type: string
+          format: uri
+          nullable: true
+    Page:
+      type: object
+      additionalProperties: false
+      required: [title, url, thumbnail]
+      properties:
+        title:
+          type: string
+        url:
+          type: string
+          format: uri
+        thumbnail:
+          type: string
+          format: uri
           nullable: true
     Health:
       type: object
