@@ -1,0 +1,53 @@
+src/Briefing/Exception/SourceDefinitionException.php
+  s_02e4949da5212d::t_22a6b47ede86da 1-12,14,16,18-19,21,33-34
+  s_02e4949da5212d::t_6d8d2248a8909d 13,15,17,20,22-32
+src/Kernel.php
+  s_02e4949da5212d::t_22a6b47ede86da 7,23-26
+  s_02e4949da5212d::t_0da5cb549c763a 27
+src/Briefing/Source/OnThisDay/OnThisDaySource.php
+  s_02e4949da5212d::t_6d8d2248a8909d 13-14,22
+tests/Briefing/Unit/DependencyInjection/OneSourcePerNamePassTest.php
+  s_02e4949da5212d::t_b159fc3db4b830 14,16,19,28-29,53,56-57,59-60,64,72-95,104-124,127
+  s_02e4949da5212d::t_5414b7099c791a 1-13,15,17-18,20-27,30-45,47-52,54-55,58,61,97-103,125-126,128-141
+  s_02e4949da5212d::t_cdfff918e1e746 46,62-63,65-71,96
+tests/Support/Briefing/AnotherApodSource.php
+  s_02e4949da5212d::t_5414b7099c791a 1-12,15-16,18-24
+  s_02e4949da5212d::t_b159fc3db4b830 13-14,17
+tests/Briefing/Unit/BriefingAggregatorTest.php
+  s_02e4949da5212d::t_5414b7099c791a 72-74,76-81,94-95
+  s_02e4949da5212d::t_b159fc3db4b830 20,67-71,75,82-93
+tests/Support/Briefing/NamelessSource.php
+  s_02e4949da5212d::t_b159fc3db4b830 1-22
+src/Briefing/DependencyInjection/OneSourcePerNamePass.php
+  s_02e4949da5212d::t_22a6b47ede86da 1-9,11-12,14-17,20,22-23,25-26,28-33,35,37,39,41-42,44-47,55-56,66,85,89,109-110,112-114,116,118,120-122,124,126-127
+  s_02e4949da5212d::t_da7ae64dc8f974 86-88,90-97
+  s_02e4949da5212d::t_c5e9ed9adb600e 49-53
+  s_02e4949da5212d::t_6d8d2248a8909d 10,13,18-19,21,24,27,34,36,38,40,43,48,54,57-65,67-84,98-108,111,115,117,119,123,125
+tests/Briefing/Integration/SourceRegistryTest.php
+  s_02e4949da5212d::t_5414b7099c791a 1-6,10-11,14,16,19,21,24,27-28,36-42,46-47,49,60-62,64,67,70,74,85-86
+  s_02e4949da5212d::t_b159fc3db4b830 7,9,12-13,15,17-18,20,22-23,25-26,32,43-45,48,50-59,63,65-66,68-69,71-73,75-80,84
+  s_02e4949da5212d::t_9531e4de75e01b 81-83
+  s_02e4949da5212d::t_cdfff918e1e746 8,29-31,33-35
+src/Briefing/Source/Weather/WeatherSource.php
+  s_02e4949da5212d::t_6d8d2248a8909d 13-14,22
+src/Briefing/Source/Apod/ApodSource.php
+  s_02e4949da5212d::t_6d8d2248a8909d 13-14,22
+src/Briefing/BriefingAggregator.php
+  s_02e4949da5212d::t_5414b7099c791a 31-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a3c9024c0953ba56176574fd03adf7de82d1d44e",
+  "prompts": {},
+  "sessions": {
+    "s_02e4949da5212d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "05351d01-d85c-422b-9e54-d8b1b82336a5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
