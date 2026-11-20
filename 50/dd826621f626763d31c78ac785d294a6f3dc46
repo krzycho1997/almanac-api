@@ -1,0 +1,64 @@
+src/Briefing/Source/Apod/ApodApiResponse.php
+  s_a463f0f3bbc4ea::t_94e774b32eb5b6 18
+src/Briefing/Source/PendingFetch.php
+  s_fed034d574131b::t_0e913fb9b8be8b 98
+  s_89a6959e63ff2b::t_ac5245a5686840 98
+tests/Briefing/Unit/Source/PendingFetchTest.php
+  s_fed034d574131b::t_f6a138fe4565de 153-154
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "50dd826621f626763d31c78ac785d294a6f3dc46",
+  "prompts": {},
+  "sessions": {
+    "s_02e4949da5212d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "05351d01-d85c-422b-9e54-d8b1b82336a5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    },
+    "s_335dc6c63fad2a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3a42bf51-54e9-49fb-a184-2cae8a3d0827",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    },
+    "s_74e023d9fce783": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "68e7658b-8e77-472f-a5da-7f2a4a796910",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    },
+    "s_89a6959e63ff2b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c620ad75-83cf-42de-8bca-bb40a5261762",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    },
+    "s_a463f0f3bbc4ea": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e80e7e02-debb-4938-91ba-befdb4b4d71a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    },
+    "s_fed034d574131b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a219eb1-3a68-425a-9ad2-3f6e3c13ed58",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
