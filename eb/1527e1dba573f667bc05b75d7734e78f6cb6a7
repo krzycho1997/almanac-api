@@ -1,0 +1,25 @@
+src/Shared/Logging/ConsoleInputRedactingProcessor.php
+  s_ecd702649c3f02::t_adb21afedd76fa 88-101
+  s_ecd702649c3f02::t_c9c665b914ce29 69-73
+tests/Shared/Integration/ConsoleLogTest.php
+  s_ecd702649c3f02::t_adb21afedd76fa 92-139
+src/Shared/Logging/ConsoleInputErrorLevelProcessor.php
+  s_ecd702649c3f02::t_adb21afedd76fa 11,14-15,25,28-30,44-45,48
+  s_ecd702649c3f02::t_6a97e052bc7ed9 1-10,12-13,16-24,26-27,31-43,46-47,49-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "eb1527e1dba573f667bc05b75d7734e78f6cb6a7",
+  "prompts": {},
+  "sessions": {
+    "s_ecd702649c3f02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79d0416-bbd9-40b6-9497-5f9421576080",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
