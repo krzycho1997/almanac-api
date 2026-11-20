@@ -1,0 +1,32 @@
+src/Briefing/Source/PlainText.php
+  s_02e4949da5212d::t_c7ff5a5bcbb362 9
+tests/Briefing/Unit/Source/PlainTextTest.php
+  s_02e4949da5212d::t_8f22e70ceb0964 1-35
+src/Briefing/Source/OnThisDay/OnThisDayMapper.php
+  s_02e4949da5212d::t_c7ff5a5bcbb362 34,117,246-249
+  s_02e4949da5212d::t_57af8eb286d3e0 250-254
+tests/Briefing/Unit/Source/Apod/ApodMapperTest.php
+  s_02e4949da5212d::t_c07bd40c129e0a 154
+tests/Briefing/Unit/Source/OnThisDay/OnThisDayMapperTest.php
+  s_02e4949da5212d::t_0b82d0308a2b31 43-69
+tests/Architecture/LayerTest.php
+  s_02e4949da5212d::t_0bdea3f6c48d8d 157-158
+config/packages/doctrine.yaml
+  s_02e4949da5212d::t_9b7d19af90b341 14,16-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9e49b279c28ad3253750fbf9387abb05d036d523",
+  "prompts": {},
+  "sessions": {
+    "s_02e4949da5212d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "05351d01-d85c-422b-9e54-d8b1b82336a5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
