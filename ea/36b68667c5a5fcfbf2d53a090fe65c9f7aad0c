@@ -1,0 +1,21 @@
+src/Briefing/Source/Apod/ApodApiResponse.php
+  s_a463f0f3bbc4ea::t_0755930d0014d1 13
+tests/Briefing/Integration/Source/Apod/ApodClientTest.php
+  s_a463f0f3bbc4ea::t_0755930d0014d1 181
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ea36b68667c5a5fcfbf2d53a090fe65c9f7aad0c",
+  "prompts": {},
+  "sessions": {
+    "s_a463f0f3bbc4ea": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e80e7e02-debb-4938-91ba-befdb4b4d71a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
