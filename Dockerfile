@@ -38,7 +38,7 @@ RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-pr
 COPY . .
 RUN composer dump-autoload --no-dev --classmap-authoritative \
     && composer dump-env prod \
-    && php bin/console cache:warmup \
+    && DATABASE_URL='postgresql://warmup@localhost:5432/warmup' REDIS_URL='redis://localhost:6379' php bin/console cache:warmup \
     && chmod -R go-w /srv/app
 
 

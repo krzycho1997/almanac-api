@@ -2,6 +2,25 @@
 set -eu
 
 max_attempts=60
+required_in_prod="APP_SECRET DATABASE_URL REDIS_URL NASA_API_KEY"
+
+require_runtime_settings() {
+    if [ "${APP_ENV:-dev}" != prod ]; then
+        return
+    fi
+
+    missing=""
+    for name in $required_in_prod; do
+        if [ -z "$(printenv "$name" || true)" ]; then
+            missing="$missing $name"
+        fi
+    done
+
+    if [ -n "$missing" ]; then
+        echo "entrypoint: set these environment variables:$missing" >&2
+        exit 1
+    fi
+}
 
 install_dependencies() {
     if [ "${APP_ENV:-dev}" != prod ]; then
@@ -33,10 +52,15 @@ migrate() {
     fi
 }
 
+if [ "$#" -eq 0 ] || [ "${1#-}" != "$1" ]; then
+    set -- php-fpm "$@"
+fi
+
 if [ "$1" != php-fpm ]; then
     exec "$@"
 fi
 
+require_runtime_settings
 install_dependencies
 wait_for_database
 migrate

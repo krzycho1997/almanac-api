@@ -2,8 +2,9 @@
 set -eu
 
 image=${1:?usage: bin/check-prod-image IMAGE}
+runtime_settings="APP_SECRET DATABASE_URL REDIS_URL NASA_API_KEY"
 
-docker run --rm --entrypoint sh "$image" -c '
+docker run --rm --entrypoint sh -e RUNTIME_SETTINGS="$runtime_settings" "$image" -c '
     status=0
     fail() { echo "check-prod-image: $1" >&2; status=1; }
 
@@ -17,7 +18,26 @@ docker run --rm --entrypoint sh "$image" -c '
     php -r "exit(ini_get(\"opcache.preload\") === \"/srv/app/config/preload.php\" ? 0 : 1);" || fail "opcache.preload is not set"
     ls var/cache/prod/*.preload.php >/dev/null 2>&1 || fail "the warmed cache has no preload file"
     [ -f .env.local.php ] || fail "the env is not dumped to .env.local.php"
+    php -r "\$env = require \".env.local.php\"; foreach (explode(\" \", getenv(\"RUNTIME_SETTINGS\")) as \$name) { if (\"\" === (\$env[\$name] ?? \"\")) { continue; } exit(1); }" || fail "the dumped env has a default for a runtime setting"
     php bin/console about --env=prod | grep -Eq "Debug +false" || fail "the kernel is not in prod without debug"
 
     exit "$status"
 '
+
+refuses_to_start() {
+    if output=$(docker run --rm "$image" "$@" 2>&1); then
+        echo "check-prod-image: php-fpm starts without the runtime settings (arguments: $*)" >&2
+        exit 1
+    fi
+
+    case $output in
+        *"set these environment variables: $runtime_settings"*) ;;
+        *)
+            echo "check-prod-image: the entrypoint does not name the missing runtime settings (arguments: $*): $output" >&2
+            exit 1
+            ;;
+    esac
+}
+
+refuses_to_start
+refuses_to_start -t

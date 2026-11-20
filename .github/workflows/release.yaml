@@ -1,0 +1,245 @@
+name: Release
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Push an image tagged with the commit SHA and draft a release
+        type: boolean
+        default: false
+
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+  RELEASE: ${{ github.event_name == 'push' }}
+  PUBLISH: ${{ github.event_name == 'push' || inputs.publish }}
+
+jobs:
+  origin:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      newest: ${{ steps.newest.outputs.newest }}
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check that the commit is on main
+        if: env.PUBLISH == 'true'
+        run: git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+      - name: Check whether the tag is the newest release
+        id: newest
+        if: env.RELEASE == 'true'
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          newest="$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-version:refname | head -n 1)"
+          if [ "$newest" = "$TAG" ]; then
+            echo "newest=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "newest=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  ci:
+    needs: origin
+    uses: ./.github/workflows/ci.yaml
+    permissions:
+      contents: read
+
+  image:
+    needs: [origin, ci]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+      security-events: write
+    env:
+      LOCAL_IMAGE: almanac-php:prod
+      TRIVY_IMAGE: docker.io/aquasec/trivy:0.76.2@sha256:8f6bb947dbc528902e11f2f5be52f7b519f6a39d5d148f41166f2040499768fb
+      GRYPE_IMAGE: docker.io/anchore/grype:v0.104.0@sha256:e4e8ddb34f01da61a7b25155dcd71a1851802077a564b624c61f2f534d9c9c0b
+    outputs:
+      digest: ${{ steps.push.outputs.digest }}
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Compute tags and labels
+        id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=semver,pattern={{version}},enable=${{ github.event_name == 'push' }}
+            type=semver,pattern={{major}}.{{minor}},enable=${{ github.event_name == 'push' }}
+            type=sha,format=long
+          flavor: latest=${{ needs.origin.outputs.newest == 'true' }}
+          labels: |
+            org.opencontainers.image.title=Almanac API
+            org.opencontainers.image.description=Daily briefing API on Symfony, PHP-FPM only
+      - name: Log in to GHCR
+        if: env.PUBLISH == 'true'
+        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push the image of this commit
+        id: push
+        if: env.PUBLISH == 'true'
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          target: prod
+          platforms: linux/amd64
+          push: true
+          provenance: mode=max
+          sbom: true
+          tags: ${{ env.IMAGE }}:sha-${{ github.sha }}
+          labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+      - name: Build the image locally
+        if: env.PUBLISH != 'true'
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          target: prod
+          platforms: linux/amd64
+          load: true
+          provenance: false
+          sbom: false
+          tags: ${{ env.LOCAL_IMAGE }}
+      - name: Choose the image under test
+        env:
+          DIGEST: ${{ steps.push.outputs.digest }}
+        run: |
+          if [ "$PUBLISH" = true ]; then
+            docker pull --quiet "$IMAGE@$DIGEST"
+            echo "SUBJECT=$IMAGE@$DIGEST" >> "$GITHUB_ENV"
+          else
+            echo "SUBJECT=$LOCAL_IMAGE" >> "$GITHUB_ENV"
+          fi
+          mkdir -p "$RUNNER_TEMP/trivy"
+      - name: Check the prod image
+        id: check
+        run: bin/check-prod-image "$SUBJECT"
+      - name: Fail on fixable high or critical vulnerabilities in the image
+        run: >-
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$RUNNER_TEMP/trivy:/root/.cache/trivy" "$TRIVY_IMAGE"
+          image --quiet --exit-code 1 --ignore-unfixed --severity HIGH,CRITICAL --scanners vuln,secret "$SUBJECT"
+      - name: Write the full vulnerability report
+        id: report
+        if: ${{ !cancelled() && steps.check.outcome == 'success' }}
+        run: >-
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$RUNNER_TEMP/trivy:/root/.cache/trivy" -v "$RUNNER_TEMP:/out" "$TRIVY_IMAGE"
+          image --quiet --skip-db-update --format sarif --output /out/trivy.sarif "$SUBJECT"
+      - name: Export the SBOM
+        if: env.PUBLISH == 'true'
+        env:
+          DIGEST: ${{ steps.push.outputs.digest }}
+        run: docker buildx imagetools inspect "$IMAGE@$DIGEST" --format '{{ json .SBOM.SPDX }}' > "$RUNNER_TEMP/sbom.spdx.json"
+      - name: Fail on fixable high or critical vulnerabilities in the SBOM
+        if: env.PUBLISH == 'true'
+        run: docker run --rm -v "$RUNNER_TEMP:/out" "$GRYPE_IMAGE" sbom:/out/sbom.spdx.json --only-fixed --fail-on high
+      - name: Upload the report to code scanning
+        if: ${{ !cancelled() && steps.report.outcome == 'success' && env.PUBLISH == 'true' }}
+        uses: github/codeql-action/upload-sarif@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          sarif_file: ${{ runner.temp }}/trivy.sarif
+          category: trivy-image
+      - name: Attest the build provenance
+        if: env.PUBLISH == 'true'
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-name: ${{ env.IMAGE }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
+      - name: Tag the checked image with the release version
+        if: env.RELEASE == 'true'
+        env:
+          DIGEST: ${{ steps.push.outputs.digest }}
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          args=()
+          while read -r tag; do
+            args+=(--tag "$tag")
+          done <<< "$TAGS"
+          docker buildx imagetools create --prefer-index=false "${args[@]}" "$IMAGE@$DIGEST"
+          while read -r tag; do
+            tagged=$(docker buildx imagetools inspect "$tag" --format '{{ .Manifest.Digest }}')
+            if [ "$tagged" != "$DIGEST" ]; then
+              echo "release: $tag points to $tagged, not the checked $DIGEST" >&2
+              exit 1
+            fi
+          done <<< "$TAGS"
+      - name: Keep the release assets
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-assets
+          path: |
+            ${{ runner.temp }}/trivy.sarif
+            ${{ runner.temp }}/sbom.spdx.json
+          if-no-files-found: ${{ env.PUBLISH == 'true' && 'error' || 'warn' }}
+
+  release:
+    needs: [origin, image]
+    if: github.event_name == 'push' || inputs.publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      DIGEST: ${{ needs.image.outputs.digest }}
+    steps:
+      - name: Fetch the release assets
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-assets
+          path: assets
+      - name: Write the release header
+        run: |
+          {
+            echo "Image: \`$IMAGE@$DIGEST\`"
+            echo
+            echo '```bash'
+            echo "docker pull $IMAGE@$DIGEST"
+            echo "gh attestation verify oci://$IMAGE@$DIGEST -R $GITHUB_REPOSITORY"
+            echo '```'
+            echo
+          } > header.md
+          cat >> header.md <<'NOTES'
+          The image runs PHP-FPM; serve it through a web server such as the one in `docker/nginx`.
+
+          Set `APP_SECRET`, `DATABASE_URL`, `REDIS_URL` and `NASA_API_KEY`: the container does not start without them.
+          NOTES
+      - name: Create the GitHub release
+        if: env.RELEASE == 'true'
+        env:
+          NEWEST: ${{ needs.origin.outputs.newest }}
+        run: gh release create "$GITHUB_REF_NAME" --verify-tag --latest="$NEWEST" --generate-notes --notes-file header.md assets/sbom.spdx.json assets/trivy.sarif
+      - name: Draft the release of this commit
+        if: env.RELEASE != 'true'
+        run: gh release create "dry-run-${GITHUB_SHA::12}" --draft --target "$GITHUB_SHA" --title "Dry run ${GITHUB_SHA::12}" --generate-notes --notes-file header.md assets/sbom.spdx.json assets/trivy.sarif
