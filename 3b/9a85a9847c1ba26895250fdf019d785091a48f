@@ -1,0 +1,75 @@
+tests/Fixtures/upstream/open_meteo/recorded.json
+  s_02e4949da5212d::t_d09f02acc4b5eb 83,89,95
+  s_02e4949da5212d::t_ddee4ec6f55d09 1-5,12-16,23-27,34-38,45-49,56-60,67-71,78-82,84-88,90-94,96-97
+  s_02e4949da5212d::t_a6f5175ac4dc88 6-11,17-22,28-33,39-44,50-55,61-66,72-77
+tests/Briefing/Unit/Recording/ShortRetryAfterTest.php
+  s_02e4949da5212d::t_d5035d87a5f852 1-48
+tests/Fixtures/upstream/README.md
+  s_02e4949da5212d::t_22aab0e4c6eefa 7-11
+  s_02e4949da5212d::t_36ea520dc98773 5-6,12
+tests/Briefing/Unit/UpstreamFixturesManifestTest.php
+  s_02e4949da5212d::t_ea1e5fb22856cf 1-15,17,19-25,28-31,35-37,40-44,46-51,53-55,67-69,71-72,74-75,87-100,103-106,108,111-128
+  s_02e4949da5212d::t_d5035d87a5f852 16,78-86
+  s_02e4949da5212d::t_aa754a268aa581 18,26-27,32-34,38-39,45,52,56-66,70,73,76-77,101-102,107,109-110
+tests/Support/Briefing/Recording/Recording.php
+  s_02e4949da5212d::t_f78204d22977cc 1-11
+tests/Support/Briefing/Recording/ShortRetryAfter.php
+  s_02e4949da5212d::t_d63e7b4da461d0 1-45
+tests/Support/Briefing/Recording/Trim.php
+  s_02e4949da5212d::t_22b7170c1423a8 18,27,31-32,36,38-41,43,46,48-56,59,61,63-67,71,73-93,95-96,99-100,104,110-111,114-158
+  s_02e4949da5212d::t_f78204d22977cc 1-17,19-26,28-30,33-35,37,42,44-45,47,57-58,60,62,68-70,72,94,97-98,101-103,105-109,112-113,159-160
+tests/Live/Briefing/UpstreamFixturesTest.php
+  s_02e4949da5212d::t_ea1e5fb22856cf 1-6,9,12-14,17,19-21,23,28-32,34-36,38-39,41-47,53,57-70,72-73,88-89,91,96,99-101,107,109-110
+  s_02e4949da5212d::t_ef5899940cea82 7-8,10-11,15-16,18,22,24-27,33,37,40,48-52,54-56,71,76,78-79,81,83-87,90,92-95,97-98,102-106,108
+  s_02e4949da5212d::t_6b201f43623a7a 74-75,77,80,82
+tests/Briefing/Unit/Recording/TrimTest.php
+  s_02e4949da5212d::t_e3324175c571b6 1-87
+tests/Briefing/Integration/UpstreamFixturesClientTest.php
+  s_02e4949da5212d::t_aa754a268aa581 1-45
+tests/Support/Briefing/Recording/FixtureFiles.php
+  s_02e4949da5212d::t_7303bbd759bd37 90-94,101,103,110-111
+  s_02e4949da5212d::t_d09f02acc4b5eb 19-20,68-69,71-72,74,78,161
+  s_02e4949da5212d::t_ea1e5fb22856cf 1-6,8-9,11,13-15,18,22-26,32-36,38,40-41,43,45,56-60,62,80-84,86,88-89,113-117,119,121,125,127-131,133-134,137-141,144-150,152-160,162,188,190-191
+  s_02e4949da5212d::t_d63e7b4da461d0 7,10,12,16-17,21,27-31,37,39,42,44,46-55,61,63-67,70,73,75-77,79,85,87,95-100,102,104-109,112,118,120,122-124,126,132,135-136,142-143,151,163-187,189
+tests/Support/Briefing/Recording/Comparison.php
+  s_02e4949da5212d::t_425001567f793e 1-11
+tests/Support/Briefing/Recording/ClientCall.php
+  s_02e4949da5212d::t_425001567f793e 1-47
+tests/Support/Briefing/Recording/ProbesClients.php
+  s_02e4949da5212d::t_ef5899940cea82 1-31
+tests/Support/Briefing/Recording/UpstreamFixtures.php
+  s_02e4949da5212d::t_f78204d22977cc 1-6,8-14,16-17,19-43,48,51,58-65,71,79-85,94-101,112,120-121,123,125,127-128
+  s_02e4949da5212d::t_425001567f793e 7,15,18,44-47,49-50,52-57,66-70,72-78,86-93,102-111,113-119,122,124,126
+tests/Fixtures/upstream/apod/recorded.json
+  s_02e4949da5212d::t_a6f5175ac4dc88 12-15,21-24,30-33
+  s_02e4949da5212d::t_ddee4ec6f55d09 1-5,7-11,16-20,25-29,34-38,40-41
+  s_02e4949da5212d::t_d09f02acc4b5eb 6,39
+tests/Support/Briefing/Recording/UpstreamFixture.php
+  s_02e4949da5212d::t_f78204d22977cc 1-14,17-22,28-34
+  s_02e4949da5212d::t_425001567f793e 15-16,23-27
+tests/Fixtures/upstream/on_this_day/recorded.json
+  s_02e4949da5212d::t_ddee4ec6f55d09 1-5,10-14,19-23,28-29
+  s_02e4949da5212d::t_a6f5175ac4dc88 6-9,15-18,24-27
+tests/Support/Briefing/Recording/ClientProbe.php
+  s_02e4949da5212d::t_d63e7b4da461d0 1-14,16-43,45-102
+  s_02e4949da5212d::t_ef5899940cea82 15,44
+tests/Briefing/Unit/Recording/FixtureFilesTest.php
+  s_02e4949da5212d::t_e3324175c571b6 1-40,45-115
+  s_02e4949da5212d::t_65e53629836234 41-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3b9a85a9847c1ba26895250fdf019d785091a48f",
+  "prompts": {},
+  "sessions": {
+    "s_02e4949da5212d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "05351d01-d85c-422b-9e54-d8b1b82336a5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
