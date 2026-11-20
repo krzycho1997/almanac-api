@@ -1,0 +1,23 @@
+tests/Briefing/Integration/Repository/SnapshotReadingTest.php
+  s_4da5374f6e605f::t_5e43c0ec1acea0 14,19-22,36,106-121,218-232
+  s_4da5374f6e605f::t_137452fbec227f 233
+src/Briefing/Repository/SourceSnapshotRepository.php
+  s_4da5374f6e605f::t_cc277e2c644967 7-8,19,23-26,28,31-34,76,78,93,102,132,143,157,159,162-170,174-175,179,184,186-187,194,196,199,201-202,206,208,210,214,216
+  s_4da5374f6e605f::t_ff8d49b56ce275 161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "41b408d93e86c7e6acb7f6eac0de67fa2be1498e",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
