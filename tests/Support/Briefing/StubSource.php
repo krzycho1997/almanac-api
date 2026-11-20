@@ -12,6 +12,8 @@ use App\Briefing\SourceName;
 
 final readonly class StubSource implements Source, SourceClient
 {
+    use KeepsFinalSnapshotsByDate;
+
     /**
      * @param \Closure(): PendingFetch $request
      */

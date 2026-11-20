@@ -10,6 +10,8 @@ use App\Briefing\SourceName;
 
 final readonly class NamelessSource implements Source
 {
+    use KeepsFinalSnapshotsByDate;
+
     public function name(): SourceName
     {
         return SourceName::Apod;

@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 final readonly class JournalingSource implements Source, SourceClient
 {
+    use KeepsFinalSnapshotsByDate;
+
     private const string URL = 'https://upstream.test/resource';
     private const string BODY = '{}';
     private const string REQUEST = 'request ';
