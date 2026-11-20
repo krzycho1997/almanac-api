@@ -18,6 +18,7 @@ use App\Briefing\Dto\Response\SourceKey;
 use App\Briefing\Dto\Response\SourceNotApplicableDto;
 use App\Briefing\Dto\Response\SourceOkDto;
 use App\Briefing\Dto\Response\SourcesDto;
+use App\Briefing\Dto\Response\SourceStaleDto;
 use App\Briefing\Dto\Response\WeatherDto;
 use App\Briefing\Dto\Response\WeatherKindValue;
 use App\Briefing\FailureKind;
@@ -55,7 +56,7 @@ final class BriefingResponseMapperTest extends TestCase
             new Attribution('Wikipedia', 'https://en.wikipedia.org/', 'CC BY-SA 4.0', 'https://creativecommons.org/licenses/by-sa/4.0/', true, null),
         );
         $weather = new DailyWeather(WeatherKind::Final, 'Europe/Warsaw', 1.2, 6.8, 0.4, 18.0, 3, '2026-11-05T06:44:00+01:00', '2026-11-05T16:02:00+01:00', 33480, new Attribution('Open-Meteo', 'https://open-meteo.com/', 'CC BY 4.0', 'https://creativecommons.org/licenses/by/4.0/', true, 'Generated using Copernicus Climate Change Service information'));
-        $briefing = BriefingResultBuilder::create()->ok(SourceName::Apod, $picture)->ok(SourceName::OnThisDay, $history)->ok(SourceName::Weather, $weather)->checkedAt(self::CHECKED_AT)->build();
+        $briefing = BriefingResultBuilder::create()->ok(SourceName::Apod, $picture)->ok(SourceName::OnThisDay, $history)->ok(SourceName::Weather, $weather)->attemptedAt(self::CHECKED_AT)->build();
         $ok = new SourceOkDto(new \DateTimeImmutable(self::CHECKED_AT), false);
 
         // When
@@ -110,7 +111,7 @@ final class BriefingResponseMapperTest extends TestCase
     public function testMapsAFailedSourceAsMissingWithItsError(FailureKind $kind, SourceError $expectedError): void
     {
         // Given
-        $briefing = BriefingResultBuilder::create()->failed(SourceName::Apod, $kind)->checkedAt(self::CHECKED_AT)->build();
+        $briefing = BriefingResultBuilder::create()->failed(SourceName::Apod, $kind)->attemptedAt(self::CHECKED_AT)->build();
 
         // When
         $response = new BriefingResponseMapper()->create($briefing);
@@ -131,6 +132,20 @@ final class BriefingResponseMapperTest extends TestCase
         yield 'rejected' => [FailureKind::Rejected, SourceError::Rejected];
         yield 'misconfigured' => [FailureKind::Misconfigured, SourceError::Misconfigured];
         yield 'invalid payload' => [FailureKind::InvalidPayload, SourceError::InvalidPayload];
+    }
+
+    public function testMapsTheLastGoodDataOfAFailedRefreshAsStale(): void
+    {
+        // Given
+        $briefing = BriefingResultBuilder::create()->stale(SourceName::Weather, SourcePayloads::dailyWeather(), '2026-11-18T09:00:00Z', FailureKind::Unavailable)->attemptedAt(self::CHECKED_AT)->build();
+
+        // When
+        $response = new BriefingResponseMapper()->create($briefing);
+
+        // Then
+        self::assertEquals(new SourceStaleDto(new \DateTimeImmutable('2026-11-18T09:00:00Z'), SourceError::Unavailable, new \DateTimeImmutable(self::CHECKED_AT)), $response->sources->weather);
+        self::assertSame([], $response->missing);
+        self::assertSame(WeatherKindValue::Final, $response->weather?->kind);
     }
 
     public function testMapsASourceThatDoesNotCoverTheDate(): void
@@ -203,7 +218,7 @@ final class BriefingResponseMapperTest extends TestCase
 
         // Then
         self::assertNull($response->weather);
-        self::assertEquals(new SourceFailedDto(SourceError::Rejected, $briefing->checkedAt), $response->sources->weather);
+        self::assertEquals(new SourceFailedDto(SourceError::Rejected, new \DateTimeImmutable(BriefingResultBuilder::ATTEMPTED_AT)), $response->sources->weather);
         self::assertSame([SourceKey::Weather], $response->missing);
         self::assertSame([SourceKey::Apod, SourceKey::OnThisDay], array_map(static fn (AttributionDto $attribution): SourceKey => $attribution->source, $response->attributions));
     }
@@ -217,7 +232,7 @@ final class BriefingResponseMapperTest extends TestCase
         $response = new BriefingResponseMapper()->create($briefing);
 
         // Then
-        self::assertEquals(new SourceFailedDto(SourceError::Unavailable, $briefing->checkedAt), $response->sources->onThisDay);
+        self::assertEquals(new SourceFailedDto(SourceError::Unavailable, new \DateTimeImmutable(BriefingResultBuilder::ATTEMPTED_AT)), $response->sources->onThisDay);
         self::assertSame([SourceKey::OnThisDay], $response->missing);
         self::assertSame([[], [], []], [$response->events, $response->births, $response->deaths]);
         self::assertSame([SourceKey::Apod, SourceKey::Weather], array_map(static fn (AttributionDto $attribution): SourceKey => $attribution->source, $response->attributions));

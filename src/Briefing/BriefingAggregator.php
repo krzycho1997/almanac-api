@@ -57,12 +57,12 @@ final readonly class BriefingAggregator
         $covering = $this->sourcesCovering($date);
         $scopes = self::scopesOf($covering, $date, $location);
         $stored = $this->snapshots->findForScopes(array_values($scopes));
-        $due = $this->dueForFetch($covering, $stored, $date, $now);
-        $settled = $this->fetcher->settleAll(self::startAll($due, $date, $location));
-        $this->recordFailures($settled, $date);
-        $current = $this->savedAndReread($settled, $scopes, $stored, $now);
+        $decisions = $this->decisionsFor($covering, $stored, $date, $now);
+        $settled = $this->fetcher->settleAll(self::startAll(self::dueForFetch($covering, $decisions), $date, $location));
+        $entries = $this->entriesAfterSaving($settled, $scopes, $stored, $decisions, $date, $now);
+        $this->recordFailures($settled, $entries, $date);
 
-        return new BriefingResult($date, $location, $this->inSourceOrder($current), $now);
+        return new BriefingResult($date, $location, array_values($entries));
     }
 
     /**
@@ -85,14 +85,36 @@ final readonly class BriefingAggregator
      * @param list<Source>                                $sources
      * @param array<value-of<SourceName>, StoredSnapshot> $stored
      *
+     * @return array<value-of<SourceName>, RefreshDecision>
+     */
+    private function decisionsFor(array $sources, array $stored, \DateTimeImmutable $date, \DateTimeImmutable $now): array
+    {
+        $decisions = [];
+
+        foreach ($sources as $source) {
+            $decisions[$source->name()->value] = $this->policy->decide(self::stateOf($source->name(), $stored), $source->refreshAfter(), $date, $now);
+        }
+
+        return $decisions;
+    }
+
+    /**
+     * @param array<value-of<SourceName>, StoredSnapshot> $stored
+     */
+    private static function stateOf(SourceName $source, array $stored): ?SnapshotState
+    {
+        return ($stored[$source->value] ?? null)?->state();
+    }
+
+    /**
+     * @param list<Source>                                 $sources
+     * @param array<value-of<SourceName>, RefreshDecision> $decisions
+     *
      * @return list<Source>
      */
-    private function dueForFetch(array $sources, array $stored, \DateTimeImmutable $date, \DateTimeImmutable $now): array
+    private static function dueForFetch(array $sources, array $decisions): array
     {
-        return array_values(array_filter(
-            $sources,
-            fn (Source $source): bool => $this->policy->decide(($stored[$source->name()->value] ?? null)?->state(), $source->refreshAfter(), $date, $now)->fetches(),
-        ));
+        return array_values(array_filter($sources, static fn (Source $source): bool => $decisions[$source->name()->value]->fetches()));
     }
 
     /**
@@ -154,36 +176,65 @@ final readonly class BriefingAggregator
     }
 
     /**
-     * @param array<value-of<SourceName>, StoredSnapshot> $stored
+     * @param list<SettledFetch>                           $settled
+     * @param array<value-of<SourceName>, SnapshotScope>   $scopes
+     * @param array<value-of<SourceName>, StoredSnapshot>  $stored
+     * @param array<value-of<SourceName>, RefreshDecision> $decisions
      *
-     * @return list<SourceResult>
+     * @return array<value-of<SourceName>, SourceEntry>
      */
-    private function inSourceOrder(array $stored): array
+    private function entriesAfterSaving(array $settled, array $scopes, array $stored, array $decisions, \DateTimeImmutable $date, \DateTimeImmutable $now): array
     {
-        return array_map(static fn (Source $source): SourceResult => self::resultOf($source->name(), $stored), $this->sources);
+        try {
+            return $this->inSourceOrder($this->savedAndReread($settled, $scopes, $stored, $now), $decisions);
+        } catch (\Throwable $exception) {
+            $this->recordFailures($settled, [], $date);
+
+            throw $exception;
+        }
     }
 
     /**
-     * @param array<value-of<SourceName>, StoredSnapshot> $stored
+     * @param array<value-of<SourceName>, StoredSnapshot>  $stored
+     * @param array<value-of<SourceName>, RefreshDecision> $decisions
+     *
+     * @return array<value-of<SourceName>, SourceEntry>
      */
-    private static function resultOf(SourceName $source, array $stored): SourceResult
+    private function inSourceOrder(array $stored, array $decisions): array
+    {
+        $entries = [];
+
+        foreach ($this->sources as $source) {
+            $entries[$source->name()->value] = self::entryOf($source->name(), $stored, $decisions);
+        }
+
+        return $entries;
+    }
+
+    /**
+     * @param array<value-of<SourceName>, StoredSnapshot>  $stored
+     * @param array<value-of<SourceName>, RefreshDecision> $decisions
+     */
+    private static function entryOf(SourceName $source, array $stored, array $decisions): SourceEntry
     {
         $snapshot = $stored[$source->value] ?? null;
 
         if ($snapshot instanceof StoredSnapshot) {
-            return $snapshot->result();
+            return $snapshot->entry(RefreshDecision::Final === ($decisions[$source->value] ?? null));
         }
 
-        return SourceResult::notApplicable($source);
+        return SourceEntry::notApplicable($source);
     }
 
     /**
-     * @param list<SettledFetch> $settled
+     * @param list<SettledFetch>                       $settled
+     * @param array<value-of<SourceName>, SourceEntry> $entries
      */
-    private function recordFailures(array $settled, \DateTimeImmutable $date): void
+    private function recordFailures(array $settled, array $entries, \DateTimeImmutable $date): void
     {
         foreach ($settled as $fetch) {
-            $this->failureLog->record($fetch->result, $date, $fetch->durationMs);
+            $entry = $entries[$fetch->result->source->value] ?? SourceEntry::notApplicable($fetch->result->source);
+            $this->failureLog->record($fetch->result, FailureOutcome::of($entry), $date, $fetch->durationMs);
         }
     }
 }

@@ -15,6 +15,7 @@ use App\Briefing\Model\PageRef;
 use App\Briefing\Model\WeatherKind;
 use App\Briefing\SourceName;
 use App\Tests\Support\Briefing\BriefingResultBuilder;
+use App\Tests\Support\Briefing\SourcePayloads;
 use App\Tests\Support\InteractsWithTestServices;
 use App\Tests\Support\OpenApi\OpenApiDocument;
 use League\OpenAPIValidation\Schema\SchemaValidator;
@@ -37,7 +38,7 @@ final class BriefingResponseSchemaTest extends KernelTestCase
     public function testDescribesSourcesWithoutDataAsOpenApiSays(BriefingResultBuilder $briefingResult, array $expectedSource): void
     {
         // Given
-        $response = new BriefingResponseMapper()->create($briefingResult->checkedAt(self::CHECKED_AT)->build());
+        $response = new BriefingResponseMapper()->create($briefingResult->attemptedAt(self::CHECKED_AT)->build());
 
         // When
         $briefing = self::serialized($response);
@@ -47,6 +48,19 @@ final class BriefingResponseSchemaTest extends KernelTestCase
         self::assertSame(['apod' => $expectedSource, 'onThisDay' => $expectedSource, 'weather' => $expectedSource], $briefing['sources']);
         self::assertSame(['apod', 'onThisDay', 'weather'], $briefing['missing']);
         self::assertSame([null, [], [], [], null], [$briefing['apod'], $briefing['events'], $briefing['births'], $briefing['deaths'], $briefing['weather']]);
+    }
+
+    public function testDescribesStaleDataAsOpenApiSays(): void
+    {
+        // Given
+        $response = new BriefingResponseMapper()->create(BriefingResultBuilder::create()->stale(SourceName::Weather, SourcePayloads::dailyWeather(), '2026-11-18T09:00:00+01:00', FailureKind::RateLimited)->attemptedAt(self::CHECKED_AT)->build());
+
+        // When
+        $briefing = self::serialized($response);
+
+        // Then
+        new SchemaValidator()->validate($briefing, OpenApiDocument::instance()->schemas()[self::SCHEMA]);
+        self::assertSame(['status' => 'ok', 'fetchedAt' => '2026-11-18T08:00:00Z', 'stale' => true, 'error' => 'rate_limited', 'lastAttemptAt' => '2026-11-18T11:00:00Z'], $briefing['sources']['weather']);
     }
 
     public function testDescribesTheDayInHistoryAsOpenApiSays(): void

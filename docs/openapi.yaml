@@ -241,6 +241,7 @@ components:
     SourceOk:
       type: object
       additionalProperties: false
+      description: The source has data. When its last refresh failed, the data is the last good one, marked stale, with the error and the time of that attempt.
       required: [status, fetchedAt, stale]
       properties:
         status:
@@ -252,6 +253,15 @@ components:
           pattern: 'Z$'
         stale:
           type: boolean
+        error:
+          type: string
+          description: Why the last refresh failed; present only when stale; new values may be added.
+          enum: [unavailable, rate_limited, rejected, misconfigured, invalid_payload]
+        lastAttemptAt:
+          type: string
+          format: date-time
+          pattern: 'Z$'
+          description: When the failed refresh was attempted; present only when stale.
     SourceFailed:
       type: object
       additionalProperties: false

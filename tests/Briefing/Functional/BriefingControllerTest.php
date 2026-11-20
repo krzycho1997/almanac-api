@@ -312,7 +312,7 @@ final class BriefingControllerTest extends FunctionalTestCase
         self::assertCount(1, $records);
         self::assertSame($level, $records[0]->level);
         self::assertSame($message, $records[0]->message);
-        self::assertEquals(['source' => self::LOG_SOURCES[$failed], 'date' => self::PICTURE_DAY] + $context, $records[0]->context);
+        self::assertEquals(['source' => self::LOG_SOURCES[$failed], 'date' => self::PICTURE_DAY, 'outcome' => 'missing'] + $context, $records[0]->context);
     }
 
     /**
@@ -382,6 +382,48 @@ final class BriefingControllerTest extends FunctionalTestCase
         self::assertSame(['apod' => self::NOT_APPLICABLE, 'onThisDay' => self::FRESH, 'weather' => self::failed('unavailable')], $briefing['sources']);
         self::assertSame(['apod', 'weather'], $briefing['missing']);
         self::assertSame(['onThisDay'], self::attributedSources($briefing));
+    }
+
+    public function testServesTheLastGoodWeatherAsStaleWhenItsRefreshFails(): void
+    {
+        // Given
+        self::upstream()->respondWith(UpstreamMock::create()->onThisDayFrom(self::HISTORY_DAY)->forecastOn(self::UNPUBLISHED_DAY));
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::UNPUBLISHED_DAY);
+        $weather = self::json($this->client->getResponse()->getContent())['weather'];
+        self::mockTime(new \DateTimeImmutable('2026-11-18 13:00:00', new \DateTimeZone(self::TIMEZONE)));
+        self::upstream()->respondWith(UpstreamMock::create()->forecast()->status(Response::HTTP_SERVICE_UNAVAILABLE)->forecast()->status(Response::HTTP_SERVICE_UNAVAILABLE));
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::UNPUBLISHED_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        $briefing = self::json($this->client->getResponse()->getContent());
+        self::assertSame(['apod' => self::NOT_APPLICABLE, 'onThisDay' => self::FRESH, 'weather' => ['status' => 'ok', 'fetchedAt' => '2026-11-18T12:00:00Z', 'stale' => true, 'error' => 'unavailable', 'lastAttemptAt' => '2026-11-18T13:00:00Z']], $briefing['sources']);
+        self::assertSame(['apod'], $briefing['missing']);
+        self::assertSame($weather, $briefing['weather']);
+        $records = self::recordsOf(self::BRIEFING_CHANNEL);
+        self::assertCount(1, $records);
+        self::assertSame(['weather', self::UNPUBLISHED_DAY, 'unavailable', 503, 'stale'], [$records[0]->context['source'] ?? null, $records[0]->context['date'] ?? null, $records[0]->context['kind'] ?? null, $records[0]->context['httpStatus'] ?? null, $records[0]->context['outcome'] ?? null]);
+    }
+
+    public function testKeepsAFailedWeatherDuringThePauseWithItsLastAttempt(): void
+    {
+        // Given
+        self::upstream()->respondWith(UpstreamMock::create()->onThisDayFrom(self::HISTORY_DAY)->forecast()->status(Response::HTTP_BAD_REQUEST));
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::UNPUBLISHED_DAY);
+        self::mockTime(new \DateTimeImmutable('2026-11-18 12:05:00', new \DateTimeZone(self::TIMEZONE)));
+        self::upstream()->respondWith(UpstreamMock::create());
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::UNPUBLISHED_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        $briefing = self::json($this->client->getResponse()->getContent());
+        self::assertSame(['apod' => self::NOT_APPLICABLE, 'onThisDay' => self::FRESH, 'weather' => self::failed('rejected')], $briefing['sources']);
+        self::assertSame([], self::upstream()->served());
+        self::assertSame([], self::recordsOf(self::BRIEFING_CHANNEL));
     }
 
     public function testMarksThePictureNotApplicableWithoutAskingNasa(): void

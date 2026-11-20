@@ -30,12 +30,43 @@ final readonly class StoredSnapshot
         return null;
     }
 
-    public function result(): SourceResult
+    public function entry(bool $final): SourceEntry
     {
+        $failure = self::failureOf($this->lastError);
+
         if ($this->payload instanceof SourcePayload) {
-            return SourceResult::ok($this->source, $this->payload);
+            return $this->withData($this->payload, $failure, $final);
         }
 
-        return SourceResult::failed($this->source, $this->lastError ?? FailureKind::InvalidPayload);
+        return SourceEntry::missing($this->source, $failure ?? self::unreadable(), $this->lastAttemptAt);
+    }
+
+    private function withData(SourcePayload $payload, ?SourceFailure $failure, bool $final): SourceEntry
+    {
+        $fetchedAt = $this->fetchedAt ?? throw new \UnexpectedValueException("The stored {$this->source->value} data has no fetch time.");
+
+        if ($final) {
+            return SourceEntry::fresh($this->source, $payload, $fetchedAt);
+        }
+
+        if ($failure instanceof SourceFailure) {
+            return SourceEntry::stale($this->source, $payload, $fetchedAt, $failure, $this->lastAttemptAt);
+        }
+
+        return SourceEntry::fresh($this->source, $payload, $fetchedAt);
+    }
+
+    private static function unreadable(): SourceFailure
+    {
+        return new SourceFailure(FailureKind::InvalidPayload);
+    }
+
+    private static function failureOf(?FailureKind $kind): ?SourceFailure
+    {
+        if ($kind instanceof FailureKind) {
+            return new SourceFailure($kind);
+        }
+
+        return null;
     }
 }

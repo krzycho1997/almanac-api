@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Support\Briefing;
 
 use App\Briefing\Location;
+use App\Briefing\SnapshotScope;
 use App\Briefing\Source\PendingFetch;
 use App\Briefing\Source\Source;
 use App\Briefing\Source\SourceClient;
@@ -12,7 +13,9 @@ use App\Briefing\SourceName;
 
 final readonly class StubSource implements Source, SourceClient
 {
-    use KeepsFinalSnapshotsByDate;
+    use KeepsFinalSnapshotsByDate {
+        scopeFor as private datedScopeFor;
+    }
 
     /**
      * @param \Closure(): PendingFetch $request
@@ -22,7 +25,13 @@ final readonly class StubSource implements Source, SourceClient
         private \Closure $request,
         private bool $covers = true,
         private ?\DateInterval $refreshAfter = null,
+        private ?SnapshotScope $scope = null,
     ) {
+    }
+
+    public function scopeFor(\DateTimeImmutable $date, Location $location): SnapshotScope
+    {
+        return $this->scope ?? $this->datedScopeFor($date, $location);
     }
 
     public function refreshAfter(): ?\DateInterval

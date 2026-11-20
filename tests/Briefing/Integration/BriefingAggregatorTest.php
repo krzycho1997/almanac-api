@@ -10,20 +10,24 @@ use App\Briefing\Location;
 use App\Briefing\Model\SourcePayload;
 use App\Briefing\RefreshPolicy;
 use App\Briefing\Repository\SourceSnapshotRepository;
+use App\Briefing\SnapshotScope;
 use App\Briefing\Source\ConcurrentFetcher;
 use App\Briefing\Source\PendingFetch;
 use App\Briefing\Source\Source;
+use App\Briefing\SourceEntry;
 use App\Briefing\SourceFailure;
 use App\Briefing\SourceFailureLog;
 use App\Briefing\SourceName;
 use App\Briefing\SourceResult;
-use App\Briefing\SourceStatus;
 use App\Tests\Support\Briefing\CallJournal;
 use App\Tests\Support\Briefing\JournalingSource;
 use App\Tests\Support\Briefing\SourcePayloads;
 use App\Tests\Support\Briefing\StubSource;
 use App\Tests\Support\InteractsWithTestServices;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Clock\MockClock;
@@ -69,8 +73,8 @@ final class BriefingAggregatorTest extends KernelTestCase
 
         // Then
         self::assertSame([SourceName::Apod, SourceName::Weather], $briefing->missing());
-        self::assertSame(SourceStatus::NotApplicable, $briefing->resultFor(SourceName::Apod)->status);
-        self::assertSame(SourceStatus::Ok, $briefing->resultFor(SourceName::OnThisDay)->status);
+        self::assertEquals(SourceEntry::notApplicable(SourceName::Apod), $briefing->entryFor(SourceName::Apod));
+        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, SourcePayloads::onThisDayFeed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
     }
 
     /**
@@ -130,7 +134,7 @@ final class BriefingAggregatorTest extends KernelTestCase
         $briefing = self::aggregator([new StubSource(SourceName::OnThisDay, self::unrequested())], $clock)->briefingFor(self::day(), self::warsaw());
 
         // Then
-        self::assertEquals(SourceResult::ok(SourceName::OnThisDay, SourcePayloads::onThisDayFeed()), $briefing->resultFor(SourceName::OnThisDay));
+        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, SourcePayloads::onThisDayFeed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
     }
 
     #[DataProvider('laterRequests')]
@@ -178,7 +182,7 @@ final class BriefingAggregatorTest extends KernelTestCase
         $briefing = self::aggregator([new StubSource(SourceName::OnThisDay, static fn (): PendingFetch => self::pendingFetch())], $clock)->briefingFor(self::day(), self::warsaw());
 
         // Then
-        self::assertEquals(SourceResult::ok(SourceName::OnThisDay, SourcePayloads::onThisDayFeed()), $briefing->resultFor(SourceName::OnThisDay));
+        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, SourcePayloads::onThisDayFeed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
     }
 
     public function testNeverRequestsAStoredPastDayAgain(): void
@@ -193,7 +197,7 @@ final class BriefingAggregatorTest extends KernelTestCase
         $briefing = self::aggregator([new StubSource(SourceName::Weather, self::unrequested(), true, new \DateInterval('PT1H'))], $clock)->briefingFor($yesterday, self::warsaw());
 
         // Then
-        self::assertTrue($briefing->resultFor(SourceName::Weather)->hasData());
+        self::assertTrue($briefing->entryFor(SourceName::Weather)->hasData());
     }
 
     public function testLeavesOutStoredDataOfASourceThatNoLongerCoversTheDate(): void
@@ -206,7 +210,69 @@ final class BriefingAggregatorTest extends KernelTestCase
         $briefing = self::aggregator([new StubSource(SourceName::OnThisDay, self::unrequested(), false)], $clock)->briefingFor(self::day(), self::warsaw());
 
         // Then
-        self::assertSame(SourceStatus::NotApplicable, $briefing->resultFor(SourceName::OnThisDay)->status);
+        self::assertEquals(SourceEntry::notApplicable(SourceName::OnThisDay), $briefing->entryFor(SourceName::OnThisDay));
+    }
+
+    public function testLogsAFailureAsStaleWhenAConcurrentSuccessStoredData(): void
+    {
+        // Given
+        $clock = new MockClock(self::NOW);
+        $logs = new TestHandler();
+        $concurrentSuccessInTheSameSecond = static function () use ($clock): PendingFetch {
+            self::testService(SourceSnapshotRepository::class)->saveResult(SourceResult::ok(SourceName::OnThisDay, SourcePayloads::onThisDayFeed()), new SnapshotScope(SourceName::OnThisDay, '11-20', null), $clock->now());
+
+            return self::failingFetch();
+        };
+
+        // When
+        $briefing = self::aggregator([new StubSource(SourceName::OnThisDay, $concurrentSuccessInTheSameSecond)], $clock, new Logger('briefing', [$logs]))->briefingFor(self::day(), self::warsaw());
+
+        // Then
+        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, SourcePayloads::onThisDayFeed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
+        self::assertSame('stale', $logs->getRecords()[0]->context['outcome'] ?? null);
+    }
+
+    public function testStillLogsTheFailuresWhenTheyCannotBeSaved(): void
+    {
+        // Given
+        $logs = new TestHandler();
+        $unsavable = new SnapshotScope(SourceName::OnThisDay, '11-20', self::day());
+
+        // When
+        try {
+            self::aggregator([new StubSource(SourceName::OnThisDay, static fn (): PendingFetch => self::failingFetch(), scope: $unsavable)], new MockClock(self::NOW), new Logger('briefing', [$logs]))->briefingFor(self::day(), self::warsaw());
+            self::fail('A failed save must reach the caller.');
+        } catch (\Doctrine\DBAL\Exception) {
+        }
+
+        // Then
+        self::assertSame(['on_this_day', 'missing'], [$logs->getRecords()[0]->context['source'] ?? null, $logs->getRecords()[0]->context['outcome'] ?? null]);
+    }
+
+    public function testLogsAFailureWithoutStoredDataAsMissing(): void
+    {
+        // Given
+        $logs = new TestHandler();
+
+        // When
+        self::aggregator([new StubSource(SourceName::OnThisDay, static fn (): PendingFetch => self::failingFetch())], new MockClock(self::NOW), new Logger('briefing', [$logs]))->briefingFor(self::day(), self::warsaw());
+
+        // Then
+        self::assertSame('missing', $logs->getRecords()[0]->context['outcome'] ?? null);
+    }
+
+    public function testServesFinalDataAsFreshEvenAfterALaterFailedAttempt(): void
+    {
+        // Given
+        $clock = new MockClock(self::NOW);
+        self::aggregator([new StubSource(SourceName::OnThisDay, static fn (): PendingFetch => self::pendingFetch())], $clock)->briefingFor(self::day(), self::warsaw());
+        self::testService(SourceSnapshotRepository::class)->saveResult(SourceResult::failed(SourceName::OnThisDay, FailureKind::Unavailable), new SnapshotScope(SourceName::OnThisDay, '11-20', null), $clock->now()->modify('+1 second'));
+
+        // When
+        $briefing = self::aggregator([new StubSource(SourceName::OnThisDay, self::unrequested())], $clock)->briefingFor(self::day(), self::warsaw());
+
+        // Then
+        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, SourcePayloads::onThisDayFeed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
     }
 
     public function testKeepsTheFirstFailureWhenTheSourceIsNotAskedAgain(): void
@@ -219,15 +285,15 @@ final class BriefingAggregatorTest extends KernelTestCase
         $briefing = self::aggregator([new StubSource(SourceName::OnThisDay, self::unrequested())], $clock)->briefingFor(self::day(), self::warsaw());
 
         // Then
-        self::assertEquals(new SourceFailure(FailureKind::Unavailable), $briefing->resultFor(SourceName::OnThisDay)->failure);
+        self::assertEquals(new SourceFailure(FailureKind::Unavailable), $briefing->entryFor(SourceName::OnThisDay)->lastFailure);
     }
 
     /**
      * @param list<Source> $sources
      */
-    private static function aggregator(array $sources, MockClock $clock): BriefingAggregator
+    private static function aggregator(array $sources, MockClock $clock, LoggerInterface $logger = new NullLogger()): BriefingAggregator
     {
-        return new BriefingAggregator($sources, new ConcurrentFetcher(new MockHttpClient(), $clock, new NullLogger(), 3.5), $clock, new SourceFailureLog(new NullLogger()), self::testService(SourceSnapshotRepository::class), new RefreshPolicy());
+        return new BriefingAggregator($sources, new ConcurrentFetcher(new MockHttpClient(), $clock, new NullLogger(), 3.5), $clock, new SourceFailureLog($logger), self::testService(SourceSnapshotRepository::class), new RefreshPolicy());
     }
 
     private static function pendingFetch(SourceName $source = SourceName::OnThisDay): PendingFetch

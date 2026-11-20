@@ -19,17 +19,17 @@ final readonly class SourceFailureLog
     ) {
     }
 
-    public function record(SourceResult $result, \DateTimeImmutable $date, int $durationMs): void
+    public function record(SourceResult $result, FailureOutcome $outcome, \DateTimeImmutable $date, int $durationMs): void
     {
         if ($result->failure instanceof SourceFailure) {
-            $this->logger->log($result->failure->kind->logLevel(), self::MESSAGE, self::contextOf($result->source, $result->failure, $date, $durationMs));
+            $this->logger->log($result->failure->kind->logLevel(), self::MESSAGE, self::contextOf($result->source, $result->failure, $outcome, $date, $durationMs));
         }
     }
 
     /**
      * @return array<string, mixed>
      */
-    private static function contextOf(SourceName $source, SourceFailure $failure, \DateTimeImmutable $date, int $durationMs): array
+    private static function contextOf(SourceName $source, SourceFailure $failure, FailureOutcome $outcome, \DateTimeImmutable $date, int $durationMs): array
     {
         return array_filter([
             LogContextKey::Source->value => $source->value,
@@ -40,6 +40,7 @@ final readonly class SourceFailureLog
             LogContextKey::ErrorType->value => $failure->cause?->errorType,
             LogContextKey::Fields->value => $failure->cause?->fields,
             LogContextKey::Reason->value => $failure->cause?->defect?->value,
+            LogContextKey::Outcome->value => $outcome->value,
             LogContextKey::DurationMs->value => $durationMs,
         ], static fn (mixed $value): bool => null !== $value);
     }

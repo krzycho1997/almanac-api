@@ -8,6 +8,8 @@ use App\Briefing\FailureKind;
 use App\Briefing\Repository\SourceSnapshotRepository;
 use App\Briefing\SnapshotScope;
 use App\Briefing\SnapshotState;
+use App\Briefing\SourceEntry;
+use App\Briefing\SourceFailure;
 use App\Briefing\SourceName;
 use App\Briefing\SourcePayloadCodec;
 use App\Briefing\SourceResult;
@@ -55,7 +57,7 @@ final class SnapshotReadingTest extends TestCase
         self::assertEquals(SourcePayloads::apodPicture(), $snapshot->payload);
         self::assertEquals([self::at(self::TEN), self::at(self::TEN), null], [$snapshot->fetchedAt, $snapshot->lastAttemptAt, $snapshot->lastError]);
         self::assertEquals(SnapshotState::fetchedAt(self::at(self::TEN)), $snapshot->state());
-        self::assertEquals(SourceResult::ok(SourceName::Apod, SourcePayloads::apodPicture()), $snapshot->result());
+        self::assertEquals(SourceEntry::fresh(SourceName::Apod, SourcePayloads::apodPicture(), self::at(self::TEN)), $snapshot->entry(false));
     }
 
     public function testReadsAFailureAfterASuccessWithTheOldData(): void
@@ -71,7 +73,8 @@ final class SnapshotReadingTest extends TestCase
         self::assertEquals(SnapshotState::failedAt(self::at(self::ELEVEN), true), $snapshot->state());
         self::assertSame(FailureKind::RateLimited, $snapshot->lastError);
         self::assertEquals(self::at(self::TEN), $snapshot->fetchedAt);
-        self::assertEquals(SourceResult::ok(SourceName::Apod, SourcePayloads::apodPicture()), $snapshot->result());
+        self::assertEquals(SourceEntry::stale(SourceName::Apod, SourcePayloads::apodPicture(), self::at(self::TEN), new SourceFailure(FailureKind::RateLimited), self::at(self::ELEVEN)), $snapshot->entry(false));
+        self::assertEquals(SourceEntry::fresh(SourceName::Apod, SourcePayloads::apodPicture(), self::at(self::TEN)), $snapshot->entry(true));
     }
 
     public function testReadsAFailureWithoutDataAsMissing(): void
@@ -84,7 +87,7 @@ final class SnapshotReadingTest extends TestCase
 
         // Then
         self::assertEquals(SnapshotState::failedAt(self::at(self::TEN), false), $snapshot->state());
-        self::assertEquals(SourceResult::failed(SourceName::Apod, FailureKind::Unavailable), $snapshot->result());
+        self::assertEquals(SourceEntry::missing(SourceName::Apod, new SourceFailure(FailureKind::Unavailable), self::at(self::TEN)), $snapshot->entry(false));
     }
 
     public function testTreatsAnUnreadableSuccessAsNoSnapshotSoItIsFetchedAgain(): void
@@ -98,7 +101,7 @@ final class SnapshotReadingTest extends TestCase
         // Then
         self::assertNull($snapshot->payload);
         self::assertNull($snapshot->state());
-        self::assertEquals(SourceResult::failed(SourceName::Apod, FailureKind::InvalidPayload), $snapshot->result());
+        self::assertEquals(SourceEntry::missing(SourceName::Apod, new SourceFailure(FailureKind::InvalidPayload), self::at(self::TEN)), $snapshot->entry(false));
     }
 
     public function testWarnsWhenStoredDataNoLongerMatchesTheModel(): void
