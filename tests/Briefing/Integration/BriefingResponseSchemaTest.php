@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Briefing\Integration;
 
-use App\Briefing\BriefingResult;
 use App\Briefing\FailureKind;
-use App\Briefing\Location;
 use App\Briefing\Mapper\BriefingResponseMapper;
 use App\Briefing\Model\Attribution;
 use App\Briefing\Model\DailyWeather;
@@ -16,7 +14,7 @@ use App\Briefing\Model\OnThisDayFeed;
 use App\Briefing\Model\PageRef;
 use App\Briefing\Model\WeatherKind;
 use App\Briefing\SourceName;
-use App\Briefing\SourceResult;
+use App\Tests\Support\Briefing\BriefingResultBuilder;
 use App\Tests\Support\InteractsWithTestServices;
 use App\Tests\Support\OpenApi\OpenApiDocument;
 use League\OpenAPIValidation\Schema\SchemaValidator;
@@ -30,17 +28,16 @@ final class BriefingResponseSchemaTest extends KernelTestCase
     use InteractsWithTestServices;
 
     private const string SCHEMA = 'Briefing';
-    private const string DATE = '2026-11-18';
     private const string CHECKED_AT = '2026-11-18T12:00:00+01:00';
 
     /**
      * @param array<string, mixed> $expectedSource
      */
     #[DataProvider('sourcesWithoutData')]
-    public function testDescribesSourcesWithoutDataAsOpenApiSays(SourceResult $apod, SourceResult $onThisDay, SourceResult $weather, array $expectedSource): void
+    public function testDescribesSourcesWithoutDataAsOpenApiSays(BriefingResultBuilder $briefingResult, array $expectedSource): void
     {
         // Given
-        $response = new BriefingResponseMapper()->create(self::briefingOf($apod, $onThisDay, $weather));
+        $response = new BriefingResponseMapper()->create($briefingResult->checkedAt(self::CHECKED_AT)->build());
 
         // When
         $briefing = self::serialized($response);
@@ -61,7 +58,7 @@ final class BriefingResponseSchemaTest extends KernelTestCase
             [new NotablePerson(-44, 'Julius Caesar', null, 'https://en.wikipedia.org/wiki/Julius_Caesar', null)],
             new Attribution('Wikipedia', 'https://en.wikipedia.org/', 'CC BY-SA 4.0', 'https://creativecommons.org/licenses/by-sa/4.0/', true, null),
         );
-        $response = new BriefingResponseMapper()->create(self::briefingOf(SourceResult::notApplicable(SourceName::Apod), SourceResult::ok(SourceName::OnThisDay, $feed), SourceResult::notApplicable(SourceName::Weather)));
+        $response = new BriefingResponseMapper()->create(BriefingResultBuilder::create()->notApplicable(SourceName::Apod)->ok(SourceName::OnThisDay, $feed)->notApplicable(SourceName::Weather)->build());
 
         // When
         $briefing = self::serialized($response);
@@ -73,15 +70,15 @@ final class BriefingResponseSchemaTest extends KernelTestCase
     }
 
     /**
-     * @return iterable<string, array{SourceResult, SourceResult, SourceResult, array<string, mixed>}>
+     * @return iterable<string, array{BriefingResultBuilder, array<string, mixed>}>
      */
     public static function sourcesWithoutData(): iterable
     {
         foreach (FailureKind::cases() as $kind) {
-            yield $kind->value => [SourceResult::failed(SourceName::Apod, $kind), SourceResult::failed(SourceName::OnThisDay, $kind), SourceResult::failed(SourceName::Weather, $kind), ['status' => 'failed', 'error' => $kind->value, 'lastAttemptAt' => '2026-11-18T11:00:00Z']];
+            yield $kind->value => [BriefingResultBuilder::create()->failed(SourceName::Apod, $kind)->failed(SourceName::OnThisDay, $kind)->failed(SourceName::Weather, $kind), ['status' => 'failed', 'error' => $kind->value, 'lastAttemptAt' => '2026-11-18T11:00:00Z']];
         }
 
-        yield 'not applicable' => [SourceResult::notApplicable(SourceName::Apod), SourceResult::notApplicable(SourceName::OnThisDay), SourceResult::notApplicable(SourceName::Weather), ['status' => 'not_applicable']];
+        yield 'not applicable' => [BriefingResultBuilder::create()->notApplicable(SourceName::Apod)->notApplicable(SourceName::OnThisDay)->notApplicable(SourceName::Weather), ['status' => 'not_applicable']];
     }
 
     /**
@@ -91,7 +88,7 @@ final class BriefingResponseSchemaTest extends KernelTestCase
     public function testDescribesTheWeatherAsOpenApiSays(DailyWeather $weather, array $expected): void
     {
         // Given
-        $response = new BriefingResponseMapper()->create(self::briefingOf(SourceResult::notApplicable(SourceName::Apod), SourceResult::notApplicable(SourceName::OnThisDay), SourceResult::ok(SourceName::Weather, $weather)));
+        $response = new BriefingResponseMapper()->create(BriefingResultBuilder::create()->notApplicable(SourceName::Apod)->notApplicable(SourceName::OnThisDay)->ok(SourceName::Weather, $weather)->build());
 
         // When
         $briefing = self::serialized($response);
@@ -119,11 +116,6 @@ final class BriefingResponseSchemaTest extends KernelTestCase
     private static function openMeteo(): Attribution
     {
         return new Attribution('Open-Meteo', 'https://open-meteo.com/', 'CC BY 4.0', 'https://creativecommons.org/licenses/by/4.0/', true, null);
-    }
-
-    private static function briefingOf(SourceResult $apod, SourceResult $onThisDay, SourceResult $weather): BriefingResult
-    {
-        return new BriefingResult(new \DateTimeImmutable(self::DATE), Location::fromCoordinates(52.23, 21.01), [$apod, $onThisDay, $weather], new \DateTimeImmutable(self::CHECKED_AT));
     }
 
     /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Briefing\Unit\Mapper;
 
-use App\Briefing\BriefingResult;
 use App\Briefing\Dto\Response\ApodDto;
 use App\Briefing\Dto\Response\ApodMediaType;
 use App\Briefing\Dto\Response\AttributionDto;
@@ -22,7 +21,6 @@ use App\Briefing\Dto\Response\SourcesDto;
 use App\Briefing\Dto\Response\WeatherDto;
 use App\Briefing\Dto\Response\WeatherKindValue;
 use App\Briefing\FailureKind;
-use App\Briefing\Location;
 use App\Briefing\Mapper\BriefingResponseMapper;
 use App\Briefing\Model\ApodPicture;
 use App\Briefing\Model\Attribution;
@@ -34,23 +32,31 @@ use App\Briefing\Model\OnThisDayFeed;
 use App\Briefing\Model\PageRef;
 use App\Briefing\Model\WeatherKind;
 use App\Briefing\SourceName;
-use App\Briefing\SourceResult;
+use App\Tests\Support\Briefing\BriefingResultBuilder;
+use App\Tests\Support\Briefing\SourcePayloads;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class BriefingResponseMapperTest extends TestCase
 {
-    private const string DATE = '2026-11-05';
-    private const string WARSAW = 'Europe/Warsaw';
     private const string CAESAR = 'https://en.wikipedia.org/wiki/Julius_Caesar';
     private const string HAUSER = 'https://en.wikipedia.org/wiki/Wings_Hauser';
     private const string THUMBNAIL = 'https://upload.wikimedia.org/hauser.jpg';
+    private const string CHECKED_AT = '2026-11-18T09:30:00+01:00';
 
-    public function testMapsAPictureWithItsSourceStatus(): void
+    public function testMapsEveryFieldOfABriefingWithData(): void
     {
         // Given
-        $picture = new ApodPicture(new \DateTimeImmutable(self::DATE), 'Pillars', 'Gas and dust.', MediaType::Image, 'https://apod.nasa.gov/a.jpg', null, null, self::apodCredit());
-        $briefing = self::briefingOf(SourceResult::ok(SourceName::Apod, $picture));
+        $picture = new ApodPicture(new \DateTimeImmutable(BriefingResultBuilder::DATE), 'Pillars', 'Gas and dust.', MediaType::Image, 'https://apod.nasa.gov/a.jpg', 'https://apod.nasa.gov/a-hd.jpg', 'Hubble', new Attribution('Astronomy Picture of the Day', 'https://apod.nasa.gov/', null, null, true, null));
+        $history = new OnThisDayFeed(
+            [new HistoricalEvent(-44, 'Julius Caesar is assassinated.', [new PageRef('Julius Caesar', self::CAESAR, self::THUMBNAIL)])],
+            [new NotablePerson(1947, 'Wings Hauser', 'American actor', self::HAUSER, self::THUMBNAIL)],
+            [new NotablePerson(-44, 'Julius Caesar', null, self::CAESAR, null)],
+            new Attribution('Wikipedia', 'https://en.wikipedia.org/', 'CC BY-SA 4.0', 'https://creativecommons.org/licenses/by-sa/4.0/', true, null),
+        );
+        $weather = new DailyWeather(WeatherKind::Final, 'Europe/Warsaw', 1.2, 6.8, 0.4, 18.0, 3, '2026-11-05T06:44:00+01:00', '2026-11-05T16:02:00+01:00', 33480, new Attribution('Open-Meteo', 'https://open-meteo.com/', 'CC BY 4.0', 'https://creativecommons.org/licenses/by/4.0/', true, 'Generated using Copernicus Climate Change Service information'));
+        $briefing = BriefingResultBuilder::create()->ok(SourceName::Apod, $picture)->ok(SourceName::OnThisDay, $history)->ok(SourceName::Weather, $weather)->checkedAt(self::CHECKED_AT)->build();
+        $ok = new SourceOkDto(new \DateTimeImmutable(self::CHECKED_AT), false);
 
         // When
         $response = new BriefingResponseMapper()->create($briefing);
@@ -58,11 +64,11 @@ final class BriefingResponseMapperTest extends TestCase
         // Then
         self::assertEquals(
             new BriefingResponse(
-                self::DATE,
-                new LocationDto(52.23, 21.01, null, false),
-                new SourcesDto(new SourceOkDto(self::checkedAt(), false), new SourceOkDto(self::checkedAt(), false), new SourceOkDto(self::checkedAt(), false)),
+                BriefingResultBuilder::DATE,
+                new LocationDto(BriefingResultBuilder::LATITUDE, BriefingResultBuilder::LONGITUDE, null, false),
+                new SourcesDto($ok, $ok, $ok),
                 [],
-                new ApodDto('Pillars', 'Gas and dust.', ApodMediaType::Image, 'https://apod.nasa.gov/a.jpg', null, null),
+                new ApodDto('Pillars', 'Gas and dust.', ApodMediaType::Image, 'https://apod.nasa.gov/a.jpg', 'https://apod.nasa.gov/a-hd.jpg', 'Hubble'),
                 [new EventDto(-44, 'Julius Caesar is assassinated.', [new PageDto('Julius Caesar', self::CAESAR, self::THUMBNAIL)])],
                 [new PersonDto(1947, 'Wings Hauser', 'American actor', self::HAUSER, self::THUMBNAIL)],
                 [new PersonDto(-44, 'Julius Caesar', null, self::CAESAR, null)],
@@ -81,10 +87,10 @@ final class BriefingResponseMapperTest extends TestCase
     public function testMapsEveryMediaType(MediaType $mediaType, ApodMediaType $expectedMediaType): void
     {
         // Given
-        $picture = new ApodPicture(new \DateTimeImmutable(self::DATE), 'Pillars', 'Gas and dust.', $mediaType, null, null, null, self::apodCredit());
+        $briefing = BriefingResultBuilder::create()->ok(SourceName::Apod, SourcePayloads::apodPicture($mediaType))->build();
 
         // When
-        $response = new BriefingResponseMapper()->create(self::briefingOf(SourceResult::ok(SourceName::Apod, $picture)));
+        $response = new BriefingResponseMapper()->create($briefing);
 
         // Then
         self::assertSame($expectedMediaType, $response->apod?->mediaType);
@@ -104,13 +110,13 @@ final class BriefingResponseMapperTest extends TestCase
     public function testMapsAFailedSourceAsMissingWithItsError(FailureKind $kind, SourceError $expectedError): void
     {
         // Given
-        $briefing = self::briefingOf(SourceResult::failed(SourceName::Apod, $kind));
+        $briefing = BriefingResultBuilder::create()->failed(SourceName::Apod, $kind)->checkedAt(self::CHECKED_AT)->build();
 
         // When
         $response = new BriefingResponseMapper()->create($briefing);
 
         // Then
-        self::assertEquals(new SourceFailedDto($expectedError, self::checkedAt()), $response->sources->apod);
+        self::assertEquals(new SourceFailedDto($expectedError, new \DateTimeImmutable(self::CHECKED_AT)), $response->sources->apod);
         self::assertSame([SourceKey::Apod], $response->missing);
         self::assertNull($response->apod);
     }
@@ -130,7 +136,7 @@ final class BriefingResponseMapperTest extends TestCase
     public function testMapsASourceThatDoesNotCoverTheDate(): void
     {
         // Given
-        $briefing = self::briefingOf(SourceResult::notApplicable(SourceName::Apod));
+        $briefing = BriefingResultBuilder::create()->notApplicable(SourceName::Apod)->build();
 
         // When
         $response = new BriefingResponseMapper()->create($briefing);
@@ -144,10 +150,10 @@ final class BriefingResponseMapperTest extends TestCase
     public function testMapsEveryWeatherKind(WeatherKind $kind, WeatherKindValue $expected): void
     {
         // Given
-        $picture = new ApodPicture(new \DateTimeImmutable(self::DATE), 'Pillars', 'Gas and dust.', MediaType::Image, null, null, null, self::apodCredit());
+        $briefing = BriefingResultBuilder::create()->ok(SourceName::Weather, SourcePayloads::dailyWeather($kind))->build();
 
         // When
-        $response = new BriefingResponseMapper()->create(self::briefingOf(SourceResult::ok(SourceName::Apod, $picture), weather: self::weather($kind)));
+        $response = new BriefingResponseMapper()->create($briefing);
 
         // Then
         self::assertSame($expected, $response->weather?->kind);
@@ -178,10 +184,10 @@ final class BriefingResponseMapperTest extends TestCase
     public function testDescribesTheWeatherCode(?int $code, ?string $expected): void
     {
         // Given
-        $picture = new ApodPicture(new \DateTimeImmutable(self::DATE), 'Pillars', 'Gas and dust.', MediaType::Image, null, null, null, self::apodCredit());
+        $briefing = BriefingResultBuilder::create()->ok(SourceName::Weather, SourcePayloads::dailyWeather(weatherCode: $code))->build();
 
         // When
-        $response = new BriefingResponseMapper()->create(self::briefingOf(SourceResult::ok(SourceName::Apod, $picture), weather: self::weatherWith(WeatherKind::Final, $code)));
+        $response = new BriefingResponseMapper()->create($briefing);
 
         // Then
         self::assertSame($expected, $response->weather?->description);
@@ -190,14 +196,14 @@ final class BriefingResponseMapperTest extends TestCase
     public function testLeavesTheWeatherEmptyWhenItHasNoData(): void
     {
         // Given
-        $picture = new ApodPicture(new \DateTimeImmutable(self::DATE), 'Pillars', 'Gas and dust.', MediaType::Image, null, null, null, self::apodCredit());
+        $briefing = BriefingResultBuilder::create()->failed(SourceName::Weather, FailureKind::Rejected)->build();
 
         // When
-        $response = new BriefingResponseMapper()->create(self::briefingOf(SourceResult::ok(SourceName::Apod, $picture), weather: SourceResult::failed(SourceName::Weather, FailureKind::Rejected)));
+        $response = new BriefingResponseMapper()->create($briefing);
 
         // Then
         self::assertNull($response->weather);
-        self::assertEquals(new SourceFailedDto(SourceError::Rejected, self::checkedAt()), $response->sources->weather);
+        self::assertEquals(new SourceFailedDto(SourceError::Rejected, $briefing->checkedAt), $response->sources->weather);
         self::assertSame([SourceKey::Weather], $response->missing);
         self::assertSame([SourceKey::Apod, SourceKey::OnThisDay], array_map(static fn (AttributionDto $attribution): SourceKey => $attribution->source, $response->attributions));
     }
@@ -205,51 +211,27 @@ final class BriefingResponseMapperTest extends TestCase
     public function testLeavesTheHistoryListsEmptyWhenOnThisDayHasNoData(): void
     {
         // Given
-        $picture = new ApodPicture(new \DateTimeImmutable(self::DATE), 'Pillars', 'Gas and dust.', MediaType::Image, null, null, null, self::apodCredit());
-        $briefing = self::briefingOf(SourceResult::ok(SourceName::Apod, $picture), SourceResult::failed(SourceName::OnThisDay, FailureKind::Unavailable));
+        $briefing = BriefingResultBuilder::create()->failed(SourceName::OnThisDay, FailureKind::Unavailable)->build();
 
         // When
         $response = new BriefingResponseMapper()->create($briefing);
 
         // Then
-        self::assertEquals(new SourceFailedDto(SourceError::Unavailable, self::checkedAt()), $response->sources->onThisDay);
+        self::assertEquals(new SourceFailedDto(SourceError::Unavailable, $briefing->checkedAt), $response->sources->onThisDay);
         self::assertSame([SourceKey::OnThisDay], $response->missing);
         self::assertSame([[], [], []], [$response->events, $response->births, $response->deaths]);
         self::assertSame([SourceKey::Apod, SourceKey::Weather], array_map(static fn (AttributionDto $attribution): SourceKey => $attribution->source, $response->attributions));
     }
 
-    private static function briefingOf(SourceResult $apod, ?SourceResult $onThisDay = null, ?SourceResult $weather = null): BriefingResult
+    public function testListsMissingSourcesInSourceOrder(): void
     {
-        return new BriefingResult(new \DateTimeImmutable(self::DATE, new \DateTimeZone(self::WARSAW)), Location::fromCoordinates(52.23, 21.01), [$apod, $onThisDay ?? self::history(), $weather ?? self::weather(WeatherKind::Final)], self::checkedAt());
-    }
+        // Given
+        $briefing = BriefingResultBuilder::create()->failed(SourceName::Weather, FailureKind::Unavailable)->notApplicable(SourceName::Apod)->build();
 
-    private static function weather(WeatherKind $kind): SourceResult
-    {
-        return self::weatherWith($kind, 3);
-    }
+        // When
+        $response = new BriefingResponseMapper()->create($briefing);
 
-    private static function weatherWith(WeatherKind $kind, ?int $code): SourceResult
-    {
-        return SourceResult::ok(SourceName::Weather, new DailyWeather($kind, 'Europe/Warsaw', 1.2, 6.8, 0.4, 18.0, $code, '2026-11-05T06:44:00+01:00', '2026-11-05T16:02:00+01:00', 33480, new Attribution('Open-Meteo', 'https://open-meteo.com/', 'CC BY 4.0', 'https://creativecommons.org/licenses/by/4.0/', true, 'Generated using Copernicus Climate Change Service information')));
-    }
-
-    private static function history(): SourceResult
-    {
-        return SourceResult::ok(SourceName::OnThisDay, new OnThisDayFeed(
-            [new HistoricalEvent(-44, 'Julius Caesar is assassinated.', [new PageRef('Julius Caesar', self::CAESAR, self::THUMBNAIL)])],
-            [new NotablePerson(1947, 'Wings Hauser', 'American actor', self::HAUSER, self::THUMBNAIL)],
-            [new NotablePerson(-44, 'Julius Caesar', null, self::CAESAR, null)],
-            new Attribution('Wikipedia', 'https://en.wikipedia.org/', 'CC BY-SA 4.0', 'https://creativecommons.org/licenses/by-sa/4.0/', true, null),
-        ));
-    }
-
-    private static function apodCredit(): Attribution
-    {
-        return new Attribution('Astronomy Picture of the Day', 'https://apod.nasa.gov/', null, null, true, null);
-    }
-
-    private static function checkedAt(): \DateTimeImmutable
-    {
-        return new \DateTimeImmutable('2026-11-18 12:00', new \DateTimeZone(self::WARSAW));
+        // Then
+        self::assertSame([SourceKey::Apod, SourceKey::Weather], $response->missing);
     }
 }
