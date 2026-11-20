@@ -1,0 +1,23 @@
+Dockerfile
+  s_74e023d9fce783::t_ff5aed7e2e4c8d 1-2,4
+composer.json
+  s_74e023d9fce783::t_ff5aed7e2e4c8d 63
+composer.lock
+  s_74e023d9fce783::t_b117201ba00d5f 7,10381
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e0982e24baaa22926164074fb9e29b00cb08e203",
+  "prompts": {},
+  "sessions": {
+    "s_74e023d9fce783": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "68e7658b-8e77-472f-a5da-7f2a4a796910",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
