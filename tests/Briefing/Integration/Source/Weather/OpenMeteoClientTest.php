@@ -159,8 +159,8 @@ final class OpenMeteoClientTest extends KernelTestCase
 
         // Then
         self::assertSame(SourceStatus::Failed, $result->status);
-        self::assertSame($kind, $result->failureKind);
-        self::assertEquals($cause, $result->cause);
+        self::assertSame($kind, $result->failure?->kind);
+        self::assertEquals($cause, $result->failure->cause);
     }
 
     /**

@@ -86,8 +86,8 @@ final class ConcurrentFetcherTest extends TestCase
         // Then
         self::assertSame(SourceStatus::Ok, $pictureFetch->result->status);
         self::assertSame(SourceName::Weather, $weatherFetch->result->source);
-        self::assertSame(FailureKind::Unavailable, $weatherFetch->result->failureKind);
-        self::assertSame(self::DEADLINE_EXCEEDED, $weatherFetch->result->cause?->errorType);
+        self::assertSame(FailureKind::Unavailable, $weatherFetch->result->failure?->kind);
+        self::assertSame(self::DEADLINE_EXCEEDED, $weatherFetch->result->failure->cause?->errorType);
         self::assertSame(3500, $weatherFetch->durationMs);
         self::assertTrue($weather->getInfo('canceled'));
     }
@@ -106,7 +106,7 @@ final class ConcurrentFetcherTest extends TestCase
         [$settled] = $this->fetcher()->settleAll([self::fetch(SourceName::OnThisDay, $selected, $births)]);
 
         // Then
-        self::assertSame(self::DEADLINE_EXCEEDED, $settled->result->cause?->errorType);
+        self::assertSame(self::DEADLINE_EXCEEDED, $settled->result->failure?->cause?->errorType);
         self::assertTrue($births->getInfo('canceled'));
     }
 
@@ -121,8 +121,8 @@ final class ConcurrentFetcherTest extends TestCase
         [$settled] = $this->fetcher()->settleAll([self::fetch(SourceName::OnThisDay, $selected, $births)]);
 
         // Then
-        self::assertSame(FailureKind::Unavailable, $settled->result->failureKind);
-        self::assertSame(Response::HTTP_SERVICE_UNAVAILABLE, $settled->result->httpStatus);
+        self::assertSame(FailureKind::Unavailable, $settled->result->failure?->kind);
+        self::assertSame(Response::HTTP_SERVICE_UNAVAILABLE, $settled->result->failure->httpStatus);
         self::assertSame(200, $settled->durationMs);
         self::assertTrue($selected->getInfo('canceled'));
     }
@@ -140,7 +140,7 @@ final class ConcurrentFetcherTest extends TestCase
         [$settled] = $this->fetcher()->settleAll([self::fetch(SourceName::OnThisDay, $births, $deaths)]);
 
         // Then
-        self::assertSame(Response::HTTP_SERVICE_UNAVAILABLE, $settled->result->httpStatus);
+        self::assertSame(Response::HTTP_SERVICE_UNAVAILABLE, $settled->result->failure?->httpStatus);
         self::assertSame(200, $settled->durationMs);
     }
 
@@ -155,7 +155,7 @@ final class ConcurrentFetcherTest extends TestCase
         [$settled] = $this->fetcher()->settleAll([self::fetch(SourceName::OnThisDay, $selected, $births)]);
 
         // Then
-        self::assertSame('TransportException', $settled->result->cause?->errorType);
+        self::assertSame('TransportException', $settled->result->failure?->cause?->errorType);
         self::assertSame(200, $settled->durationMs);
         self::assertSame([2, 2], $this->upstream->streamedCounts());
         self::assertTrue($selected->getInfo('canceled'));
@@ -212,7 +212,7 @@ final class ConcurrentFetcherTest extends TestCase
         [$settled] = $this->fetcher()->settleAll([self::fetch(SourceName::Weather, $weather)]);
 
         // Then
-        self::assertSame(self::DEADLINE_EXCEEDED, $settled->result->cause?->errorType);
+        self::assertSame(self::DEADLINE_EXCEEDED, $settled->result->failure?->cause?->errorType);
         self::assertSame(3500, $settled->durationMs);
     }
 
@@ -242,8 +242,8 @@ final class ConcurrentFetcherTest extends TestCase
         [$settled] = $this->fetcher()->settleAll([self::fetch(SourceName::Weather, $weather)]);
 
         // Then
-        self::assertSame(FailureKind::Unavailable, $settled->result->failureKind);
-        self::assertSame('TransportException', $settled->result->cause?->errorType);
+        self::assertSame(FailureKind::Unavailable, $settled->result->failure?->kind);
+        self::assertSame('TransportException', $settled->result->failure->cause?->errorType);
         self::assertSame(200, $settled->durationMs);
     }
 
@@ -276,8 +276,8 @@ final class ConcurrentFetcherTest extends TestCase
         $settled = $this->fetcher()->settleAll([self::fetch(SourceName::Apod, $picture), self::fetch(SourceName::Weather, $weather)]);
 
         // Then
-        self::assertSame([$errorType, $errorType], array_map(static fn (SettledFetch $fetch): ?string => $fetch->result->cause?->errorType, $settled));
-        self::assertSame([FailureKind::Unavailable, FailureKind::Unavailable], array_map(static fn (SettledFetch $fetch): ?FailureKind => $fetch->result->failureKind, $settled));
+        self::assertSame([$errorType, $errorType], array_map(static fn (SettledFetch $fetch): ?string => $fetch->result->failure?->cause?->errorType, $settled));
+        self::assertSame([FailureKind::Unavailable, FailureKind::Unavailable], array_map(static fn (SettledFetch $fetch): ?FailureKind => $fetch->result->failure?->kind, $settled));
         self::assertTrue($picture->getInfo('canceled'));
         self::assertCount(1, $this->logs->getRecords());
         self::assertSame(Level::Error, $this->logs->getRecords()[0]->level);

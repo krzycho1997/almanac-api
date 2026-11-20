@@ -7,6 +7,7 @@ namespace App\Briefing\Repository;
 use App\Briefing\FailureKind;
 use App\Briefing\Model\SourcePayload;
 use App\Briefing\SnapshotScope;
+use App\Briefing\SourceFailure;
 use App\Briefing\SourcePayloadCodec;
 use App\Briefing\SourceResult;
 use App\Briefing\SourceStatus;
@@ -69,8 +70,8 @@ final readonly class SourceSnapshotRepository
             return $this->saveSuccess($result->payload, $scope, $attemptedAt);
         }
 
-        if ($result->failureKind instanceof FailureKind) {
-            return $this->saveFailure($result->failureKind, $scope, $attemptedAt);
+        if ($result->failure instanceof SourceFailure) {
+            return $this->saveFailure($result->failure->kind, $scope, $attemptedAt);
         }
 
         throw new \InvalidArgumentException("A {$result->status->value} result of {$result->source->value} has nothing to store.");

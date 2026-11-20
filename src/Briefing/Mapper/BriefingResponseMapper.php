@@ -36,9 +36,9 @@ use App\Briefing\Model\PageRef;
 use App\Briefing\Model\SourcePayload;
 use App\Briefing\Model\WeatherKind;
 use App\Briefing\Model\WmoCode;
+use App\Briefing\SourceFailure;
 use App\Briefing\SourceName;
 use App\Briefing\SourceResult;
-use App\Briefing\SourceStatus;
 
 final readonly class BriefingResponseMapper
 {
@@ -92,16 +92,15 @@ final readonly class BriefingResponseMapper
 
     private static function status(SourceResult $result, \DateTimeImmutable $checkedAt): SourceStatusDto
     {
-        return match ($result->status) {
-            SourceStatus::Ok => new SourceOkDto($checkedAt, self::NOT_STALE),
-            SourceStatus::Failed => new SourceFailedDto(self::error(self::failure($result)), $checkedAt),
-            SourceStatus::NotApplicable => new SourceNotApplicableDto(),
-        };
-    }
+        if ($result->hasData()) {
+            return new SourceOkDto($checkedAt, self::NOT_STALE);
+        }
 
-    private static function failure(SourceResult $result): FailureKind
-    {
-        return $result->failureKind ?? throw new \LogicException("The failed {$result->source->value} result has no failure kind.");
+        if ($result->failure instanceof SourceFailure) {
+            return new SourceFailedDto(self::error($result->failure->kind), $checkedAt);
+        }
+
+        return new SourceNotApplicableDto();
     }
 
     private static function error(FailureKind $kind): SourceError

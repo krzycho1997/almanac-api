@@ -131,9 +131,9 @@ final class OnThisDayClientTest extends KernelTestCase
 
         // Then
         self::assertSame(SourceStatus::Failed, $result->status);
-        self::assertSame($kind, $result->failureKind);
-        self::assertSame($status, $result->httpStatus);
-        self::assertEquals($cause, $result->cause);
+        self::assertSame($kind, $result->failure?->kind);
+        self::assertSame($status, $result->failure->httpStatus);
+        self::assertEquals($cause, $result->failure->cause);
     }
 
     /**

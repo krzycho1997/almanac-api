@@ -105,6 +105,6 @@ final class UpstreamFixturesTest extends KernelTestCase
 
     private static function rejected(UpstreamFixture $fixture, SourceResult $result): string
     {
-        return "Our client rejects the live answer for {$fixture->path} ({$result->failureKind?->value}, {$result->cause?->errorType}). Nothing was recorded.";
+        return "Our client rejects the live answer for {$fixture->path} ({$result->failure?->kind->value}, {$result->failure?->cause?->errorType}). Nothing was recorded.";
     }
 }

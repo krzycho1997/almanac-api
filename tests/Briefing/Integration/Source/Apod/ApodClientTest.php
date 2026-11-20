@@ -152,8 +152,8 @@ final class ApodClientTest extends KernelTestCase
 
         // Then
         self::assertSame(SourceStatus::Failed, $result->status);
-        self::assertSame(FailureKind::InvalidPayload, $result->failureKind);
-        self::assertEquals(new FailureCause('InvalidUpstreamPayloadException', ['date'], PayloadDefect::OtherDate), $result->cause);
+        self::assertSame(FailureKind::InvalidPayload, $result->failure?->kind);
+        self::assertEquals(new FailureCause('InvalidUpstreamPayloadException', ['date'], PayloadDefect::OtherDate), $result->failure->cause);
     }
 
     #[DataProvider('unusableMediaAddresses')]
@@ -193,8 +193,8 @@ final class ApodClientTest extends KernelTestCase
 
         // Then
         self::assertSame(SourceStatus::Failed, $result->status);
-        self::assertSame($kind, $result->failureKind);
-        self::assertEquals($cause, $result->cause);
+        self::assertSame($kind, $result->failure?->kind);
+        self::assertEquals($cause, $result->failure->cause);
     }
 
     /**

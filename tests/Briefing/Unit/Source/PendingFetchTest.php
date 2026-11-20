@@ -10,6 +10,7 @@ use App\Briefing\FailureCause;
 use App\Briefing\FailureKind;
 use App\Briefing\Model\SourcePayload;
 use App\Briefing\Source\PendingFetch;
+use App\Briefing\SourceFailure;
 use App\Briefing\SourceName;
 use App\Briefing\SourceStatus;
 use App\Tests\Support\Briefing\FakePayload;
@@ -39,7 +40,7 @@ final class PendingFetchTest extends TestCase
         self::assertSame(SourceName::Apod, $result->source);
         self::assertSame(SourceStatus::Ok, $result->status);
         self::assertEquals(new FakePayload(['title' => 'Pillars of Creation']), $result->payload);
-        self::assertNull($result->failureKind);
+        self::assertNull($result->failure);
     }
 
     #[DataProvider('failedStatuses')]
@@ -53,11 +54,8 @@ final class PendingFetchTest extends TestCase
 
         // Then
         self::assertSame(SourceStatus::Failed, $result->status);
-        self::assertSame($kind, $result->failureKind);
-        self::assertSame($status, $result->httpStatus);
+        self::assertEquals(new SourceFailure($kind, $status), $result->failure);
         self::assertNull($result->payload);
-        self::assertNull($result->retryAt);
-        self::assertNull($result->cause);
     }
 
     /**
@@ -90,9 +88,9 @@ final class PendingFetchTest extends TestCase
         $result = $fetch->resolve(SourceName::Apod);
 
         // Then
-        self::assertSame(FailureKind::RateLimited, $result->failureKind);
-        self::assertSame(Response::HTTP_TOO_MANY_REQUESTS, $result->httpStatus);
-        self::assertSame($expectedRetryAt, $result->retryAt?->format(\DateTimeInterface::ATOM));
+        self::assertSame(FailureKind::RateLimited, $result->failure?->kind);
+        self::assertSame(Response::HTTP_TOO_MANY_REQUESTS, $result->failure->httpStatus);
+        self::assertSame($expectedRetryAt, $result->failure->retryAt?->format(\DateTimeInterface::ATOM));
     }
 
     /**
@@ -120,9 +118,9 @@ final class PendingFetchTest extends TestCase
         $result = $fetch->resolve(SourceName::Weather);
 
         // Then
-        self::assertSame(FailureKind::Unavailable, $result->failureKind);
-        self::assertNull($result->httpStatus);
-        self::assertEquals(new FailureCause($errorType), $result->cause);
+        self::assertSame(FailureKind::Unavailable, $result->failure?->kind);
+        self::assertNull($result->failure->httpStatus);
+        self::assertEquals(new FailureCause($errorType), $result->failure->cause);
     }
 
     /**
@@ -145,7 +143,7 @@ final class PendingFetchTest extends TestCase
         $result = $fetch->resolve(SourceName::Weather);
 
         // Then
-        self::assertSame(FailureKind::Unavailable, $result->failureKind);
+        self::assertSame(FailureKind::Unavailable, $result->failure?->kind);
     }
 
     #[DataProvider('invalidPayloads')]
@@ -158,9 +156,9 @@ final class PendingFetchTest extends TestCase
         $result = $fetch->resolve(SourceName::OnThisDay);
 
         // Then
-        self::assertSame(FailureKind::InvalidPayload, $result->failureKind);
-        self::assertSame(Response::HTTP_OK, $result->httpStatus);
-        self::assertEquals($cause, $result->cause);
+        self::assertSame(FailureKind::InvalidPayload, $result->failure?->kind);
+        self::assertSame(Response::HTTP_OK, $result->failure->httpStatus);
+        self::assertEquals($cause, $result->failure->cause);
     }
 
     /**
@@ -198,9 +196,9 @@ final class PendingFetchTest extends TestCase
         $result = $fetch->resolve(SourceName::OnThisDay);
 
         // Then
-        self::assertSame($kind, $result->failureKind);
-        self::assertSame($status, $result->httpStatus);
-        self::assertSame($retryAt, $result->retryAt?->format(\DateTimeInterface::ATOM));
+        self::assertSame($kind, $result->failure?->kind);
+        self::assertSame($status, $result->failure->httpStatus);
+        self::assertSame($retryAt, $result->failure->retryAt?->format(\DateTimeInterface::ATOM));
     }
 
     /**
@@ -222,8 +220,8 @@ final class PendingFetchTest extends TestCase
         $result = $fetch->resolve(SourceName::OnThisDay);
 
         // Then
-        self::assertSame(FailureKind::InvalidPayload, $result->failureKind);
-        self::assertNull($result->httpStatus);
+        self::assertSame(FailureKind::InvalidPayload, $result->failure?->kind);
+        self::assertNull($result->failure->httpStatus);
     }
 
     public function testLeavesNoUnreadFailedResponseBehind(): void
@@ -237,7 +235,7 @@ final class PendingFetchTest extends TestCase
         gc_collect_cycles();
 
         // Then
-        self::assertSame(FailureKind::Rejected, $result->failureKind);
+        self::assertSame(FailureKind::Rejected, $result->failure?->kind);
     }
 
     /**
