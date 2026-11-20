@@ -1,0 +1,26 @@
+tests/Support/Identity/FailingFlush.php
+  s_ecd702649c3f02::t_b6611a477525ef 1-13
+src/Identity/Repository/UserRepository.php
+  s_ecd702649c3f02::t_8c3ab747db1c8a 18-19,28-29
+tests/Identity/Integration/AccessTokenIssuerTest.php
+  s_ecd702649c3f02::t_e08e17e201d911 12
+  s_ecd702649c3f02::t_b6611a477525ef 17,34-37,97,140-178,180-181,277-302
+  s_ecd702649c3f02::t_8a34ea8b73292f 179
+  s_ecd702649c3f02::t_8eeab2af157b8a 303
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0189ee6b5190a605db0670508a5613a08faea121",
+  "prompts": {},
+  "sessions": {
+    "s_ecd702649c3f02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79d0416-bbd9-40b6-9497-5f9421576080",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
