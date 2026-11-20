@@ -1,0 +1,29 @@
+tests/Fixtures/upstream/README.md
+  s_02e4949da5212d::t_a8508efe8b9d92 3
+tests/Fixtures/upstream/apod/date-out-of-range.json
+  s_02e4949da5212d::t_2a2b8402bbe6b3 5
+tests/Fixtures/upstream/apod/placeholder-2026-11-18.json
+  s_02e4949da5212d::t_7010bc5380a66f 9
+tests/Fixtures/upstream/on_this_day/births-03-15.json
+  s_02e4949da5212d::t_e7aca661fdba91 2-4513
+tests/Fixtures/upstream/on_this_day/deaths-03-15.json
+  s_02e4949da5212d::t_fc8cba00330aef 2-2137
+tests/Fixtures/upstream/on_this_day/selected-03-15.json
+  s_02e4949da5212d::t_fb90d99c7fdcbf 2-1344
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5188bd2906393bf3f5431823ee346ba0835031c9",
+  "prompts": {},
+  "sessions": {
+    "s_02e4949da5212d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "05351d01-d85c-422b-9e54-d8b1b82336a5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
