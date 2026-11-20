@@ -1,0 +1,19 @@
+tests/Briefing/Unit/DependencyInjection/OneSourcePerNamePassTest.php
+  s_02e4949da5212d::t_d28f5af650417d 76-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ffeb35f1866090e20d3c84ee8b92e3c95dcaed7c",
+  "prompts": {},
+  "sessions": {
+    "s_02e4949da5212d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "05351d01-d85c-422b-9e54-d8b1b82336a5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
