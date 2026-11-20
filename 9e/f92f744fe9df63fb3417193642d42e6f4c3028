@@ -1,0 +1,23 @@
+tests/Briefing/Integration/BriefingResponseSchemaTest.php
+  s_a463f0f3bbc4ea::t_c1cf2dcf72573f 1-60,62-66,71-72
+  s_a463f0f3bbc4ea::t_d5abd537562436 61,67-70
+tests/Briefing/Unit/Mapper/BriefingResponseMapperTest.php
+  s_a463f0f3bbc4ea::t_a6a312abed7fa2 25,55-56,59-82,88,93-103
+  s_a463f0f3bbc4ea::t_75d04642476b6c 104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9ef92f744fe9df63fb3417193642d42e6f4c3028",
+  "prompts": {},
+  "sessions": {
+    "s_a463f0f3bbc4ea": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e80e7e02-debb-4938-91ba-befdb4b4d71a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
