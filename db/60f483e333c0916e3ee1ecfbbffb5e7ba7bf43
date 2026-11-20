@@ -1,0 +1,19 @@
+tests/Briefing/Integration/RateLimiterRedisTest.php
+  s_3184f64bee17b6::t_c8bf339e97124e 7,23,49,86,91
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "db60f483e333c0916e3ee1ecfbbffb5e7ba7bf43",
+  "prompts": {},
+  "sessions": {
+    "s_3184f64bee17b6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5b20d54b-baa8-4fc8-8d48-372b8bdb8ead",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
