@@ -1,0 +1,39 @@
+phpstan.dist.neon
+  s_4da5374f6e605f::t_6b9ad034812eba 32-34
+  s_4da5374f6e605f::t_52f9273934a0e8 31
+tests/Briefing/Unit/Contract/DiscoveryIdTypeTest.php
+  s_4da5374f6e605f::t_dee3d11239f1eb 11,81-100
+  s_4da5374f6e605f::t_c341531e47176d 124-129,134-139,151-161
+  s_4da5374f6e605f::t_1ac6d0c0ab4de8 122-123,130-133,140-141
+  s_4da5374f6e605f::t_dca6232c8c5ae8 1-10,12-63,65-80,101-121,142-150,162-163
+  s_4da5374f6e605f::t_c5f77c491886ff 64
+src/Briefing/Contract/DiscoveryId.php
+  s_4da5374f6e605f::t_6b9ad034812eba 1-11
+tests/Briefing/Unit/Contract/DiscoveryIdTest.php
+  s_4da5374f6e605f::t_dee3d11239f1eb 67
+  s_4da5374f6e605f::t_dca6232c8c5ae8 1-9,11-42,45-50,53-61,63-66,69-71
+  s_4da5374f6e605f::t_c5f77c491886ff 10,68
+  s_4da5374f6e605f::t_1ac6d0c0ab4de8 43-44,51-52,62
+src/Briefing/Contract/DiscoveryIdType.php
+  s_4da5374f6e605f::t_6b9ad034812eba 1-64
+config/packages/doctrine.yaml
+  s_4da5374f6e605f::t_6b9ad034812eba 7
+tests/Briefing/Integration/DiscoveryIdTypeTest.php
+  s_4da5374f6e605f::t_dca6232c8c5ae8 1-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "65b20fbbfa385f7c8836654f08ac945b1d560707",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
