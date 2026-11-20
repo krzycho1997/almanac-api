@@ -1,0 +1,31 @@
+src/Briefing/Source/ConcurrentFetcher.php
+  s_02e4949da5212d::t_944fa563c05f37 7,19,70-71,95-98,106-118
+  s_02e4949da5212d::t_5b43309740e903 119-121
+src/Briefing/Exception/UpstreamStreamException.php
+  s_02e4949da5212d::t_944fa563c05f37 1-19
+tests/Support/Briefing/ScriptedUpstream.php
+  s_02e4949da5212d::t_d28f5af650417d 28-32,61-70,90,107-119
+  s_02e4949da5212d::t_944fa563c05f37 35-36,56-58,126-129
+  s_02e4949da5212d::t_5974147710b6a7 59-60,120
+tests/Briefing/Unit/Source/ConcurrentFetcherTest.php
+  s_02e4949da5212d::t_a6a7b0142b92da 160,179
+  s_02e4949da5212d::t_d28f5af650417d 147-159,161-178,180-181
+  s_02e4949da5212d::t_bbe01191b99b03 32,268,273,288,292-301,303-319
+  s_02e4949da5212d::t_62d5fa90b1cbf9 302
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f9e92b62ea8ebaec4b54a117c0f3754ad2fb73a4",
+  "prompts": {},
+  "sessions": {
+    "s_02e4949da5212d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "05351d01-d85c-422b-9e54-d8b1b82336a5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
