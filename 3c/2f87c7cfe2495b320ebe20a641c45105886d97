@@ -1,0 +1,27 @@
+src/Briefing/Source/UpstreamResponseDecoder.php
+  s_a463f0f3bbc4ea::t_c62f7e08756a36 11,14,22-25,58-64,77,79
+  s_a463f0f3bbc4ea::t_9edfc7c847aa73 81
+  s_a463f0f3bbc4ea::t_13c6d1fd09da89 82,85
+tests/Briefing/Integration/UpstreamResponseDecoderTest.php
+  s_a463f0f3bbc4ea::t_13c6d1fd09da89 95-96
+  s_a463f0f3bbc4ea::t_be390b8d7016c5 97
+src/Briefing/Exception/InvalidUpstreamPayloadException.php
+  s_a463f0f3bbc4ea::t_13c6d1fd09da89 10-11,62-66
+  s_a463f0f3bbc4ea::t_e45ac79483c8c4 38,46,60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3c2f87c7cfe2495b320ebe20a641c45105886d97",
+  "prompts": {},
+  "sessions": {
+    "s_a463f0f3bbc4ea": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e80e7e02-debb-4938-91ba-befdb4b4d71a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
