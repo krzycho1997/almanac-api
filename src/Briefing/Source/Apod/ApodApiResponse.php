@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 final readonly class ApodApiResponse
 {
     public function __construct(
-        #[Assert\NotBlank(normalizer: 'trim')]
+        #[Assert\NotBlank(normalizer: 'trim'), Assert\Date]
         public string $date,
         #[Assert\NotBlank(normalizer: 'trim')]
         public string $title,

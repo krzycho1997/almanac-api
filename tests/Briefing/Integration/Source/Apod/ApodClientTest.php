@@ -178,6 +178,7 @@ final class ApodClientTest extends KernelTestCase
         yield 'date out of range' => [UpstreamMock::create()->apod()->fixture('apod/date-out-of-range.json')->status(Response::HTTP_BAD_REQUEST), FailureKind::Rejected];
         yield 'server error twice' => [UpstreamMock::create()->apod()->status(Response::HTTP_INTERNAL_SERVER_ERROR)->apod()->status(Response::HTTP_INTERNAL_SERVER_ERROR), FailureKind::Unavailable];
         yield 'empty object' => [UpstreamMock::create()->apod(), FailureKind::InvalidPayload];
+        yield 'null byte in the date' => [UpstreamMock::create()->apod()->json('{"date":"2024-03-15\\u0000","title":"Pillars","explanation":"Gas","media_type":"image","url":"https://apod.nasa.gov/a.jpg"}'), FailureKind::InvalidPayload];
         yield 'empty picture address' => [UpstreamMock::create()->apod()->json('{"date":"2024-03-15","title":"Pillars","explanation":"Gas","media_type":"image","url":""}'), FailureKind::InvalidPayload];
         yield 'blank media type' => [UpstreamMock::create()->apod()->json('{"date":"2024-03-15","title":"Pillars","explanation":"Gas","media_type":" ","url":"https://apod.nasa.gov/a.jpg"}'), FailureKind::InvalidPayload];
         yield 'relative picture address' => [UpstreamMock::create()->apod()->json('{"date":"2024-03-15","title":"Pillars","explanation":"Gas","media_type":"image","url":"/apod/image.jpg"}'), FailureKind::InvalidPayload];
