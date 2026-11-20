@@ -9,6 +9,8 @@ use App\Briefing\Exception\PayloadDefect;
 
 final readonly class FailureCause
 {
+    private const string DEADLINE_EXCEEDED = 'DeadlineExceeded';
+
     /**
      * @param list<string>|null $fields
      */
@@ -17,6 +19,11 @@ final readonly class FailureCause
         public ?array $fields = null,
         public ?PayloadDefect $defect = null,
     ) {
+    }
+
+    public static function deadlineExceeded(): self
+    {
+        return new self(self::DEADLINE_EXCEEDED);
     }
 
     public static function of(\Throwable $exception): self

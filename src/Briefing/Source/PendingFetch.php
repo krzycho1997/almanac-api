@@ -18,6 +18,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final readonly class PendingFetch
 {
+    private const string CANCELED = 'canceled';
+
     /**
      * @param non-empty-list<ResponseInterface> $responses
      * @param \Closure(): SourcePayload         $map
@@ -36,13 +38,13 @@ final readonly class PendingFetch
         } catch (TransportExceptionInterface $exception) {
             return SourceResult::failed($source, FailureKind::Unavailable, cause: FailureCause::of($exception));
         } finally {
-            $this->cancelAll();
+            $this->cancel();
         }
     }
 
     private function firstFailure(SourceName $source): ?SourceResult
     {
-        foreach ($this->responses as $response) {
+        foreach ($this->uncanceledFirst() as $response) {
             $status = $response->getStatusCode();
 
             if (self::isSuccessful($status)) {
@@ -88,7 +90,22 @@ final readonly class PendingFetch
         return FailureKind::Rejected;
     }
 
-    private static function isSuccessful(int $status): bool
+    /**
+     * @return list<ResponseInterface>
+     */
+    private function uncanceledFirst(): array
+    {
+        $canceled = array_filter($this->responses, self::isCanceled(...));
+
+        return [...array_diff_key($this->responses, $canceled), ...$canceled];
+    }
+
+    private static function isCanceled(ResponseInterface $response): bool
+    {
+        return true === $response->getInfo(self::CANCELED);
+    }
+
+    public static function isSuccessful(int $status): bool
     {
         return $status >= Response::HTTP_OK && $status < Response::HTTP_MULTIPLE_CHOICES;
     }
@@ -122,7 +139,15 @@ final readonly class PendingFetch
         return null;
     }
 
-    private function cancelAll(): void
+    /**
+     * @return non-empty-list<ResponseInterface>
+     */
+    public function responses(): array
+    {
+        return $this->responses;
+    }
+
+    public function cancel(): void
     {
         foreach ($this->responses as $response) {
             $response->cancel();

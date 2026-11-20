@@ -19,17 +19,17 @@ final readonly class SourceFailureLog
     ) {
     }
 
-    public function record(SourceResult $result, \DateTimeImmutable $date): void
+    public function record(SourceResult $result, \DateTimeImmutable $date, int $durationMs): void
     {
         if ($result->failureKind instanceof FailureKind) {
-            $this->logger->log($result->failureKind->logLevel(), self::MESSAGE, self::contextOf($result, $result->failureKind, $date));
+            $this->logger->log($result->failureKind->logLevel(), self::MESSAGE, self::contextOf($result, $result->failureKind, $date, $durationMs));
         }
     }
 
     /**
      * @return array<string, mixed>
      */
-    private static function contextOf(SourceResult $result, FailureKind $kind, \DateTimeImmutable $date): array
+    private static function contextOf(SourceResult $result, FailureKind $kind, \DateTimeImmutable $date, int $durationMs): array
     {
         return array_filter([
             LogContextKey::Source->value => $result->source->value,
@@ -40,6 +40,7 @@ final readonly class SourceFailureLog
             LogContextKey::ErrorType->value => $result->cause?->errorType,
             LogContextKey::Fields->value => $result->cause?->fields,
             LogContextKey::Reason->value => $result->cause?->defect?->value,
+            LogContextKey::DurationMs->value => $durationMs,
         ], static fn (mixed $value): bool => null !== $value);
     }
 }

@@ -65,7 +65,7 @@ final class UpstreamHttpClientsTest extends KernelTestCase
 
         // Then
         $options = self::onlyServedRequest()->getRequestOptions();
-        self::assertSame(2.0, $options['timeout']);
+        self::assertSame((float) \ini_get('default_socket_timeout'), $options['timeout']);
         self::assertSame(3.0, $options['max_duration']);
         self::assertSame(0, $options['max_redirects']);
         self::assertSame(1.0, $options['max_connect_duration']);
