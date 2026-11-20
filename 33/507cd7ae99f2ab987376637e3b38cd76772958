@@ -1,0 +1,41 @@
+docs/openapi.yaml
+  s_3184f64bee17b6::t_8fbf1661c10c49 122
+  s_3184f64bee17b6::t_cc9972cfabf5b5 82-83,96-101,121,123-131
+tests/Support/Briefing/InteractsWithRateLimit.php
+  s_3184f64bee17b6::t_c7eed68cf60dcb 1-28
+tests/Briefing/Functional/RateLimitTest.php
+  s_3184f64bee17b6::t_827979ace79e55 22,60
+  s_3184f64bee17b6::t_46a3cd88843c2f 1-7,9-17,19-21,23-27,32-35,37-48,50-55,57-59,61-66,68-78,80-91,93-95,135-152
+  s_3184f64bee17b6::t_8fbf1661c10c49 28-31,56,96-134
+  s_3184f64bee17b6::t_c7eed68cf60dcb 8,18,36,49,67,79,92
+src/Briefing/Controller/BriefingController.php
+  s_3184f64bee17b6::t_f8e76f9c407caf 19,26-27,30
+  s_3184f64bee17b6::t_8fbf1661c10c49 15,28-29,41-47
+  s_3184f64bee17b6::t_123dcde07569f9 40,48
+tests/Shared/Functional/ErrorFormatTest.php
+  s_3184f64bee17b6::t_dd2ce4bc6d7f22 93-95,97-104
+  s_3184f64bee17b6::t_c7eed68cf60dcb 8,18-19,96
+  s_3184f64bee17b6::t_2a9a9b6814cede 105-106
+config/packages/rate_limiter.yaml
+  s_3184f64bee17b6::t_facfa0dcc7407a 1-7
+composer.json
+  s_3184f64bee17b6::t_b1f98a09bddc02 33
+composer.lock
+  s_3184f64bee17b6::t_0c2255c58ad97f 7,3588-3659,4492-4566
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "33507cd7ae99f2ab987376637e3b38cd76772958",
+  "prompts": {},
+  "sessions": {
+    "s_3184f64bee17b6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5b20d54b-baa8-4fc8-8d48-372b8bdb8ead",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
