@@ -1,0 +1,24 @@
+src/Identity/Dto/Input/CreateUserInput.php
+  s_ecd702649c3f02::t_673d0a5c1cc485 1-19,21-52,60-64,66-68,77-78
+  s_ecd702649c3f02::t_54eeb29bff4a93 20,53-59,65,69-76
+tests/Identity/Functional/CreateUserCommandTest.php
+  s_ecd702649c3f02::t_a43ec0313b887e 1-163
+src/Identity/Command/CreateUserCommand.php
+  s_ecd702649c3f02::t_54eeb29bff4a93 1-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ec644c321fb938b8e325c759badb72cb6229e3b4",
+  "prompts": {},
+  "sessions": {
+    "s_ecd702649c3f02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79d0416-bbd9-40b6-9497-5f9421576080",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
