@@ -1,0 +1,25 @@
+src/Identity/Entity/User.php
+  s_ecd702649c3f02::t_70585c76341a34 7,20
+tests/Identity/Unit/Entity/UserTest.php
+  s_ecd702649c3f02::t_70585c76341a34 1-33
+src/Identity/Contract/AuthenticatedUser.php
+  s_ecd702649c3f02::t_70585c76341a34 1-10
+tests/Support/Controller/AuthenticatedUserProbeController.php
+  s_ecd702649c3f02::t_70585c76341a34 7,21,23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ab31a564c021d678bc127ee4cd14196766c26917",
+  "prompts": {},
+  "sessions": {
+    "s_ecd702649c3f02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79d0416-bbd9-40b6-9497-5f9421576080",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
