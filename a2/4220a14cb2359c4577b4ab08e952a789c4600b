@@ -1,0 +1,25 @@
+tests/Shared/Functional/ErrorFormatTest.php
+  s_ecd702649c3f02::t_451d2f1f31f271 60
+tests/Support/Controller/AuthenticatedUserProbeController.php
+  s_ecd702649c3f02::t_451d2f1f31f271 17-18,27-31
+  s_ecd702649c3f02::t_59a35feba463d0 32
+tests/Identity/Functional/AccessTokenAuthenticationTest.php
+  s_ecd702649c3f02::t_451d2f1f31f271 28,104-121,133-136
+  s_ecd702649c3f02::t_edd4e0a8c7b306 137
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a24220a14cb2359c4577b4ab08e952a789c4600b",
+  "prompts": {},
+  "sessions": {
+    "s_ecd702649c3f02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79d0416-bbd9-40b6-9497-5f9421576080",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
