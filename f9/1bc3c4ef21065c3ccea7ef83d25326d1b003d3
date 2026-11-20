@@ -1,0 +1,43 @@
+config/packages/doctrine.yaml
+  s_02e4949da5212d::t_5e2d106afb12f7 13,15-19
+tests/Briefing/Unit/SnapshotScopeTest.php
+  s_02e4949da5212d::t_5e2d106afb12f7 1-50
+tools/phpstan/src/Doctrine/JsonbTypeDescriptor.php
+  s_02e4949da5212d::t_4b900a05b71c36 1-7,13,15-18,39-40
+  s_02e4949da5212d::t_9e53c7adcf9dfd 8-12,14,19-38
+src/Briefing/Repository/SnapshotWrite.php
+  s_02e4949da5212d::t_5e2d106afb12f7 1-20
+src/Briefing/Entity/SourceSnapshot.php
+  s_02e4949da5212d::t_5e2d106afb12f7 1-18,20-40
+  s_02e4949da5212d::t_ac01bcec3369fa 19
+src/Briefing/Repository/SourceSnapshotRepository.php
+  s_02e4949da5212d::t_5e2d106afb12f7 1-117
+phpstan.dist.neon
+  s_02e4949da5212d::t_5d0596800f7a35 41-42
+  s_02e4949da5212d::t_4b900a05b71c36 40
+  s_02e4949da5212d::t_d843a27907cf63 39
+migrations/Version20261120203720.php
+  s_02e4949da5212d::t_5e2d106afb12f7 1-47
+src/Briefing/SnapshotScope.php
+  s_02e4949da5212d::t_5e2d106afb12f7 1-24
+tests/Briefing/Integration/Repository/SchemaConstraintsTest.php
+  s_02e4949da5212d::t_5e2d106afb12f7 1-97
+tests/Briefing/Integration/Repository/SourceSnapshotRepositoryTest.php
+  s_02e4949da5212d::t_5e2d106afb12f7 1-339
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f91bc3c4ef21065c3ccea7ef83d25326d1b003d3",
+  "prompts": {},
+  "sessions": {
+    "s_02e4949da5212d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "05351d01-d85c-422b-9e54-d8b1b82336a5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
