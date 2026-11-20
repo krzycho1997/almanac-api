@@ -1,0 +1,36 @@
+tests/Support/Briefing/BriefingRateLimit.php
+  s_3184f64bee17b6::t_4c842cd732fdb6 1-18
+src/Briefing/Controller/BriefingController.php
+  s_3184f64bee17b6::t_612a3a44e75245 36
+tests/Shared/Functional/ErrorFormatTest.php
+  s_3184f64bee17b6::t_4c842cd732fdb6 87
+src/Briefing/Controller/ClientNetworkKey.php
+  s_3184f64bee17b6::t_89ef968c792a71 21,23-24,27-32
+  s_3184f64bee17b6::t_612a3a44e75245 1-20,22,25-26,33-34
+tests/Support/Briefing/InteractsWithRateLimit.php
+  s_3184f64bee17b6::t_4c842cd732fdb6 7,9-10,21,24,26-33
+tests/Briefing/Functional/RateLimitTest.php
+  s_3184f64bee17b6::t_4c842cd732fdb6 8,14,23-24,26-28,31-32,35,40,48,54,62,64-65,71,80,83,93,96,99,105,108-109,112,115,118,121,124,127,130,133,136,142-168
+  s_3184f64bee17b6::t_58a88182838d80 169
+docs/openapi.yaml
+  s_3184f64bee17b6::t_c8bf339e97124e 122
+tests/Briefing/Unit/Controller/ClientNetworkKeyTest.php
+  s_3184f64bee17b6::t_80ed2d66367d30 1-37,40-54
+  s_3184f64bee17b6::t_89ef968c792a71 38-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ea3fb8bcdb226a9af47fb1b0beb4e0271a063540",
+  "prompts": {},
+  "sessions": {
+    "s_3184f64bee17b6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5b20d54b-baa8-4fc8-8d48-372b8bdb8ead",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
