@@ -1,0 +1,12 @@
+security:
+    firewalls:
+        api:
+            pattern: ^/api/bookmarks(?:/|$)
+            stateless: true
+            access_token:
+                token_handler: App\Identity\Security\AccessTokenHandler
+                failure_handler: App\Identity\Security\ApiAuthenticationResponder
+            entry_point: App\Identity\Security\ApiAuthenticationResponder
+
+    access_control:
+        - { path: ^/api/bookmarks(?:/|$), roles: IS_AUTHENTICATED_FULLY }

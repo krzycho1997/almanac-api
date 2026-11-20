@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Shared\Functional;
 
 use App\Shared\ErrorHandler\ProblemJsonErrorRenderer;
+use App\Tests\Support\Controller\AuthenticatedUserProbeController;
 use App\Tests\Support\FunctionalTestCase;
 use Monolog\Level;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -55,6 +56,8 @@ final class ErrorFormatTest extends FunctionalTestCase
         yield 'method not allowed' => [Request::METHOD_POST, self::HEALTH, [], null, Response::HTTP_METHOD_NOT_ALLOWED, 'Method Not Allowed'];
         yield 'malformed JSON' => [Request::METHOD_POST, '/_test/payload', ['CONTENT_TYPE' => 'application/json'], '{"name":', Response::HTTP_BAD_REQUEST, 'Bad Request'];
         yield 'unsupported content type' => [Request::METHOD_POST, '/_test/payload', ['CONTENT_TYPE' => 'text/plain'], 'name', Response::HTTP_UNSUPPORTED_MEDIA_TYPE, 'Unsupported Media Type'];
+        yield 'missing Bearer token' => [Request::METHOD_GET, AuthenticatedUserProbeController::PATH, [], null, Response::HTTP_UNAUTHORIZED, 'Unauthorized'];
+        yield 'unknown Bearer token' => [Request::METHOD_GET, AuthenticatedUserProbeController::PATH, ['HTTP_AUTHORIZATION' => 'Bearer 0000000000000000000000000000000000000000000000000000000000000000'], null, Response::HTTP_UNAUTHORIZED, 'Unauthorized'];
     }
 
     /**

@@ -34,6 +34,8 @@ final class ArchitectureRulesTest extends TestCase
             'Briefing/Dto/Response/ProbeResponseUsesDomainEnum.php' => ['phpat.responseDtosOwnTheirTypes'],
             'Briefing/Dto/Response/ProbeResponseUsesModel.php' => ['phpat.responseDtosOwnTheirTypes'],
             'Shared/ProbeNotFinal.php' => ['phpat.classesAreFinal'],
+            'Identity/Entity/ProbeEntityUsesServiceAndHttp.php' => ['phpat.entitiesStayBelowServices', 'phpat.entitiesStayBelowServices'],
+            'Identity/Entity/ProbeEntityUsesMapper.php' => ['phpat.entitiesStayBelowServices'],
         ];
 
         // When
