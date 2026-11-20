@@ -37,6 +37,10 @@ services:
         tags:
             - phpstan.doctrine.typeDescriptor
     -
+        class: App\PHPStan\Doctrine\JsonbTypeDescriptor
+        tags:
+            - phpstan.doctrine.typeDescriptor
+    -
         class: App\Tests\Architecture\ModuleBoundaryTest
         tags:
             - phpat.test
