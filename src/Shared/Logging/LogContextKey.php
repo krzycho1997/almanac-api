@@ -10,9 +10,11 @@ enum LogContextKey: string
     case Date = 'date';
     case Dates = 'dates';
     case DurationMs = 'durationMs';
+    case ErrorType = 'errorType';
     case Exception = 'exception';
     case ExpiresAt = 'expiresAt';
     case Failures = 'failures';
+    case Fields = 'fields';
     case From = 'from';
     case HttpStatus = 'httpStatus';
     case Kind = 'kind';

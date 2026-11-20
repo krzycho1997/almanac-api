@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Briefing\Source;
 
 use App\Briefing\Exception\InvalidUpstreamPayloadException;
+use App\Briefing\FailureCause;
 use App\Briefing\FailureKind;
 use App\Briefing\Model\SourcePayload;
 use App\Briefing\SourceName;
@@ -31,8 +32,8 @@ final readonly class PendingFetch
     {
         try {
             return $this->resultFor($source, $this->response->getStatusCode());
-        } catch (TransportExceptionInterface) {
-            return SourceResult::failed($source, FailureKind::Unavailable);
+        } catch (TransportExceptionInterface $exception) {
+            return SourceResult::failed($source, FailureKind::Unavailable, cause: FailureCause::of($exception));
         }
     }
 
@@ -53,8 +54,8 @@ final readonly class PendingFetch
     {
         try {
             return SourceResult::ok($source, ($this->map)($this->response));
-        } catch (DecodingExceptionInterface|InvalidUpstreamPayloadException|\JsonException) {
-            return SourceResult::failed($source, FailureKind::InvalidPayload, $status);
+        } catch (DecodingExceptionInterface|InvalidUpstreamPayloadException|\JsonException $exception) {
+            return SourceResult::failed($source, FailureKind::InvalidPayload, $status, cause: FailureCause::of($exception));
         }
     }
 

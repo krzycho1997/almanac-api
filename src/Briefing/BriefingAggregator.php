@@ -22,6 +22,7 @@ final readonly class BriefingAggregator
         #[AutowireIterator(Source::class)]
         iterable $sources,
         private ClockInterface $clock,
+        private SourceFailureLog $failureLog,
     ) {
         $this->sources = array_values([...$sources]);
     }
@@ -29,8 +30,20 @@ final readonly class BriefingAggregator
     public function briefingFor(\DateTimeImmutable $date, Location $location): BriefingResult
     {
         $fetches = array_map(fn (Source $source): \Closure => $this->start($source, $date, $location), $this->sources);
+        $results = array_map(static fn (\Closure $settle): SourceResult => $settle(), $fetches);
+        $this->recordFailures($results, $date);
 
-        return new BriefingResult($date, $location, array_map(static fn (\Closure $settle): SourceResult => $settle(), $fetches), $this->clock->now());
+        return new BriefingResult($date, $location, $results, $this->clock->now());
+    }
+
+    /**
+     * @param list<SourceResult> $results
+     */
+    private function recordFailures(array $results, \DateTimeImmutable $date): void
+    {
+        foreach ($results as $result) {
+            $this->failureLog->record($result, $date);
+        }
     }
 
     /**

@@ -7,6 +7,7 @@ namespace App\Tests\Briefing\Unit\Source\Apod;
 use App\Briefing\Exception\InvalidUpstreamPayloadException;
 use App\Briefing\Model\ApodPicture;
 use App\Briefing\Model\MediaType;
+use App\Briefing\PayloadDefect;
 use App\Briefing\Source\Apod\ApodApiResponse;
 use App\Briefing\Source\Apod\ApodMapper;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -160,30 +161,36 @@ final class ApodMapperTest extends TestCase
         $logo = 'https://science.nasa.gov/wp-content/themes/nasa-child/assets/images/nasa-logo@2x.png';
         $response = new ApodApiResponse(self::DATE, "NASA Science\t", 'Discover the cosmos!', 'image', $logo, $logo);
 
-        // Then / When
-        $this->expectException(InvalidUpstreamPayloadException::class);
-        new ApodMapper()->map($response);
+        // When
+        $rejection = self::rejectionOf($response);
+
+        // Then
+        self::assertSame(['title'], $rejection->fields());
+        self::assertSame(PayloadDefect::Placeholder, $rejection->defect());
     }
 
     #[DataProvider('textsWithoutContent')]
-    public function testRejectsATitleOrExplanationWithoutText(string $title, string $explanation): void
+    public function testRejectsATitleOrExplanationWithoutText(string $title, string $explanation, string $field): void
     {
         // Given
         $response = new ApodApiResponse(self::DATE, $title, $explanation, 'image', self::URL);
 
-        // Then / When
-        $this->expectException(InvalidUpstreamPayloadException::class);
-        new ApodMapper()->map($response);
+        // When
+        $rejection = self::rejectionOf($response);
+
+        // Then
+        self::assertSame([$field], $rejection->fields());
+        self::assertSame(PayloadDefect::NoText, $rejection->defect());
     }
 
     /**
-     * @return iterable<string, array{string, string}>
+     * @return iterable<string, array{string, string, string}>
      */
     public static function textsWithoutContent(): iterable
     {
-        yield 'title of empty tags' => ['<b> </b>', self::EXPLANATION];
-        yield 'title of a non-breaking space' => ["\u{00A0}", self::EXPLANATION];
-        yield 'explanation of only the label' => [self::TITLE, '<strong>Explanation:</strong> '];
+        yield 'title of empty tags' => ['<b> </b>', self::EXPLANATION, 'title'];
+        yield 'title of a non-breaking space' => ["\u{00A0}", self::EXPLANATION, 'title'];
+        yield 'explanation of only the label' => [self::TITLE, '<strong>Explanation:</strong> ', 'explanation'];
     }
 
     #[DataProvider('invalidDates')]
@@ -192,9 +199,12 @@ final class ApodMapperTest extends TestCase
         // Given
         $response = new ApodApiResponse($date, self::TITLE, self::EXPLANATION, 'image', self::URL);
 
-        // Then / When
-        $this->expectException(InvalidUpstreamPayloadException::class);
-        new ApodMapper()->map($response);
+        // When
+        $rejection = self::rejectionOf($response);
+
+        // Then
+        self::assertSame(['date'], $rejection->fields());
+        self::assertSame(PayloadDefect::NotACalendarDate, $rejection->defect());
     }
 
     /**
@@ -206,5 +216,16 @@ final class ApodMapperTest extends TestCase
         yield 'another format' => ['18/11/2026'];
         yield 'with a time' => ['2026-11-18T00:00:00'];
         yield 'empty' => [''];
+    }
+
+    private static function rejectionOf(ApodApiResponse $response): InvalidUpstreamPayloadException
+    {
+        try {
+            new ApodMapper()->map($response);
+        } catch (InvalidUpstreamPayloadException $exception) {
+            return $exception;
+        }
+
+        self::fail('The response must be rejected.');
     }
 }

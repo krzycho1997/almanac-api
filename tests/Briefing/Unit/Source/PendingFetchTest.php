@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Briefing\Unit\Source;
 
 use App\Briefing\Exception\InvalidUpstreamPayloadException;
+use App\Briefing\FailureCause;
 use App\Briefing\FailureKind;
 use App\Briefing\Model\SourcePayload;
+use App\Briefing\PayloadDefect;
 use App\Briefing\Source\PendingFetch;
 use App\Briefing\SourceName;
 use App\Briefing\SourceStatus;
@@ -55,6 +57,7 @@ final class PendingFetchTest extends TestCase
         self::assertSame($status, $result->httpStatus);
         self::assertNull($result->payload);
         self::assertNull($result->retryAt);
+        self::assertNull($result->cause);
     }
 
     /**
@@ -103,10 +106,15 @@ final class PendingFetchTest extends TestCase
         yield 'not a date' => ['soon', null];
     }
 
-    public function testReportsANetworkFailureAsUnavailable(): void
+    /**
+     * @param string|list<string>  $body
+     * @param array<string, mixed> $info
+     */
+    #[DataProvider('transportFailures')]
+    public function testReportsATransportFailureAsUnavailableWithItsErrorType(string|array $body, array $info, string $errorType): void
     {
         // Given
-        $fetch = self::fetch(new MockResponse('', ['error' => 'Connection refused']));
+        $fetch = self::fetch(new MockResponse($body, $info));
 
         // When
         $result = $fetch->resolve(SourceName::Weather);
@@ -114,6 +122,18 @@ final class PendingFetchTest extends TestCase
         // Then
         self::assertSame(FailureKind::Unavailable, $result->failureKind);
         self::assertNull($result->httpStatus);
+        self::assertEquals(new FailureCause($errorType), $result->cause);
+    }
+
+    /**
+     * @return iterable<string, array{string|list<string>, array<string, mixed>, string}>
+     */
+    public static function transportFailures(): iterable
+    {
+        yield 'connection refused' => ['', ['error' => 'Connection refused'], 'TransportException'];
+        yield 'unknown host' => ['', ['error' => 'Could not resolve host: upstream.test'], 'TransportException'];
+        yield 'max duration reached' => ['', ['error' => 'Max duration was reached for "'.self::URL.'".'], 'TransportException'];
+        yield 'idle timeout' => [['', self::BODY], [], 'TimeoutException'];
     }
 
     public function testReportsATimeoutWhileReadingTheBodyAsUnavailable(): void
@@ -129,7 +149,7 @@ final class PendingFetchTest extends TestCase
     }
 
     #[DataProvider('invalidPayloads')]
-    public function testReportsAnInvalidPayload(string $body, \Closure $map): void
+    public function testReportsAnInvalidPayload(string $body, \Closure $map, FailureCause $cause): void
     {
         // Given
         $fetch = self::fetch(new MockResponse($body), $map);
@@ -140,16 +160,18 @@ final class PendingFetchTest extends TestCase
         // Then
         self::assertSame(FailureKind::InvalidPayload, $result->failureKind);
         self::assertSame(Response::HTTP_OK, $result->httpStatus);
+        self::assertEquals($cause, $result->cause);
     }
 
     /**
-     * @return iterable<string, array{string, \Closure(ResponseInterface): SourcePayload}>
+     * @return iterable<string, array{string, \Closure(ResponseInterface): SourcePayload, FailureCause}>
      */
     public static function invalidPayloads(): iterable
     {
-        yield 'malformed JSON' => ['{"title":', self::decodedPayload(...)];
-        yield 'JSON the mapper rejects' => [self::BODY, static fn (ResponseInterface $response): SourcePayload => throw InvalidUpstreamPayloadException::because('missing url')];
-        yield 'JSON decoded by the mapper itself' => ['{"title":', static fn (ResponseInterface $response): SourcePayload => new FakePayload((array) json_decode($response->getContent(), true, flags: \JSON_THROW_ON_ERROR))];
+        yield 'malformed JSON' => ['{"title":', self::decodedPayload(...), new FailureCause('JsonException')];
+        yield 'body that is not JSON' => ['<html>', static fn (ResponseInterface $response): SourcePayload => throw InvalidUpstreamPayloadException::notJson(FakePayload::class), new FailureCause('InvalidUpstreamPayloadException', [], PayloadDefect::NotJson)];
+        yield 'JSON the mapper rejects' => [self::BODY, static fn (ResponseInterface $response): SourcePayload => throw InvalidUpstreamPayloadException::at('url', PayloadDefect::NoText, 'missing url'), new FailureCause('InvalidUpstreamPayloadException', ['url'], PayloadDefect::NoText)];
+        yield 'JSON decoded by the mapper itself' => ['{"title":', static fn (ResponseInterface $response): SourcePayload => new FakePayload((array) json_decode($response->getContent(), true, flags: \JSON_THROW_ON_ERROR)), new FailureCause('JsonException')];
     }
 
     /**

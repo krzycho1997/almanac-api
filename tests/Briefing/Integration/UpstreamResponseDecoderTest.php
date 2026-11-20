@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Briefing\Integration;
 
 use App\Briefing\Exception\InvalidUpstreamPayloadException;
+use App\Briefing\PayloadDefect;
 use App\Briefing\Source\UpstreamResponseDecoder;
 use App\Tests\Support\Briefing\ExampleApiResponse;
 use App\Tests\Support\Briefing\ExampleItem;
@@ -55,8 +56,11 @@ final class UpstreamResponseDecoderTest extends KernelTestCase
         self::assertNull($decoded->url);
     }
 
+    /**
+     * @param list<string> $expectedFields
+     */
     #[DataProvider('invalidBodies')]
-    public function testRejectsABodyNamingOnlyTheFailedFields(string $body, string $expectedMessage): void
+    public function testRejectsABodyNamingOnlyTheFailedFields(string $body, string $expectedMessage, array $expectedFields, PayloadDefect $expectedDefect): void
     {
         // Given
         $response = self::response($body);
@@ -68,33 +72,35 @@ final class UpstreamResponseDecoderTest extends KernelTestCase
         } catch (InvalidUpstreamPayloadException $exception) {
             // Then
             self::assertSame($expectedMessage, $exception->getMessage());
+            self::assertSame($expectedFields, $exception->fields());
+            self::assertSame($expectedDefect, $exception->defect());
             self::assertNull($exception->getPrevious());
         }
     }
 
     /**
-     * @return iterable<string, array{string, string}>
+     * @return iterable<string, array{string, string, list<string>, PayloadDefect}>
      */
     public static function invalidBodies(): iterable
     {
         $type = ExampleApiResponse::class;
 
-        yield 'malformed JSON' => ['{"title":', "Upstream response for {$type} is not valid JSON."];
-        yield 'not JSON' => ['<html>NASA Science</html>', "Upstream response for {$type} is not valid JSON."];
-        yield 'empty body' => ['', "Upstream response for {$type} is not valid JSON."];
-        yield 'missing field' => ['{"media_type":"image"}', "Upstream response does not match {$type} at title."];
-        yield 'error body' => ['{"code":400,"msg":"Date must be between Jun 16, 1995 and Nov 20, 2026."}', "Upstream response does not match {$type} at title, mediaType."];
-        yield 'list' => ['[{"title":"Pillars","media_type":"image"}]', "Upstream response does not match {$type} at title, mediaType."];
-        yield 'number instead of text' => ['{"title":20261118,"media_type":"image"}', "Upstream response does not match {$type} at title."];
-        yield 'null instead of text' => ['{"title":null,"media_type":"image"}', "Upstream response does not match {$type} at title."];
-        yield 'text instead of a number in a list' => ['{"title":"Pillars","media_type":"image","items":[{"text":"Moon landing","year":"1969"}]}', "Upstream response does not match {$type} at items[0].year."];
-        yield 'text instead of an object in a list' => ['{"title":"Pillars","media_type":"image","items":["secret"]}', "Upstream response does not match {$type} at items[0].text, items[0].year."];
-        yield 'several wrong fields' => ['{"media_type":"image","items":[{"year":"1969"}]}', "Upstream response does not match {$type} at title, items[0].text, items[0].year."];
-        yield 'JSON text instead of an object' => ['"Pillars"', "Upstream response does not match {$type} at title, mediaType."];
-        yield 'blank title' => ['{"title":" ","media_type":"image"}', "Upstream response {$type} is invalid at title."];
-        yield 'empty url' => ['{"title":"Pillars","media_type":"image","url":""}', "Upstream response {$type} is invalid at url."];
-        yield 'url with another scheme' => ['{"title":"Pillars","media_type":"image","url":"ftp://secret.example/52.23"}', "Upstream response {$type} is invalid at url."];
-        yield 'blank text in a list' => ['{"title":"Pillars","media_type":"image","items":[{"text":" ","year":1969}]}', "Upstream response {$type} is invalid at items[0].text."];
+        yield 'malformed JSON' => ['{"title":', "Upstream response for {$type} is not valid JSON.", [], PayloadDefect::NotJson];
+        yield 'not JSON' => ['<html>NASA Science</html>', "Upstream response for {$type} is not valid JSON.", [], PayloadDefect::NotJson];
+        yield 'empty body' => ['', "Upstream response for {$type} is not valid JSON.", [], PayloadDefect::NotJson];
+        yield 'missing field' => ['{"media_type":"image"}', "Upstream response does not match {$type} at title.", ['title'], PayloadDefect::WrongShape];
+        yield 'error body' => ['{"code":400,"msg":"Date must be between Jun 16, 1995 and Nov 20, 2026."}', "Upstream response does not match {$type} at title, mediaType.", ['title', 'mediaType'], PayloadDefect::WrongShape];
+        yield 'list' => ['[{"title":"Pillars","media_type":"image"}]', "Upstream response does not match {$type} at title, mediaType.", ['title', 'mediaType'], PayloadDefect::WrongShape];
+        yield 'number instead of text' => ['{"title":20261118,"media_type":"image"}', "Upstream response does not match {$type} at title.", ['title'], PayloadDefect::WrongShape];
+        yield 'null instead of text' => ['{"title":null,"media_type":"image"}', "Upstream response does not match {$type} at title.", ['title'], PayloadDefect::WrongShape];
+        yield 'text instead of a number in a list' => ['{"title":"Pillars","media_type":"image","items":[{"text":"Moon landing","year":"1969"}]}', "Upstream response does not match {$type} at items[0].year.", ['items[0].year'], PayloadDefect::WrongShape];
+        yield 'text instead of an object in a list' => ['{"title":"Pillars","media_type":"image","items":["secret"]}', "Upstream response does not match {$type} at items[0].text, items[0].year.", ['items[0].text', 'items[0].year'], PayloadDefect::WrongShape];
+        yield 'several wrong fields' => ['{"media_type":"image","items":[{"year":"1969"}]}', "Upstream response does not match {$type} at title, items[0].text, items[0].year.", ['title', 'items[0].text', 'items[0].year'], PayloadDefect::WrongShape];
+        yield 'JSON text instead of an object' => ['"Pillars"', "Upstream response does not match {$type} at title, mediaType.", ['title', 'mediaType'], PayloadDefect::WrongShape];
+        yield 'blank title' => ['{"title":" ","media_type":"image"}', "Upstream response {$type} is invalid at title.", ['title'], PayloadDefect::InvalidValue];
+        yield 'empty url' => ['{"title":"Pillars","media_type":"image","url":""}', "Upstream response {$type} is invalid at url.", ['url'], PayloadDefect::InvalidValue];
+        yield 'url with another scheme' => ['{"title":"Pillars","media_type":"image","url":"ftp://secret.example/52.23"}', "Upstream response {$type} is invalid at url.", ['url'], PayloadDefect::InvalidValue];
+        yield 'blank text in a list' => ['{"title":"Pillars","media_type":"image","items":[{"text":" ","year":1969}]}', "Upstream response {$type} is invalid at items[0].text.", ['items[0].text'], PayloadDefect::InvalidValue];
     }
 
     private static function decoder(): UpstreamResponseDecoder

@@ -50,4 +50,12 @@ trait InteractsWithLogs
 
         return array_values(array_filter($levels, static fn (Level $level): bool => $minimum->includes($level)));
     }
+
+    /**
+     * @return list<LogRecord>
+     */
+    protected static function recordsOf(string $channel): array
+    {
+        return array_values(array_filter(self::logHandler()->getRecords(), static fn (LogRecord $record): bool => $channel === $record->channel));
+    }
 }

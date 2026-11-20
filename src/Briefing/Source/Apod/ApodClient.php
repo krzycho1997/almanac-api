@@ -7,6 +7,7 @@ namespace App\Briefing\Source\Apod;
 use App\Briefing\Exception\InvalidUpstreamPayloadException;
 use App\Briefing\Location;
 use App\Briefing\Model\ApodPicture;
+use App\Briefing\PayloadDefect;
 use App\Briefing\Source\PendingFetch;
 use App\Briefing\Source\SourceClient;
 use App\Briefing\Source\UpstreamResponseDecoder;
@@ -64,7 +65,7 @@ final readonly class ApodClient implements SourceClient
             return $picture;
         }
 
-        throw InvalidUpstreamPayloadException::because('APOD answered with the picture of another date.');
+        throw InvalidUpstreamPayloadException::at('date', PayloadDefect::OtherDate, 'APOD answered with the picture of another date.');
     }
 
     private function publishedToday(): string

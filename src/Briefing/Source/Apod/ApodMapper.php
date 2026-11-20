@@ -7,6 +7,7 @@ namespace App\Briefing\Source\Apod;
 use App\Briefing\Exception\InvalidUpstreamPayloadException;
 use App\Briefing\Model\ApodPicture;
 use App\Briefing\Model\MediaType;
+use App\Briefing\PayloadDefect;
 
 final readonly class ApodMapper
 {
@@ -30,7 +31,7 @@ final readonly class ApodMapper
         $title = self::requiredText(self::plainText($response->title), 'title');
 
         if (self::PLACEHOLDER_TITLE === $title) {
-            throw InvalidUpstreamPayloadException::because('APOD returned the NASA Science placeholder instead of the picture of the day.');
+            throw InvalidUpstreamPayloadException::at('title', PayloadDefect::Placeholder, 'APOD returned the NASA Science placeholder instead of the picture of the day.');
         }
 
         return new ApodPicture(
@@ -52,7 +53,7 @@ final readonly class ApodMapper
             return $parsed;
         }
 
-        throw InvalidUpstreamPayloadException::because('APOD date is not a calendar date in Y-m-d.');
+        throw InvalidUpstreamPayloadException::at('date', PayloadDefect::NotACalendarDate, 'APOD date is not a calendar date in Y-m-d.');
     }
 
     /**
@@ -70,7 +71,7 @@ final readonly class ApodMapper
     private static function requiredText(string $text, string $field): string
     {
         if (self::EMPTY === $text) {
-            throw InvalidUpstreamPayloadException::because("APOD {$field} has no text once its HTML is removed.");
+            throw InvalidUpstreamPayloadException::at($field, PayloadDefect::NoText, "APOD {$field} has no text once its HTML is removed.");
         }
 
         return $text;
