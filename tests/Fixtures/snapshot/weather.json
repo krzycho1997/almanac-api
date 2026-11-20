@@ -1,0 +1,20 @@
+{
+    "kind": "final",
+    "timezone": "Europe/Warsaw",
+    "temperatureMin": -3.5,
+    "temperatureMax": 12.0,
+    "precipitationSum": 0.0,
+    "windSpeedMax": 18.4,
+    "weatherCode": 3,
+    "sunrise": "2024-03-15T05:59:00+01:00",
+    "sunset": "2024-03-15T17:43:00+01:00",
+    "daylightDuration": 42240,
+    "attribution": {
+        "name": "Open-Meteo",
+        "url": "https://open-meteo.com/",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+        "modified": true,
+        "notice": "Generated using Copernicus Climate Change Service information"
+    }
+}
