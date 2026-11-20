@@ -1,0 +1,36 @@
+tests/Briefing/Unit/Source/UpstreamRetryStrategyTest.php
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 1-8,10,12-16,18-24,26-28,39-40
+  s_a463f0f3bbc4ea::t_e1406613b4f5d6 9,11,17,25,29-38
+.env.example
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 13
+config/services.yaml
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 39
+tests/Briefing/Integration/UpstreamRetryWiringTest.php
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 1-33
+.env.dev
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 5
+.env
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 21
+tests/Briefing/Integration/UpstreamHttpClientsTest.php
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 104,106-108
+src/Briefing/Source/UpstreamRetryStrategy.php
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 8,14-22
+.env.test
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "97e40e52ab391bb53588a60c7893033ec7e4c20e",
+  "prompts": {},
+  "sessions": {
+    "s_a463f0f3bbc4ea": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e80e7e02-debb-4938-91ba-befdb4b4d71a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
