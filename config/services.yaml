@@ -121,3 +121,7 @@ when@test:
             class: App\Tests\Support\TickingClock
             arguments:
                 $tickSeconds: 0.001
+
+        test.identity.access_token_issuer:
+            alias: App\Identity\AccessTokenIssuer
+            public: true
