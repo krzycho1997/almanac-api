@@ -6,6 +6,7 @@ tests/Support/Controller/AuthenticatedUserProbeController.php
   s_ecd702649c3f02::t_d6130323f3d661 1-25
 src/Identity/Entity/User.php
   s_ecd702649c3f02::t_2e7eb825506e7b 14,19,21,39-54
+  s_ecd702649c3f02::t_86395ed6b812af 22
 config/packages/security.yaml
   s_ecd702649c3f02::t_2e7eb825506e7b 3-7,10
   s_ecd702649c3f02::t_fa8c0c8d66a79b 1-2,8-9
