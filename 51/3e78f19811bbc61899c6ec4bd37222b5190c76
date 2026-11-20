@@ -1,0 +1,39 @@
+tests/Briefing/Unit/Source/Apod/ApodMapperTest.php
+  s_6faeadad632792::t_32f18cecf1f9e8 1-96,135-158
+  s_6faeadad632792::t_9b7b0c6b84ad58 97-134
+src/Briefing/Model/ApodPicture.php
+  s_cfa33f4979cb4d::t_5228e71337cbdc 14
+  s_6faeadad632792::t_3be9fefcae16e2 1-13,15-19
+src/Briefing/Source/Apod/ApodMapper.php
+  s_6faeadad632792::t_32f18cecf1f9e8 13-14,44-59
+  s_6faeadad632792::t_9b7b0c6b84ad58 16-34,40,43,60,63-91
+  s_6faeadad632792::t_d89b62a7634fd5 1-12,15,35-39,41-42,61-62,92
+src/Briefing/Model/MediaType.php
+  s_6faeadad632792::t_39f37a09deb966 1-12
+src/Briefing/Source/Apod/ApodApiResponse.php
+  s_6faeadad632792::t_7a73e95872a30f 1-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "513e78f19811bbc61899c6ec4bd37222b5190c76",
+  "prompts": {},
+  "sessions": {
+    "s_6faeadad632792": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "196b12c3-cde9-4e52-9708-3d08802cf2c6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    },
+    "s_cfa33f4979cb4d": {
+      "agent_id": {
+        "tool": "github-copilot-jetbrains",
+        "id": "1795095217413",
+        "model": "unknown"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
