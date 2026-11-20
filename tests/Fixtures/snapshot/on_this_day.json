@@ -1,0 +1,44 @@
+{
+    "events": [
+        {
+            "year": -44,
+            "text": "Julius Caesar is assassinated.",
+            "pages": [
+                {
+                    "title": "Julius Caesar",
+                    "url": "https://en.wikipedia.org/wiki/Julius_Caesar",
+                    "thumbnail": "https://upload.wikimedia.org/caesar.jpg",
+                    "wikidataId": "Q1048"
+                }
+            ]
+        }
+    ],
+    "births": [
+        {
+            "year": 1947,
+            "name": "Wings Hauser",
+            "description": "American actor",
+            "url": "https://en.wikipedia.org/wiki/Wings_Hauser",
+            "thumbnail": null,
+            "wikidataId": null
+        }
+    ],
+    "deaths": [
+        {
+            "year": 2023,
+            "name": "Fred White",
+            "description": "American musician",
+            "url": null,
+            "thumbnail": null,
+            "wikidataId": null
+        }
+    ],
+    "attribution": {
+        "name": "Wikipedia",
+        "url": "https://en.wikipedia.org/",
+        "license": "CC BY-SA 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "modified": true,
+        "notice": null
+    }
+}

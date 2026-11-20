@@ -10,6 +10,8 @@ use App\Briefing\SourceName;
 
 final readonly class AnotherApodSource implements Source
 {
+    use KeepsFinalSnapshotsByDate;
+
     public const SourceName NAME = SourceName::Apod;
 
     public function name(): SourceName

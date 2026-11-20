@@ -7,17 +7,20 @@ namespace App\Tests\Briefing\Unit;
 use App\Briefing\BriefingResult;
 use App\Briefing\FailureKind;
 use App\Briefing\Location;
+use App\Briefing\SourceEntry;
+use App\Briefing\SourceFailure;
 use App\Briefing\SourceName;
-use App\Briefing\SourceResult;
 use App\Tests\Support\Briefing\FakePayload;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class BriefingResultTest extends TestCase
 {
+    private const string NOW = '2026-11-18 12:00';
+
     /**
-     * @param list<SourceResult> $results
-     * @param list<SourceName>   $missing
+     * @param list<SourceEntry> $results
+     * @param list<SourceName>  $missing
      */
     #[DataProvider('results')]
     public function testTellsWhichSourcesHaveNoData(array $results, bool $hasAnyData, array $missing): void
@@ -31,27 +34,29 @@ final class BriefingResultTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{list<SourceResult>, bool, list<SourceName>}>
+     * @return iterable<string, array{list<SourceEntry>, bool, list<SourceName>}>
      */
     public static function results(): iterable
     {
-        $ok = SourceResult::ok(SourceName::Apod, new FakePayload([]));
-        $failed = SourceResult::failed(SourceName::OnThisDay, FailureKind::Unavailable);
-        $notApplicable = SourceResult::notApplicable(SourceName::Weather);
+        $ok = SourceEntry::fresh(SourceName::Apod, new FakePayload([]), new \DateTimeImmutable(self::NOW));
+        $failed = SourceEntry::missing(SourceName::OnThisDay, new SourceFailure(FailureKind::Unavailable), new \DateTimeImmutable(self::NOW));
+        $notApplicable = SourceEntry::notApplicable(SourceName::Weather);
+        $stale = SourceEntry::stale(SourceName::Weather, new FakePayload([]), new \DateTimeImmutable(self::NOW), new SourceFailure(FailureKind::Unavailable), new \DateTimeImmutable(self::NOW));
 
         yield 'every source has data' => [[$ok], true, []];
         yield 'some sources have data' => [[$ok, $failed, $notApplicable], true, [SourceName::OnThisDay, SourceName::Weather]];
         yield 'no source has data' => [[$failed, $notApplicable], false, [SourceName::OnThisDay, SourceName::Weather]];
+        yield 'stale data counts as data' => [[$failed, $stale], true, [SourceName::OnThisDay]];
     }
 
     public function testFindsTheResultOfASource(): void
     {
         // Given
-        $failed = SourceResult::failed(SourceName::OnThisDay, FailureKind::Unavailable);
-        $briefing = self::briefingOf([SourceResult::notApplicable(SourceName::Weather), $failed]);
+        $failed = SourceEntry::missing(SourceName::OnThisDay, new SourceFailure(FailureKind::Unavailable), new \DateTimeImmutable(self::NOW));
+        $briefing = self::briefingOf([SourceEntry::notApplicable(SourceName::Weather), $failed]);
 
         // When
-        $result = $briefing->resultFor(SourceName::OnThisDay);
+        $result = $briefing->entryFor(SourceName::OnThisDay);
 
         // Then
         self::assertSame($failed, $result);
@@ -60,20 +65,20 @@ final class BriefingResultTest extends TestCase
     public function testRefusesASourceWithoutAResult(): void
     {
         // Given
-        $briefing = self::briefingOf([SourceResult::notApplicable(SourceName::Weather)]);
+        $briefing = self::briefingOf([SourceEntry::notApplicable(SourceName::Weather)]);
 
         // Then / When
         $this->expectException(\LogicException::class);
-        $briefing->resultFor(SourceName::Apod);
+        $briefing->entryFor(SourceName::Apod);
     }
 
     /**
-     * @param list<SourceResult> $results
+     * @param list<SourceEntry> $entries
      */
-    private static function briefingOf(array $results): BriefingResult
+    private static function briefingOf(array $entries): BriefingResult
     {
-        $now = new \DateTimeImmutable('2026-11-18 12:00');
+        $now = new \DateTimeImmutable(self::NOW);
 
-        return new BriefingResult($now, Location::fromCoordinates(52.23, 21.01), $results, $now);
+        return new BriefingResult($now, Location::fromCoordinates(52.23, 21.01), $entries);
     }
 }

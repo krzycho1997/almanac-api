@@ -55,7 +55,7 @@ final class SourceRegistryTest extends KernelTestCase
         $briefing = self::testService(BriefingAggregator::class)->briefingFor(new \DateTimeImmutable(self::BEFORE_EVERY_DATED_SOURCE), Location::fromCoordinates(52.23, 21.01));
 
         // Then
-        self::assertSame(SourceName::cases(), array_map(static fn (SourceName $name): SourceName => $briefing->resultFor($name)->source, SourceName::cases()));
+        self::assertSame(SourceName::cases(), array_map(static fn (SourceName $name): SourceName => $briefing->entryFor($name)->source, SourceName::cases()));
         self::assertSame([SourceName::Apod, SourceName::Weather], $briefing->missing());
     }
 

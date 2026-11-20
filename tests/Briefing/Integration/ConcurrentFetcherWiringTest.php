@@ -68,7 +68,7 @@ final class ConcurrentFetcherWiringTest extends TestCase
         $settled = self::fetcherIn($container)->settleAll($fetches);
 
         // Then
-        self::assertSame(array_fill(0, \count(self::CLIENTS), 'TransportException'), array_map(static fn (SettledFetch $fetch): ?string => $fetch->result->cause?->errorType, $settled));
+        self::assertSame(array_fill(0, \count(self::CLIENTS), 'TransportException'), array_map(static fn (SettledFetch $fetch): ?string => $fetch->result->failure?->cause?->errorType, $settled));
     }
 
     #[DataProvider('environments')]

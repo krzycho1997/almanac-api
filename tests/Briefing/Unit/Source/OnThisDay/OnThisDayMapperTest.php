@@ -40,6 +40,34 @@ final class OnThisDayMapperTest extends TestCase
         );
     }
 
+    #[DataProvider('wikidataIds')]
+    public function testKeepsOnlyAWikidataIdOfTheRightForm(?string $id, ?string $expected): void
+    {
+        // Given
+        $selected = [new OnThisDayEntry('Caesar is stabbed.', -44, [new OnThisDayPage('Julius Caesar', self::links('Julius_Caesar'), null, null, $id)])];
+
+        // When
+        $feed = self::mapper()->map(self::selected($selected), self::births([self::born()]), self::deaths([self::born()]));
+
+        // Then
+        self::assertSame($expected, $feed->events[0]->pages[0]->wikidataId);
+    }
+
+    /**
+     * @return iterable<string, array{?string, ?string}>
+     */
+    public static function wikidataIds(): iterable
+    {
+        yield 'item' => ['Q1048', 'Q1048'];
+        yield 'none' => [null, null];
+        yield 'empty' => ['', null];
+        yield 'prefixed' => ['wd:Q1048', null];
+        yield 'control character' => ["Q1048\0", null];
+        yield 'line break at the end' => ["Q1048\n", null];
+        yield 'leading zero' => ['Q01048', null];
+        yield 'property instead of an item' => ['P31', null];
+    }
+
     #[DataProvider('peopleAndTheirPages')]
     public function testLinksAPersonOnlyToThePageAboutThem(OnThisDayEntry $entry, NotablePerson $expected): void
     {

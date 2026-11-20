@@ -7,6 +7,7 @@ namespace App\Tests\Briefing\Unit;
 use App\Briefing\Exception\PayloadDefect;
 use App\Briefing\FailureCause;
 use App\Briefing\FailureKind;
+use App\Briefing\FailureOutcome;
 use App\Briefing\SourceFailureLog;
 use App\Briefing\SourceName;
 use App\Briefing\SourceResult;
@@ -39,7 +40,7 @@ final class SourceFailureLogTest extends TestCase
     public function testLogsAFailureAtItsKindsLevel(SourceResult $failure, Level $level, array $context): void
     {
         // When
-        $this->log->record($failure, new \DateTimeImmutable(self::DATE), self::DURATION_MS);
+        $this->log->record($failure, FailureOutcome::Missing, new \DateTimeImmutable(self::DATE), self::DURATION_MS);
 
         // Then
         $records = $this->handler->getRecords();
@@ -59,50 +60,69 @@ final class SourceFailureLogTest extends TestCase
         yield 'server error' => [
             SourceResult::failed(SourceName::Weather, FailureKind::Unavailable, 503),
             Level::Warning,
-            ['source' => 'weather', 'date' => self::DATE, 'kind' => 'unavailable', 'httpStatus' => 503, 'durationMs' => 1234],
+            ['source' => 'weather', 'date' => self::DATE, 'kind' => 'unavailable', 'httpStatus' => 503, 'outcome' => 'missing', 'durationMs' => 1234],
         ];
         yield 'timeout' => [
             SourceResult::failed(SourceName::Weather, FailureKind::Unavailable, cause: new FailureCause('TimeoutException')),
             Level::Warning,
-            ['source' => 'weather', 'date' => self::DATE, 'kind' => 'unavailable', 'errorType' => 'TimeoutException', 'durationMs' => 1234],
+            ['source' => 'weather', 'date' => self::DATE, 'kind' => 'unavailable', 'errorType' => 'TimeoutException', 'outcome' => 'missing', 'durationMs' => 1234],
         ];
         yield 'rate limit' => [
             SourceResult::failed(SourceName::OnThisDay, FailureKind::RateLimited, 429, $retryAt),
             Level::Warning,
-            ['source' => 'on_this_day', 'date' => self::DATE, 'kind' => 'rate_limited', 'httpStatus' => 429, 'retryAt' => $retryAt, 'durationMs' => 1234],
+            ['source' => 'on_this_day', 'date' => self::DATE, 'kind' => 'rate_limited', 'httpStatus' => 429, 'retryAt' => $retryAt, 'outcome' => 'missing', 'durationMs' => 1234],
         ];
         yield 'rejected request' => [
             SourceResult::failed(SourceName::Apod, FailureKind::Rejected, 400),
             Level::Notice,
-            ['source' => 'apod', 'date' => self::DATE, 'kind' => 'rejected', 'httpStatus' => 400, 'durationMs' => 1234],
+            ['source' => 'apod', 'date' => self::DATE, 'kind' => 'rejected', 'httpStatus' => 400, 'outcome' => 'missing', 'durationMs' => 1234],
         ];
         yield 'refused key' => [
             SourceResult::failed(SourceName::Apod, FailureKind::Misconfigured, 403),
             Level::Error,
-            ['source' => 'apod', 'date' => self::DATE, 'kind' => 'misconfigured', 'httpStatus' => 403, 'durationMs' => 1234],
+            ['source' => 'apod', 'date' => self::DATE, 'kind' => 'misconfigured', 'httpStatus' => 403, 'outcome' => 'missing', 'durationMs' => 1234],
         ];
         yield 'invalid payload' => [
             SourceResult::failed(SourceName::Apod, FailureKind::InvalidPayload, 200, cause: new FailureCause('InvalidUpstreamPayloadException', ['date', 'url'], PayloadDefect::InvalidValue)),
             Level::Error,
-            ['source' => 'apod', 'date' => self::DATE, 'kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['date', 'url'], 'reason' => 'invalid_value', 'durationMs' => 1234],
+            ['source' => 'apod', 'date' => self::DATE, 'kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['date', 'url'], 'reason' => 'invalid_value', 'outcome' => 'missing', 'durationMs' => 1234],
         ];
         yield 'NASA placeholder' => [
             SourceResult::failed(SourceName::Apod, FailureKind::InvalidPayload, 200, cause: new FailureCause('InvalidUpstreamPayloadException', ['title'], PayloadDefect::Placeholder)),
             Level::Error,
-            ['source' => 'apod', 'date' => self::DATE, 'kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['title'], 'reason' => 'placeholder', 'durationMs' => 1234],
+            ['source' => 'apod', 'date' => self::DATE, 'kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['title'], 'reason' => 'placeholder', 'outcome' => 'missing', 'durationMs' => 1234],
         ];
         yield 'body that is not JSON' => [
             SourceResult::failed(SourceName::Apod, FailureKind::InvalidPayload, 200, cause: new FailureCause('InvalidUpstreamPayloadException', [], PayloadDefect::NotJson)),
             Level::Error,
-            ['source' => 'apod', 'date' => self::DATE, 'kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => [], 'reason' => 'not_json', 'durationMs' => 1234],
+            ['source' => 'apod', 'date' => self::DATE, 'kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => [], 'reason' => 'not_json', 'outcome' => 'missing', 'durationMs' => 1234],
         ];
+    }
+
+    #[DataProvider('outcomes')]
+    public function testTellsWhetherTheOldDataIsServed(FailureOutcome $outcome, string $expected): void
+    {
+        // When
+        $this->log->record(SourceResult::failed(SourceName::Weather, FailureKind::Unavailable), $outcome, new \DateTimeImmutable(self::DATE), self::DURATION_MS);
+
+        // Then
+        self::assertSame($expected, $this->handler->getRecords()[0]->context['outcome'] ?? null);
+    }
+
+    /**
+     * @return iterable<string, array{FailureOutcome, string}>
+     */
+    public static function outcomes(): iterable
+    {
+        yield 'stale' => [FailureOutcome::Stale, 'stale'];
+        yield 'missing' => [FailureOutcome::Missing, 'missing'];
     }
 
     #[DataProvider('answers')]
     public function testLogsNothingForASourceThatDidNotFail(SourceResult $answer): void
     {
         // When
-        $this->log->record($answer, new \DateTimeImmutable(self::DATE), self::DURATION_MS);
+        $this->log->record($answer, FailureOutcome::Missing, new \DateTimeImmutable(self::DATE), self::DURATION_MS);
 
         // Then
         self::assertSame([], $this->handler->getRecords());

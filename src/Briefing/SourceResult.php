@@ -12,21 +12,18 @@ final readonly class SourceResult
         public SourceName $source,
         public SourceStatus $status,
         public ?SourcePayload $payload,
-        public ?FailureKind $failureKind,
-        public ?int $httpStatus,
-        public ?\DateTimeImmutable $retryAt,
-        public ?FailureCause $cause,
+        public ?SourceFailure $failure,
     ) {
     }
 
     public static function ok(SourceName $source, SourcePayload $payload): self
     {
-        return new self($source, SourceStatus::Ok, $payload, null, null, null, null);
+        return new self($source, SourceStatus::Ok, $payload, null);
     }
 
     public static function notApplicable(SourceName $source): self
     {
-        return new self($source, SourceStatus::NotApplicable, null, null, null, null, null);
+        return new self($source, SourceStatus::NotApplicable, null, null);
     }
 
     /**
@@ -39,6 +36,6 @@ final readonly class SourceResult
 
     public static function failed(SourceName $source, FailureKind $kind, ?int $httpStatus = null, ?\DateTimeImmutable $retryAt = null, ?FailureCause $cause = null): self
     {
-        return new self($source, SourceStatus::Failed, null, $kind, $httpStatus, $retryAt, $cause);
+        return new self($source, SourceStatus::Failed, null, new SourceFailure($kind, $httpStatus, $retryAt, $cause));
     }
 }
