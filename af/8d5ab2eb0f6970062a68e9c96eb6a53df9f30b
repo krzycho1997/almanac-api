@@ -1,0 +1,37 @@
+tests/Briefing/Unit/Source/Weather/OpenMeteoMapperTest.php
+  s_02e4949da5212d::t_42d56efc4d1b4e 240,243,250,254-257
+  s_02e4949da5212d::t_db9999623bc46a 75-79,85-96,126
+  s_02e4949da5212d::t_c712841d45825d 196
+src/Briefing/Source/Weather/OpenMeteoMapper.php
+  s_02e4949da5212d::t_7440e3785f4fcd 7,48,92,222,231
+  s_02e4949da5212d::t_d742d73673c795 32,74
+src/Briefing/Source/Weather/WeatherHorizon.php
+  s_02e4949da5212d::t_7440e3785f4fcd 7,26,37,52
+docs/openapi.yaml
+  s_02e4949da5212d::t_018232cd19cb50 344
+tests/Briefing/Integration/Source/Weather/OpenMeteoClientTest.php
+  s_02e4949da5212d::t_42d56efc4d1b4e 179
+src/Briefing/Source/Weather/OpenMeteoApiResponse.php
+  s_02e4949da5212d::t_d742d73673c795 12-13,15,24-27
+  s_02e4949da5212d::t_16b56d266f73d7 19
+  s_02e4949da5212d::t_7a568883c20da7 14,20
+  s_02e4949da5212d::t_d73527b1f0ac25 28
+src/Briefing/Source/Weather/OpenMeteoClient.php
+  s_02e4949da5212d::t_7440e3785f4fcd 7,55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "af8d5ab2eb0f6970062a68e9c96eb6a53df9f30b",
+  "prompts": {},
+  "sessions": {
+    "s_02e4949da5212d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "05351d01-d85c-422b-9e54-d8b1b82336a5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
