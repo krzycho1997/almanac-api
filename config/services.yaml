@@ -61,6 +61,20 @@ when@test:
             alias: App\Briefing\Source\Apod\ApodSource
             public: true
 
+        serializer.normalizer.problem:
+            class: Symfony\Component\Serializer\Normalizer\ProblemNormalizer
+            arguments:
+                $debug: false
+                $translator: '@?translator'
+            tags:
+                - { name: serializer.normalizer, built_in: true, priority: -890 }
+
+        test.client:
+            class: App\Tests\Support\OpenApi\OpenApiValidatingBrowser
+            shared: false
+            public: true
+            arguments: ['@kernel', '%test.client.parameters%', '@test.client.history', '@test.client.cookiejar']
+
         App\Tests\Support\Briefing\UpstreamMockResponseFactory:
             public: true
             arguments:

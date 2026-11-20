@@ -32,7 +32,9 @@
     },
     "require-dev": {
         "dama/doctrine-test-bundle": "^8.8",
+        "devizzent/cebe-php-openapi": "^1.1",
         "friendsofphp/php-cs-fixer": "^3.95",
+        "league/openapi-psr7-validator": "^0.24",
         "osteel/openapi-httpfoundation-testing": "^0.15",
         "phpat/phpat": "^0.12",
         "phpstan/extension-installer": "^1.4",
@@ -97,7 +99,7 @@
         "check:fast": [
             "@composer validate --strict",
             "bin/check-env-keys",
-            "bin/console lint:yaml config --parse-tags",
+            "bin/console lint:yaml config docs --parse-tags",
             "@cs-check",
             "bin/console lint:container",
             "bin/console doctrine:schema:validate --skip-sync",

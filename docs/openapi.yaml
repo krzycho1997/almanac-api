@@ -1,0 +1,78 @@
+openapi: 3.0.3
+info:
+  title: Almanac API
+  version: 1.0.0
+  description: Daily briefing of NASA's Astronomy Picture of the Day, events from Wikipedia's On This Day and the weather, with bookmarks.
+  license:
+    name: Proprietary
+    url: https://github.com/krzycho1997/almanac-api
+servers:
+  - url: http://127.0.0.1:8080
+    description: Local Docker Compose stack
+tags:
+  - name: health
+    description: Liveness of the application
+paths:
+  /api/health:
+    get:
+      operationId: getHealth
+      summary: Report that the application is up
+      tags: [health]
+      security: []
+      responses:
+        '200':
+          description: The application is up.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  headers:
+    RequestId:
+      description: Id of the request, taken from nginx or the client when it is safe, otherwise generated; also written to every log entry.
+      required: true
+      schema:
+        type: string
+        pattern: '^[A-Za-z0-9._-]{1,64}$'
+  responses:
+    InternalServerError:
+      description: The application failed; the details are only in the logs.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    Health:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+    Problem:
+      description: Problem Details (RFC 9457) without internals.
+      type: object
+      additionalProperties: false
+      required: [type, title, status, detail]
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+          minimum: 400
+          maximum: 599
+        detail:
+          type: string
+        instance:
+          type: string
