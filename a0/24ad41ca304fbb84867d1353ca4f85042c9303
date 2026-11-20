@@ -1,0 +1,39 @@
+config/bundles.php
+  s_ecd702649c3f02::t_09ff68e8b17158 11
+tests/Identity/Unit/Entity/UserTest.php
+  s_ecd702649c3f02::t_09ff68e8b17158 1-38
+tests/Identity/Integration/AccessTokenHandlerTest.php
+  s_ecd702649c3f02::t_09ff68e8b17158 1-68,74-81,83-114,125-144
+tests/Support/Controller/AuthenticatedUserProbeController.php
+  s_ecd702649c3f02::t_09ff68e8b17158 1-25
+composer.json
+  s_ecd702649c3f02::t_09ff68e8b17158 32
+src/Identity/Security/AccessTokenHandler.php
+  s_ecd702649c3f02::t_09ff68e8b17158 1-17,18-37,39-53,54-58
+src/Identity/Entity/User.php
+  s_ecd702649c3f02::t_09ff68e8b17158 14,19,21-22,39-54
+config/services.yaml
+  s_ecd702649c3f02::t_09ff68e8b17158 127-130
+src/Identity/Repository/AccessTokenRepository.php
+  s_ecd702649c3f02::t_09ff68e8b17158 23-36
+config/packages/security.yaml
+  s_ecd702649c3f02::t_09ff68e8b17158 1-10
+tests/Identity/Functional/AccessTokenAuthenticationTest.php
+  s_ecd702649c3f02::t_09ff68e8b17158 1-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a024ad41ca304fbb84867d1353ca4f85042c9303",
+  "prompts": {},
+  "sessions": {
+    "s_ecd702649c3f02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79d0416-bbd9-40b6-9497-5f9421576080",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}

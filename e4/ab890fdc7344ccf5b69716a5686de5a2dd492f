@@ -1,0 +1,29 @@
+src/Identity/Repository/UserRepository.php
+  s_ecd702649c3f02::t_dbb3138a44321b 7-8,24-27,30-42
+src/Identity/Issuance.php
+  s_ecd702649c3f02::t_dbb3138a44321b 1-24
+src/Identity/Repository/AccessTokenRepository.php
+  s_ecd702649c3f02::t_dbb3138a44321b 7,9,22-34
+tests/Identity/Integration/AccessTokenIssuerTest.php
+  s_ecd702649c3f02::t_dbb3138a44321b 1-11,13-16,18-33,38-96,98-139,182-276,304-321
+config/services.yaml
+  s_ecd702649c3f02::t_dbb3138a44321b 124-127
+src/Identity/AccessTokenIssuer.php
+  s_ecd702649c3f02::t_dbb3138a44321b 1-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e4ab890fdc7344ccf5b69716a5686de5a2dd492f",
+  "prompts": {},
+  "sessions": {
+    "s_ecd702649c3f02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79d0416-bbd9-40b6-9497-5f9421576080",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
