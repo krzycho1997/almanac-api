@@ -1,7 +1,7 @@
-FROM docker.io/mlocati/php-extension-installer:2.13 AS php-extension-installer
-FROM docker.io/library/composer:2.11 AS composer
+FROM docker.io/mlocati/php-extension-installer:2.13@sha256:4fd45396c16685266d32bf147a24ecd5e81029d3820295895bf4a90131190ac9 AS php-extension-installer
+FROM docker.io/library/composer:2.11@sha256:919efe8e62179c71dfd31fad035fd671fe7454211c6b2aa30a10af0ab4acedba AS composer
 
-FROM docker.io/library/php:8.5.12-fpm-alpine AS runtime
+FROM docker.io/library/php:8.5.13-fpm-alpine@sha256:51414d5291758fe27f58a64c7e8a078465d32cc7dcef7bda803f5b36019802e0 AS runtime
 
 COPY --from=php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 RUN install-php-extensions apcu intl pdo_pgsql redis \
@@ -38,7 +38,7 @@ RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-pr
 COPY . .
 RUN composer dump-autoload --no-dev --classmap-authoritative \
     && composer dump-env prod \
-    && php bin/console cache:warmup \
+    && DATABASE_URL='postgresql://warmup@localhost:5432/warmup' REDIS_URL='redis://localhost:6379' php bin/console cache:warmup \
     && chmod -R go-w /srv/app
 
 

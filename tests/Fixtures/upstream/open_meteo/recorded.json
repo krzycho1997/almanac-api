@@ -1,0 +1,97 @@
+{
+    "archive-2024-03-15.json": {
+        "url": "https://archive-api.open-meteo.com/v1/archive?latitude=48.86&longitude=2.35&start_date=2024-03-15&end_date=2024-03-15&daily=weather_code%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum%2Cwind_speed_10m_max%2Csunrise%2Csunset%2Cdaylight_duration&timezone=auto&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm",
+        "status": 200,
+        "recordedOn": "2026-11-20",
+        "headers": {
+            "content-type": "application/json; charset=utf-8",
+            "date": "Fri, 20 Nov 2026 17:28:10 GMT",
+            "x-ratelimit-limit": "600.0",
+            "x-ratelimit-window": "60"
+        }
+    },
+    "archive-north-pole-2024-03-15.json": {
+        "url": "https://archive-api.open-meteo.com/v1/archive?latitude=90.00&longitude=0.00&start_date=2024-03-15&end_date=2024-03-15&daily=weather_code%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum%2Cwind_speed_10m_max%2Csunrise%2Csunset%2Cdaylight_duration&timezone=auto&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm",
+        "status": 200,
+        "recordedOn": "2026-11-20",
+        "headers": {
+            "content-type": "application/json; charset=utf-8",
+            "date": "Fri, 20 Nov 2026 17:27:59 GMT",
+            "x-ratelimit-limit": "600.0",
+            "x-ratelimit-window": "60"
+        }
+    },
+    "archive-point-nemo-2024-03-15.json": {
+        "url": "https://archive-api.open-meteo.com/v1/archive?latitude=-48.88&longitude=-123.39&start_date=2024-03-15&end_date=2024-03-15&daily=weather_code%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum%2Cwind_speed_10m_max%2Csunrise%2Csunset%2Cdaylight_duration&timezone=auto&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm",
+        "status": 200,
+        "recordedOn": "2026-11-20",
+        "headers": {
+            "content-type": "application/json; charset=utf-8",
+            "date": "Fri, 20 Nov 2026 17:28:06 GMT",
+            "x-ratelimit-limit": "600.0",
+            "x-ratelimit-window": "60"
+        }
+    },
+    "archive-polar-day-2024-06-21.json": {
+        "url": "https://archive-api.open-meteo.com/v1/archive?latitude=78.22&longitude=15.65&start_date=2024-06-21&end_date=2024-06-21&daily=weather_code%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum%2Cwind_speed_10m_max%2Csunrise%2Csunset%2Cdaylight_duration&timezone=auto&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm",
+        "status": 200,
+        "recordedOn": "2026-11-20",
+        "headers": {
+            "content-type": "application/json; charset=utf-8",
+            "date": "Fri, 20 Nov 2026 17:28:01 GMT",
+            "x-ratelimit-limit": "600.0",
+            "x-ratelimit-window": "60"
+        }
+    },
+    "archive-polar-night-2024-12-21.json": {
+        "url": "https://archive-api.open-meteo.com/v1/archive?latitude=78.22&longitude=15.65&start_date=2024-12-21&end_date=2024-12-21&daily=weather_code%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum%2Cwind_speed_10m_max%2Csunrise%2Csunset%2Cdaylight_duration&timezone=auto&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm",
+        "status": 200,
+        "recordedOn": "2026-11-20",
+        "headers": {
+            "content-type": "application/json; charset=utf-8",
+            "date": "Fri, 20 Nov 2026 17:27:57 GMT",
+            "x-ratelimit-limit": "600.0",
+            "x-ratelimit-window": "60"
+        }
+    },
+    "archive-summer-2024-07-01.json": {
+        "url": "https://archive-api.open-meteo.com/v1/archive?latitude=48.86&longitude=2.35&start_date=2024-07-01&end_date=2024-07-01&daily=weather_code%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum%2Cwind_speed_10m_max%2Csunrise%2Csunset%2Cdaylight_duration&timezone=auto&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm",
+        "status": 200,
+        "recordedOn": "2026-11-20",
+        "headers": {
+            "content-type": "application/json; charset=utf-8",
+            "date": "Fri, 20 Nov 2026 17:28:03 GMT",
+            "x-ratelimit-limit": "600.0",
+            "x-ratelimit-window": "60"
+        }
+    },
+    "archive-sunset-after-midnight-2024-05-17.json": {
+        "url": "https://archive-api.open-meteo.com/v1/archive?latitude=69.65&longitude=18.96&start_date=2024-05-17&end_date=2024-05-17&daily=weather_code%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum%2Cwind_speed_10m_max%2Csunrise%2Csunset%2Cdaylight_duration&timezone=auto&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm",
+        "status": 200,
+        "recordedOn": "2026-11-20",
+        "headers": {
+            "content-type": "application/json; charset=utf-8",
+            "date": "Fri, 20 Nov 2026 17:27:55 GMT",
+            "x-ratelimit-limit": "600.0",
+            "x-ratelimit-window": "60"
+        }
+    },
+    "forecast-2026-11-20.json": {
+        "url": "https://api.open-meteo.com/v1/forecast?latitude=48.86&longitude=2.35&start_date=2026-11-20&end_date=2026-11-20&daily=weather_code%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum%2Cwind_speed_10m_max%2Csunrise%2Csunset%2Cdaylight_duration&timezone=auto&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm",
+        "status": 200,
+        "recordedOn": "2026-11-20",
+        "headers": {}
+    },
+    "forecast-beyond-the-horizon-2026-12-05.json": {
+        "url": "https://api.open-meteo.com/v1/forecast?latitude=21.30&longitude=-157.85&start_date=2026-12-05&end_date=2026-12-05&daily=weather_code%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum%2Cwind_speed_10m_max%2Csunrise%2Csunset%2Cdaylight_duration&timezone=auto&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm",
+        "status": 200,
+        "recordedOn": "2026-11-20",
+        "headers": {}
+    },
+    "forecast-out-of-range.json": {
+        "url": "https://api.open-meteo.com/v1/forecast?latitude=48.86&longitude=2.35&start_date=2026-12-06&end_date=2026-12-06&daily=weather_code%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum%2Cwind_speed_10m_max%2Csunrise%2Csunset%2Cdaylight_duration&timezone=auto&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm",
+        "status": 400,
+        "recordedOn": "2026-11-20",
+        "headers": {}
+    }
+}

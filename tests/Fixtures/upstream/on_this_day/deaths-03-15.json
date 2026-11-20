@@ -1,0 +1,2138 @@
+{
+    "deaths": [
+        {
+            "text": "Wings Hauser, American actor (born 1947)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Wings_Hauser",
+                    "normalizedtitle": "Wings Hauser",
+                    "description": "American actor (1947–2025)",
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Wings_Hauser"
+                        }
+                    },
+                    "wikibase_item": "Q376182"
+                }
+            ],
+            "year": 2025
+        },
+        {
+            "text": "Nita Lowey, American politician (born 1937)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Nita_Lowey",
+                    "normalizedtitle": "Nita Lowey",
+                    "description": "American politician (1937–2025)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/Rep_Nita_Lowey_%28slight_crop%29.jpg/330px-Rep_Nita_Lowey_%28slight_crop%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 437
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Nita_Lowey"
+                        }
+                    },
+                    "wikibase_item": "Q460652"
+                }
+            ],
+            "year": 2025
+        },
+        {
+            "text": "Rajnikumar Pandya, Indian writer (born 1938)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Rajnikumar_Pandya",
+                    "normalizedtitle": "Rajnikumar Pandya",
+                    "description": "Indian Gujarati-language writer",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/Rajnikumar_Pandya.JPG/330px-Rajnikumar_Pandya.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 320
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Rajnikumar_Pandya"
+                        }
+                    },
+                    "wikibase_item": "Q133800304"
+                }
+            ],
+            "year": 2025
+        },
+        {
+            "text": "Barbara Maier Gustern, American vocal coach and singer (born 1935)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Barbara_Maier_Gustern",
+                    "normalizedtitle": "Barbara Maier Gustern",
+                    "description": "American vocal coach (1935–2022)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Barbara_Joan_Maier.jpg/330px-Barbara_Joan_Maier.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 444
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Barbara_Maier_Gustern"
+                        }
+                    },
+                    "wikibase_item": "Q111257056"
+                }
+            ],
+            "year": 2022
+        },
+        {
+            "text": "Vittorio Gregotti, Italian architect (born 1927)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Vittorio_Gregotti",
+                    "normalizedtitle": "Vittorio Gregotti",
+                    "description": "Italian architect (1927–2020)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Vittorio_Gregotti_-_Festival_Economia_2016.jpg/330px-Vittorio_Gregotti_-_Festival_Economia_2016.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 463
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Vittorio_Gregotti"
+                        }
+                    },
+                    "wikibase_item": "Q679049"
+                }
+            ],
+            "year": 2020
+        },
+        {
+            "text": "Larry DiTillio, American film and TV series writer (born 1948)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Larry_DiTillio",
+                    "normalizedtitle": "Larry DiTillio",
+                    "description": "American writer and game designer",
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Larry_DiTillio"
+                        }
+                    },
+                    "wikibase_item": "Q6490194"
+                }
+            ],
+            "year": 2019
+        },
+        {
+            "text": "Sylvia Anderson, English voice actress and television and film producer (born 1927)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Sylvia_Anderson",
+                    "normalizedtitle": "Sylvia Anderson",
+                    "description": "British producer (1927–2016)",
+                    "thumbnail": {
+                        "source": "https://upload.wikimedia.org/wikipedia/en/7/79/Syvia_Anderson.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+                        "width": 319,
+                        "height": 312
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Sylvia_Anderson"
+                        }
+                    },
+                    "wikibase_item": "Q2673235"
+                }
+            ],
+            "year": 2016
+        },
+        {
+            "text": "Asa Briggs, English historian and academic (born 1921)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Asa_Briggs",
+                    "normalizedtitle": "Asa Briggs",
+                    "description": "English historian (1921–2016)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/en/thumb/c/c3/Asa_Briggs.jpg/330px-Asa_Briggs.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 260
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Asa_Briggs"
+                        }
+                    },
+                    "wikibase_item": "Q336863"
+                }
+            ],
+            "year": 2016
+        },
+        {
+            "text": "Seru Rabeni, Fijian rugby player (born 1978)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Seru_Rabeni",
+                    "normalizedtitle": "Seru Rabeni",
+                    "description": "Fiji international rugby union player",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Seru_Rabeni_2007.jpg/330px-Seru_Rabeni_2007.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 800
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Seru_Rabeni"
+                        }
+                    },
+                    "wikibase_item": "Q3480000"
+                }
+            ],
+            "year": 2016
+        },
+        {
+            "text": "Collins Chabane, South African politician (born 1960)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Collins_Chabane",
+                    "normalizedtitle": "Collins Chabane",
+                    "description": "South African politician (1960–2015)",
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Collins_Chabane"
+                        }
+                    },
+                    "wikibase_item": "Q1109753"
+                }
+            ],
+            "year": 2015
+        },
+        {
+            "text": "Robert Clatworthy, English sculptor and educator (born 1928)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Robert_Clatworthy_(sculptor)",
+                    "normalizedtitle": "Robert Clatworthy (sculptor)",
+                    "description": "British sculptor and art teacher (1928–2015)",
+                    "thumbnail": {
+                        "source": "https://upload.wikimedia.org/wikipedia/en/c/c0/Robert_Clatworthy_by_James_Hunkin%2C_grayscale%2C_cropped.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+                        "width": 285,
+                        "height": 348
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Robert_Clatworthy_(sculptor)"
+                        }
+                    },
+                    "wikibase_item": "Q17279223"
+                }
+            ],
+            "year": 2015
+        },
+        {
+            "text": "Sally Forrest, American actress and dancer (born 1928)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Sally_Forrest",
+                    "normalizedtitle": "Sally Forrest",
+                    "description": "American actress (1928–2015)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Sally_Forrest_in_Vengeance_Valley_2.jpg/330px-Sally_Forrest_in_Vengeance_Valley_2.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 305
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Sally_Forrest"
+                        }
+                    },
+                    "wikibase_item": "Q3469981"
+                }
+            ],
+            "year": 2015
+        },
+        {
+            "text": "Curtis Gans, American political scientist and author (born 1937)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Curtis_Gans",
+                    "normalizedtitle": "Curtis Gans",
+                    "description": "American activist and writer (1937-2015)",
+                    "thumbnail": {
+                        "source": "https://upload.wikimedia.org/wikipedia/commons/9/93/Curtis_Gans.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+                        "width": 199,
+                        "height": 218
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Curtis_Gans"
+                        }
+                    },
+                    "wikibase_item": "Q5195744"
+                }
+            ],
+            "year": 2015
+        },
+        {
+            "text": "Mike Porcaro, American bass player (born 1955)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Mike_Porcaro",
+                    "normalizedtitle": "Mike Porcaro",
+                    "description": "American bassist (1955–2015)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/Mike_Porcaro_with_bass_guitar.jpg/330px-Mike_Porcaro_with_bass_guitar.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 440
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Mike_Porcaro"
+                        }
+                    },
+                    "wikibase_item": "Q921542"
+                }
+            ],
+            "year": 2015
+        },
+        {
+            "text": "Scott Asheton, American drummer (born 1949)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Scott_Asheton",
+                    "normalizedtitle": "Scott Asheton",
+                    "description": "American drummer (1949–2014)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Scott_Asheton_1969.jpg/330px-Scott_Asheton_1969.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 483
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Scott_Asheton"
+                        }
+                    },
+                    "wikibase_item": "Q2342571"
+                }
+            ],
+            "year": 2014
+        },
+        {
+            "text": "David Brenner, American comedian, actor, and author (born 1936)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "David_Brenner",
+                    "normalizedtitle": "David Brenner",
+                    "description": "American comedian and actor (1936–2014)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/David_Brenner_1976.jpg/330px-David_Brenner_1976.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 462
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/David_Brenner"
+                        }
+                    },
+                    "wikibase_item": "Q3017563"
+                }
+            ],
+            "year": 2014
+        },
+        {
+            "text": "Bo Callaway, American soldier and politician, United States Secretary of the Army (born 1927)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Bo_Callaway",
+                    "normalizedtitle": "Bo Callaway",
+                    "description": "American businessman and politician (1927–2014)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Howard_Callaway_in_1974_%28cropped%29.jpg/330px-Howard_Callaway_in_1974_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 440
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Bo_Callaway"
+                        }
+                    },
+                    "wikibase_item": "Q1631824"
+                },
+                {
+                    "type": "standard",
+                    "title": "United_States_Secretary_of_the_Army",
+                    "normalizedtitle": "United States Secretary of the Army",
+                    "description": "Civilian head of the U.S. Department of the Army",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/Emblem_of_the_U.S._Department_of_the_Army.svg/330px-Emblem_of_the_U.S._Department_of_the_Army.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 330
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/United_States_Secretary_of_the_Army"
+                        }
+                    },
+                    "wikibase_item": "Q1591470"
+                }
+            ],
+            "year": 2014
+        },
+        {
+            "text": "Clarissa Dickson Wright, English chef, author, and television personality (born 1947)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Clarissa_Dickson_Wright",
+                    "normalizedtitle": "Clarissa Dickson Wright",
+                    "description": "English television cook (1947–2014)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/Clarissa_Dickson_Wright_2011.jpg/330px-Clarissa_Dickson_Wright_2011.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 495
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Clarissa_Dickson_Wright"
+                        }
+                    },
+                    "wikibase_item": "Q5127064"
+                }
+            ],
+            "year": 2014
+        },
+        {
+            "text": "Booth Gardner, American businessman and politician, Governor of Washington (born 1936)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Booth_Gardner",
+                    "normalizedtitle": "Booth Gardner",
+                    "description": "Governor of Washington from 1985 to 1993",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/Booth_Gardner.jpg/330px-Booth_Gardner.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 482
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Booth_Gardner"
+                        }
+                    },
+                    "wikibase_item": "Q142462"
+                },
+                {
+                    "type": "standard",
+                    "title": "List_of_governors_of_Washington",
+                    "normalizedtitle": "List of governors of Washington",
+                    "description": "",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Bob_Ferguson_at_his_2023_Shrimp_Feed_02_%28cropped%29.jpg/330px-Bob_Ferguson_at_his_2023_Shrimp_Feed_02_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 439
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/List_of_governors_of_Washington"
+                        }
+                    },
+                    "wikibase_item": "Q878264"
+                }
+            ],
+            "year": 2013
+        },
+        {
+            "text": "Terry Lightfoot, English clarinet player (born 1935)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Terry_Lightfoot",
+                    "normalizedtitle": "Terry Lightfoot",
+                    "description": "British jazz clarinettist and bandleader (1935–2013)",
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Terry_Lightfoot"
+                        }
+                    },
+                    "wikibase_item": "Q2405670"
+                }
+            ],
+            "year": 2013
+        },
+        {
+            "text": "Leverne McDonnell, Australian actress (born 1963)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Leverne_McDonnell",
+                    "normalizedtitle": "Leverne McDonnell",
+                    "description": "Australian actress",
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Leverne_McDonnell"
+                        }
+                    },
+                    "wikibase_item": "Q13561147"
+                }
+            ],
+            "year": 2013
+        },
+        {
+            "text": "Peter Worsley, English sociologist (born 1924)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Peter_Worsley",
+                    "normalizedtitle": "Peter Worsley",
+                    "description": "British sociologist and anthropologist (1924–2013)",
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Peter_Worsley"
+                        }
+                    },
+                    "wikibase_item": "Q1727458"
+                }
+            ],
+            "year": 2013
+        },
+        {
+            "text": "Mervyn Davies, Welsh rugby player (born 1946)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Mervyn_Davies_(rugby_union)",
+                    "normalizedtitle": "Mervyn Davies (rugby union)",
+                    "description": "British Lions & Wales international rugby union player (1946-2012)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/en/thumb/2/2d/Mervyn_Davies_in_Wales_strip.jpg/330px-Mervyn_Davies_in_Wales_strip.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 247
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Mervyn_Davies_(rugby_union)"
+                        }
+                    },
+                    "wikibase_item": "Q584317"
+                }
+            ],
+            "year": 2012
+        },
+        {
+            "text": "Dave Philley, American baseball player and manager (born 1920)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Dave_Philley",
+                    "normalizedtitle": "Dave Philley",
+                    "description": "American baseball player (1920–2012)",
+                    "thumbnail": {
+                        "source": "https://upload.wikimedia.org/wikipedia/en/6/60/Dave_Philley.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+                        "width": 230,
+                        "height": 320
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Dave_Philley"
+                        }
+                    },
+                    "wikibase_item": "Q5229570"
+                }
+            ],
+            "year": 2012
+        },
+        {
+            "text": "Nate Dogg, American rapper (born 1969)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Nate_Dogg",
+                    "normalizedtitle": "Nate Dogg",
+                    "description": "American singer and rapper (1969–2011)",
+                    "thumbnail": {
+                        "source": "https://upload.wikimedia.org/wikipedia/en/b/b6/Nate_Dogg_Vol._1_promo_photo.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+                        "width": 260,
+                        "height": 383
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Nate_Dogg"
+                        }
+                    },
+                    "wikibase_item": "Q47159"
+                }
+            ],
+            "year": 2011
+        },
+        {
+            "text": "Smiley Culture, English singer and DJ (born 1963)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Smiley_Culture",
+                    "normalizedtitle": "Smiley Culture",
+                    "description": "British reggae singer and DJ (1963–2011)",
+                    "thumbnail": {
+                        "source": "https://upload.wikimedia.org/wikipedia/en/a/af/SmileyCultureLWTPubPic.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+                        "width": 220,
+                        "height": 293
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Smiley_Culture"
+                        }
+                    },
+                    "wikibase_item": "Q3398633"
+                }
+            ],
+            "year": 2011
+        },
+        {
+            "text": "Kazim al-Samawi, Iraqi poet (born 1925)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Kazim_al-Samawi",
+                    "normalizedtitle": "Kazim al-Samawi",
+                    "description": "Iraqi poet and journalist (1925–2010)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Kazim_al-Samawi_-_1970s.jpg/330px-Kazim_al-Samawi_-_1970s.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 451
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Kazim_al-Samawi"
+                        }
+                    },
+                    "wikibase_item": "Q70986970"
+                }
+            ],
+            "year": 2010
+        },
+        {
+            "text": "Ron Silver, American actor, director, and producer (born 1946)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Ron_Silver",
+                    "normalizedtitle": "Ron Silver",
+                    "description": "American actor (1946–2009)",
+                    "thumbnail": {
+                        "source": "https://upload.wikimedia.org/wikipedia/en/b/b7/Ron_Silver.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+                        "width": 220,
+                        "height": 287
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Ron_Silver"
+                        }
+                    },
+                    "wikibase_item": "Q382036"
+                }
+            ],
+            "year": 2009
+        },
+        {
+            "text": "Mikey Dread, Jamaican singer-songwriter and producer (born 1954)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Mikey_Dread",
+                    "normalizedtitle": "Mikey Dread",
+                    "description": "Jamaican musician (1954–2008)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Mikeydreadwsrf.jpg/330px-Mikeydreadwsrf.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 248
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Mikey_Dread"
+                        }
+                    },
+                    "wikibase_item": "Q730746"
+                }
+            ],
+            "year": 2008
+        },
+        {
+            "text": "G. David Low, American astronaut and engineer (born 1956)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "G._David_Low",
+                    "normalizedtitle": "G. David Low",
+                    "description": "American astronaut (1956–2008)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Low_David.jpg/330px-Low_David.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 416
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/G._David_Low"
+                        }
+                    },
+                    "wikibase_item": "Q1507223"
+                }
+            ],
+            "year": 2008
+        },
+        {
+            "text": "Sarla Thakral, First Indian woman to earn a pilot's license. (born 1914)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Sarla_Thukral",
+                    "normalizedtitle": "Sarla Thukral",
+                    "description": "Pioneer Indian woman pilot (1914–2008)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/Sarla_Thakral.jpg/330px-Sarla_Thakral.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 239
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Sarla_Thukral"
+                        }
+                    },
+                    "wikibase_item": "Q15054580"
+                }
+            ],
+            "year": 2008
+        },
+        {
+            "text": "Charles Harrelson, American murderer (born 1938)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Charles_Harrelson",
+                    "normalizedtitle": "Charles Harrelson",
+                    "description": "American hitman (1938–2007)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/en/thumb/2/2d/Harrelson.jpg/330px-Harrelson.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 240
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Charles_Harrelson"
+                        }
+                    },
+                    "wikibase_item": "Q2194178"
+                }
+            ],
+            "year": 2007
+        },
+        {
+            "text": "Stuart Rosenberg, American director and producer (born 1927)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Stuart_Rosenberg",
+                    "normalizedtitle": "Stuart Rosenberg",
+                    "description": "American film and television director",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/Stuart_Rosenberg_%281975%29.jpg/330px-Stuart_Rosenberg_%281975%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 422
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Stuart_Rosenberg"
+                        }
+                    },
+                    "wikibase_item": "Q966078"
+                }
+            ],
+            "year": 2007
+        },
+        {
+            "text": "Georgios Rallis, Greek lieutenant and politician, Prime Minister of Greece (born 1918)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Georgios_Rallis",
+                    "normalizedtitle": "Georgios Rallis",
+                    "description": "Greek politician (1918–2006)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/%D0%93%D0%B5%D0%BE%D1%80%D0%B3%D0%B8%D0%BE%D1%81_%D0%A0%D0%B0%D0%BB%D0%BB%D0%B8%D1%81_%D0%B2_%D0%9B%D1%8E%D0%BA%D1%81%D0%B5%D0%BC%D0%B1%D1%83%D1%80%D0%B3%D0%B5_%2829-06-1981%29.jpg/330px-%D0%93%D0%B5%D0%BE%D1%80%D0%B3%D0%B8%D0%BE%D1%81_%D0%A0%D0%B0%D0%BB%D0%BB%D0%B8%D1%81_%D0%B2_%D0%9B%D1%8E%D0%BA%D1%81%D0%B5%D0%BC%D0%B1%D1%83%D1%80%D0%B3%D0%B5_%2829-06-1981%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 470
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Georgios_Rallis"
+                        }
+                    },
+                    "wikibase_item": "Q252657"
+                },
+                {
+                    "type": "standard",
+                    "title": "Prime_Minister_of_Greece",
+                    "normalizedtitle": "Prime Minister of Greece",
+                    "description": "Head of government",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/Coat_of_Arms_of_Greece_%28Monochromatic%29.svg/330px-Coat_of_Arms_of_Greece_%28Monochromatic%29.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 331
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Prime_Minister_of_Greece"
+                        }
+                    },
+                    "wikibase_item": "Q4377230"
+                }
+            ],
+            "year": 2006
+        },
+        {
+            "text": "Red Storey, Canadian football player and referee (born 1918)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Red_Storey",
+                    "normalizedtitle": "Red Storey",
+                    "description": "Canadian athlete, referee, broadcaster (1918–2006)",
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Red_Storey"
+                        }
+                    },
+                    "wikibase_item": "Q3422787"
+                }
+            ],
+            "year": 2006
+        },
+        {
+            "text": "Otar Korkia, Georgian basketball player (born 1923)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Otar_Korkia",
+                    "normalizedtitle": "Otar Korkia",
+                    "description": "Georgian basketball player and coach",
+                    "thumbnail": {
+                        "source": "https://upload.wikimedia.org/wikipedia/en/4/43/Otar_Korkia.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+                        "width": 215,
+                        "height": 464
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Otar_Korkia"
+                        }
+                    },
+                    "wikibase_item": "Q2711773"
+                }
+            ],
+            "year": 2005
+        },
+        {
+            "text": "Philippe Lemaire, French actor (born 1927)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Philippe_Lemaire",
+                    "normalizedtitle": "Philippe Lemaire",
+                    "description": "French actor (1927–2004)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/81/Saluti_e_baci_%281953%29_Philippe_Lemaire.png/330px-Saluti_e_baci_%281953%29_Philippe_Lemaire.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 240
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Philippe_Lemaire"
+                        }
+                    },
+                    "wikibase_item": "Q2087651"
+                }
+            ],
+            "year": 2004
+        },
+        {
+            "text": "Bill Pickering, New Zealand-American scientist and engineer (born 1910)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Bill_Pickering_(rocket_scientist)",
+                    "normalizedtitle": "Bill Pickering (rocket scientist)",
+                    "description": "New Zealand aerospace engineer",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/Pickering_with_Mariner_4_model.jpg/330px-Pickering_with_Mariner_4_model.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 411
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Bill_Pickering_(rocket_scientist)"
+                        }
+                    },
+                    "wikibase_item": "Q2447874"
+                }
+            ],
+            "year": 2004
+        },
+        {
+            "text": "John Pople, English-American chemist and academic, Nobel Prize laureate (born 1925)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "John_Pople",
+                    "normalizedtitle": "John Pople",
+                    "description": "British theoretical chemist (1925–2004)",
+                    "thumbnail": {
+                        "source": "https://upload.wikimedia.org/wikipedia/commons/c/c1/John_Anthony_Pople.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+                        "width": 73,
+                        "height": 99
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/John_Pople"
+                        }
+                    },
+                    "wikibase_item": "Q233973"
+                },
+                {
+                    "type": "standard",
+                    "title": "Nobel_Prize_in_Chemistry",
+                    "normalizedtitle": "Nobel Prize in Chemistry",
+                    "description": "Annual prize awarded in the field of chemistry (from 1895)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/en/thumb/e/ed/Nobel_Prize.png/330px-Nobel_Prize.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 325
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Nobel_Prize_in_Chemistry"
+                        }
+                    },
+                    "wikibase_item": "Q44585"
+                }
+            ],
+            "year": 2004
+        },
+        {
+            "text": "Thora Hird, English actress (born 1911)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Thora_Hird",
+                    "normalizedtitle": "Thora Hird",
+                    "description": "British actress (1911–2003)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Dame_Thora_Hird_Allan_Warren.jpg/330px-Dame_Thora_Hird_Allan_Warren.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 466
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Thora_Hird"
+                        }
+                    },
+                    "wikibase_item": "Q4347204"
+                }
+            ],
+            "year": 2003
+        },
+        {
+            "text": "Paul Stojanovich, American television producer, created World's Wildest Police Videos (born 1955)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Paul_Stojanovich",
+                    "normalizedtitle": "Paul Stojanovich",
+                    "description": "American television producer (1956–2003)",
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Paul_Stojanovich"
+                        }
+                    },
+                    "wikibase_item": "Q6191096"
+                },
+                {
+                    "type": "standard",
+                    "title": "World's_Wildest_Police_Videos",
+                    "normalizedtitle": "World's Wildest Police Videos",
+                    "description": "American reality television series (1998–2012)",
+                    "thumbnail": {
+                        "source": "https://upload.wikimedia.org/wikipedia/en/1/12/World%27s_Wildest_Police_Videos.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+                        "width": 320,
+                        "height": 240
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/World's_Wildest_Police_Videos"
+                        }
+                    },
+                    "wikibase_item": "Q8035257"
+                }
+            ],
+            "year": 2003
+        },
+        {
+            "text": "Ann Sothern, American actress and singer (born 1909)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Ann_Sothern",
+                    "normalizedtitle": "Ann Sothern",
+                    "description": "American actress (1909–2001)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Ann_Sothern_1943_portrait.jpg/330px-Ann_Sothern_1943_portrait.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 413
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Ann_Sothern"
+                        }
+                    },
+                    "wikibase_item": "Q235289"
+                }
+            ],
+            "year": 2001
+        },
+        {
+            "text": "Benjamin Spock, American pediatrician and author (born 1903)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Benjamin_Spock",
+                    "normalizedtitle": "Benjamin Spock",
+                    "description": "American pediatrician, political activist, and writer (1903–1998)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Benjamin_McLane_Spock_%281976%29_02.jpg/330px-Benjamin_McLane_Spock_%281976%29_02.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 440
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Benjamin_Spock"
+                        }
+                    },
+                    "wikibase_item": "Q310694"
+                }
+            ],
+            "year": 1998
+        },
+        {
+            "text": "Gail Davis, American actress (born 1925)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Gail_Davis",
+                    "normalizedtitle": "Gail Davis",
+                    "description": "American actress and horseback rider",
+                    "thumbnail": {
+                        "source": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Gail_Davis_%28c.1941%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+                        "width": 196,
+                        "height": 261
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Gail_Davis"
+                        }
+                    },
+                    "wikibase_item": "Q4357688"
+                }
+            ],
+            "year": 1997
+        },
+        {
+            "text": "Victor Vasarely, Hungarian-French painter (born 1906)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Victor_Vasarely",
+                    "normalizedtitle": "Victor Vasarely",
+                    "description": "Hungarian-French artist (1906–1997)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/Victor_Vasarely.jpg/330px-Victor_Vasarely.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 451
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Victor_Vasarely"
+                        }
+                    },
+                    "wikibase_item": "Q154448"
+                }
+            ],
+            "year": 1997
+        },
+        {
+            "text": "Bud Freeman, American saxophonist, composer, and bandleader (born 1906)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Bud_Freeman",
+                    "normalizedtitle": "Bud Freeman",
+                    "description": "American jazz musician (1906–1991)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/Bud_Freeman_%28cropped%29.jpg/330px-Bud_Freeman_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 399
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Bud_Freeman"
+                        }
+                    },
+                    "wikibase_item": "Q711163"
+                }
+            ],
+            "year": 1991
+        },
+        {
+            "text": "Farzad Bazoft, Iranian-English journalist (born 1958)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Farzad_Bazoft",
+                    "normalizedtitle": "Farzad Bazoft",
+                    "description": "Iranian journalist (1958–1990)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/en/thumb/c/c1/Farzad_Bazoft.webp/330px-Farzad_Bazoft.webp?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 247
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Farzad_Bazoft"
+                        }
+                    },
+                    "wikibase_item": "Q3067046"
+                }
+            ],
+            "year": 1990
+        },
+        {
+            "text": "Tom Harmon, American football player and sportscaster (born 1919)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Tom_Harmon",
+                    "normalizedtitle": "Tom Harmon",
+                    "description": "American football player and broadcaster",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/Tom_Harmon_from_1948_Michiganensian.jpg/330px-Tom_Harmon_from_1948_Michiganensian.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 422
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Tom_Harmon"
+                        }
+                    },
+                    "wikibase_item": "Q3530742"
+                }
+            ],
+            "year": 1990
+        },
+        {
+            "text": "Dmitri Polyakov, Ukrainian general and spy (born 1921)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Dmitri_Polyakov",
+                    "normalizedtitle": "Dmitri Polyakov",
+                    "description": "Soviet major general and spy (1921–1988)",
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Dmitri_Polyakov"
+                        }
+                    },
+                    "wikibase_item": "Q572146"
+                }
+            ],
+            "year": 1988
+        },
+        {
+            "text": "Alan A. Freeman, English record producer (born 1920)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Alan_A._Freeman",
+                    "normalizedtitle": "Alan A. Freeman",
+                    "description": "British record producer (1920–1985)",
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Alan_A._Freeman"
+                        }
+                    },
+                    "wikibase_item": "Q2636610"
+                }
+            ],
+            "year": 1985
+        },
+        {
+            "text": "Rebecca West, English author and critic (born 1892)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Rebecca_West",
+                    "normalizedtitle": "Rebecca West",
+                    "description": "British author and journalist (1892–1983)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Rebecca_West.jpg/330px-Rebecca_West.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 406
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Rebecca_West"
+                        }
+                    },
+                    "wikibase_item": "Q236669"
+                }
+            ],
+            "year": 1983
+        },
+        {
+            "text": "René Clair, French director and screenwriter (born 1898)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "René_Clair",
+                    "normalizedtitle": "René Clair",
+                    "description": "French filmmaker and writer (1898–1981)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/Identite-ReneClair-1930-Sacem.png/330px-Identite-ReneClair-1930-Sacem.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 365
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Ren%C3%A9_Clair"
+                        }
+                    },
+                    "wikibase_item": "Q55388"
+                }
+            ],
+            "year": 1981
+        },
+        {
+            "text": "Philip Testa, Italian-American mobster (born 1924)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Philip_Testa",
+                    "normalizedtitle": "Philip Testa",
+                    "description": "American mobster (1924–1981)",
+                    "thumbnail": {
+                        "source": "https://upload.wikimedia.org/wikipedia/en/9/99/PhilipTesta.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+                        "width": 253,
+                        "height": 394
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Philip_Testa"
+                        }
+                    },
+                    "wikibase_item": "Q16009742"
+                }
+            ],
+            "year": 1981
+        },
+        {
+            "text": "Hubert Aquin, Canadian author and activist (born 1929)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Hubert_Aquin",
+                    "normalizedtitle": "Hubert Aquin",
+                    "description": "Quebec novelist and intellectual (1929–1977)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/Hubert_Aquin_1976.png/330px-Hubert_Aquin_1976.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 308
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Hubert_Aquin"
+                        }
+                    },
+                    "wikibase_item": "Q732980"
+                }
+            ],
+            "year": 1977
+        },
+        {
+            "text": "Antonino Rocca, Italian-American wrestler and referee (born 1921)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Antonino_Rocca",
+                    "normalizedtitle": "Antonino Rocca",
+                    "description": "Italian professional wrestler (1921–1977)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Antonino_Rocca_1956.jpg/330px-Antonino_Rocca_1956.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 395
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Antonino_Rocca"
+                        }
+                    },
+                    "wikibase_item": "Q599260"
+                }
+            ],
+            "year": 1977
+        },
+        {
+            "text": "Aristotle Onassis, Greek-Argentinian businessman (born 1906)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Aristotle_Onassis",
+                    "normalizedtitle": "Aristotle Onassis",
+                    "description": "Greek business magnate (1906–1975)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/Aristotle_Onassis_1967cr.jpg/330px-Aristotle_Onassis_1967cr.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 440
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Aristotle_Onassis"
+                        }
+                    },
+                    "wikibase_item": "Q180455"
+                }
+            ],
+            "year": 1975
+        },
+        {
+            "text": "Tarjei Vesaas, Norwegian author and poet (born 1897)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Tarjei_Vesaas",
+                    "normalizedtitle": "Tarjei Vesaas",
+                    "description": "Norwegian writer (1897–1970)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Tarjei_Vesaas.jpg/330px-Tarjei_Vesaas.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 458
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Tarjei_Vesaas"
+                        }
+                    },
+                    "wikibase_item": "Q381443"
+                }
+            ],
+            "year": 1970
+        },
+        {
+            "text": "Miles Malleson, English actor and screenwriter (born 1888)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Miles_Malleson",
+                    "normalizedtitle": "Miles Malleson",
+                    "description": "English actor (1888–1969)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/en/thumb/8/8a/Milles_Malleson.jpg/330px-Milles_Malleson.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 247
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Miles_Malleson"
+                        }
+                    },
+                    "wikibase_item": "Q440360"
+                }
+            ],
+            "year": 1969
+        },
+        {
+            "text": "Abe Saperstein, American basketball player and coach (born 1902)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Abe_Saperstein",
+                    "normalizedtitle": "Abe Saperstein",
+                    "description": "Harlem Globetrotters founder and first coach (1902–1966)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/Abe_Saperstein.jpeg/330px-Abe_Saperstein.jpeg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 407
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Abe_Saperstein"
+                        }
+                    },
+                    "wikibase_item": "Q318200"
+                }
+            ],
+            "year": 1966
+        },
+        {
+            "text": "Arthur Compton, American physicist and academic, Nobel Prize laureate (born 1892)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Arthur_Compton",
+                    "normalizedtitle": "Arthur Compton",
+                    "description": "American physicist (1892–1962)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c0/Arthur_Compton_1927.jpg/330px-Arthur_Compton_1927.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 442
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Arthur_Compton"
+                        }
+                    },
+                    "wikibase_item": "Q127944"
+                },
+                {
+                    "type": "standard",
+                    "title": "Nobel_Prize_in_Physics",
+                    "normalizedtitle": "Nobel Prize in Physics",
+                    "description": "Annual prize awarded since 1895",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/en/thumb/e/ed/Nobel_Prize.png/330px-Nobel_Prize.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 325
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Nobel_Prize_in_Physics"
+                        }
+                    },
+                    "wikibase_item": "Q38104"
+                }
+            ],
+            "year": 1962
+        },
+        {
+            "text": "Lester Young, American saxophonist and clarinet player (born 1909)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Lester_Young",
+                    "normalizedtitle": "Lester Young",
+                    "description": "American jazz saxophonist (1909–1959)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c1/Lester-Young-LIFE-1944.jpg/330px-Lester-Young-LIFE-1944.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 390
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Lester_Young"
+                        }
+                    },
+                    "wikibase_item": "Q110714"
+                }
+            ],
+            "year": 1959
+        },
+        {
+            "text": "Imanuel Lauster, German engineer (born 1873)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Imanuel_Lauster",
+                    "normalizedtitle": "Imanuel Lauster",
+                    "description": "German engineer",
+                    "thumbnail": {
+                        "source": "https://upload.wikimedia.org/wikipedia/en/9/97/Imanuel_Lauster.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+                        "width": 269,
+                        "height": 370
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Imanuel_Lauster"
+                        }
+                    },
+                    "wikibase_item": "Q1659717"
+                }
+            ],
+            "year": 1948
+        },
+        {
+            "text": "Rachel Field, American author and poet (born 1894)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Rachel_Field",
+                    "normalizedtitle": "Rachel Field",
+                    "description": "American novelist and poet (1894–1942)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b3/Rachel_Field_%26_Spriggin.jpg/330px-Rachel_Field_%26_Spriggin.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 432
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Rachel_Field"
+                        }
+                    },
+                    "wikibase_item": "Q1453687"
+                }
+            ],
+            "year": 1942
+        },
+        {
+            "text": "Alexej von Jawlensky, Russian-German painter (born 1864)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Alexej_von_Jawlensky",
+                    "normalizedtitle": "Alexej von Jawlensky",
+                    "description": "Russian-born German painter (1864–1941)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Alexej_von_Jawlensky_Selbstbildnis_1905.jpg/330px-Alexej_von_Jawlensky_Selbstbildnis_1905.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 463
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Alexej_von_Jawlensky"
+                        }
+                    },
+                    "wikibase_item": "Q156426"
+                }
+            ],
+            "year": 1941
+        },
+        {
+            "text": "H. P. Lovecraft, American short story writer, editor, and novelist (born 1890)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "H._P._Lovecraft",
+                    "normalizedtitle": "H. P. Lovecraft",
+                    "description": "American writer (1890–1937)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/10/H._P._Lovecraft%2C_June_1934.jpg/330px-H._P._Lovecraft%2C_June_1934.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 405
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/H._P._Lovecraft"
+                        }
+                    },
+                    "wikibase_item": "Q169566"
+                }
+            ],
+            "year": 1937
+        },
+        {
+            "text": "Hector Rason, English-Australian politician, 7th Premier of Western Australia (born 1858)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Hector_Rason",
+                    "normalizedtitle": "Hector Rason",
+                    "description": "Australian politician (1858–1927)",
+                    "thumbnail": {
+                        "source": "https://upload.wikimedia.org/wikipedia/commons/5/5a/Cornthwaite_Rason_%281858-1927%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+                        "width": 271,
+                        "height": 411
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Hector_Rason"
+                        }
+                    },
+                    "wikibase_item": "Q5171900"
+                },
+                {
+                    "type": "standard",
+                    "title": "Premier_of_Western_Australia",
+                    "normalizedtitle": "Premier of Western Australia",
+                    "description": "Head of government of Western Australia",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/Coat_of_arms_of_Western_Australia.svg/330px-Coat_of_arms_of_Western_Australia.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 244
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Premier_of_Western_Australia"
+                        }
+                    },
+                    "wikibase_item": "Q1550276"
+                }
+            ],
+            "year": 1927
+        },
+        {
+            "text": "Sam Dreben, American soldier and mercenary (born 1878)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Sam_Dreben",
+                    "normalizedtitle": "Sam Dreben",
+                    "description": "US Army soldier and mercenary",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Sam_Dreben.jpg/330px-Sam_Dreben.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 575
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Sam_Dreben"
+                        }
+                    },
+                    "wikibase_item": "Q2905636"
+                }
+            ],
+            "year": 1925
+        },
+        {
+            "text": "Talaat Pasha, Ottoman politician, Grand Vizier of the Ottoman Empire (born 1874)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Talaat_Pasha",
+                    "normalizedtitle": "Talaat Pasha",
+                    "description": "Turkish Ottoman politician (1874–1921)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Mehmed_talat.jpg/330px-Mehmed_talat.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 396
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Talaat_Pasha"
+                        }
+                    },
+                    "wikibase_item": "Q315888"
+                },
+                {
+                    "type": "standard",
+                    "title": "List_of_Ottoman_grand_viziers",
+                    "normalizedtitle": "List of Ottoman grand viziers",
+                    "description": "",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/Seal_of_the_Ottoman_Grand_Vizier_%28with_flags%29.png/330px-Seal_of_the_Ottoman_Grand_Vizier_%28with_flags%29.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 332
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/List_of_Ottoman_grand_viziers"
+                        }
+                    },
+                    "wikibase_item": "Q1142289"
+                }
+            ],
+            "year": 1921
+        },
+        {
+            "text": "Henry Bessemer, English engineer and businessman (born 1813)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Henry_Bessemer",
+                    "normalizedtitle": "Henry Bessemer",
+                    "description": "English inventor (1813–1898)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/Henry_Bessemer_1890s2.jpg/330px-Henry_Bessemer_1890s2.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 440
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Henry_Bessemer"
+                        }
+                    },
+                    "wikibase_item": "Q310201"
+                }
+            ],
+            "year": 1898
+        },
+        {
+            "text": "James Joseph Sylvester, English mathematician and academic (born 1814)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "James_Joseph_Sylvester",
+                    "normalizedtitle": "James Joseph Sylvester",
+                    "description": "English mathematician (1814–1897)",
+                    "thumbnail": {
+                        "source": "https://upload.wikimedia.org/wikipedia/commons/2/29/James_Joseph_Sylvester.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+                        "width": 287,
+                        "height": 400
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/James_Joseph_Sylvester"
+                        }
+                    },
+                    "wikibase_item": "Q310781"
+                }
+            ],
+            "year": 1897
+        },
+        {
+            "text": "Joseph Bazalgette, English engineer and academic (born 1819)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Joseph_Bazalgette",
+                    "normalizedtitle": "Joseph Bazalgette",
+                    "description": "British civil engineer (1819–1891)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Joseph_Bazalgette_by_Lock_%26_Whitfield.jpg/330px-Joseph_Bazalgette_by_Lock_%26_Whitfield.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 410
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Joseph_Bazalgette"
+                        }
+                    },
+                    "wikibase_item": "Q981915"
+                }
+            ],
+            "year": 1891
+        },
+        {
+            "text": "Johan Jakob Nervander, Finnish poet, physicist and meteorologist (born 1805)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Johan_Jakob_Nervander",
+                    "normalizedtitle": "Johan Jakob Nervander",
+                    "description": "Finnish poet, physicist and meteorologist (1805–1848)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/J_J_Nervander.jpg/330px-J_J_Nervander.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 408
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Johan_Jakob_Nervander"
+                        }
+                    },
+                    "wikibase_item": "Q3180415"
+                }
+            ],
+            "year": 1848
+        },
+        {
+            "text": "Luigi Cherubini, Italian composer and theorist (born 1760)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Luigi_Cherubini",
+                    "normalizedtitle": "Luigi Cherubini",
+                    "description": "Italian composer (1760–1842)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Portrait_of_Cherubini.jpg/330px-Portrait_of_Cherubini.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 454
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Luigi_Cherubini"
+                        }
+                    },
+                    "wikibase_item": "Q20721"
+                }
+            ],
+            "year": 1842
+        },
+        {
+            "text": "Clement Mary Hofbauer, Austrian priest and saint (born 1751)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Clement_Mary_Hofbauer",
+                    "normalizedtitle": "Clement Mary Hofbauer",
+                    "description": "Austrian Redemptorist and saint",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/60/Wien_Maria_am_Gestade_Hofbauer-Relief_Detail.jpg/330px-Wien_Maria_am_Gestade_Hofbauer-Relief_Detail.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 420
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Clement_Mary_Hofbauer"
+                        }
+                    },
+                    "wikibase_item": "Q508588"
+                }
+            ],
+            "year": 1820
+        },
+        {
+            "text": "Eusebio Kino, Italian priest and missionary (born 1645)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Eusebio_Kino",
+                    "normalizedtitle": "Eusebio Kino",
+                    "description": "German-Italian Jesuit missionary (1645–1711)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Padre_Misionero_Francisco_Eusebio_Kino.jpg/330px-Padre_Misionero_Francisco_Eusebio_Kino.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 328
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Eusebio_Kino"
+                        }
+                    },
+                    "wikibase_item": "Q45185"
+                }
+            ],
+            "year": 1711
+        },
+        {
+            "text": "Salvator Rosa, Italian painter and poet (born 1615)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Salvator_Rosa",
+                    "normalizedtitle": "Salvator Rosa",
+                    "description": "Italian painter, poet and printmaker (1615–1673)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/Salvator_rosa%2C_autoritratto%2C_1650-60_ca_%28cropped%29.jpg/330px-Salvator_rosa%2C_autoritratto%2C_1650-60_ca_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 391
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Salvator_Rosa"
+                        }
+                    },
+                    "wikibase_item": "Q359421"
+                }
+            ],
+            "year": 1673
+        },
+        {
+            "text": "Annibale Padovano, Italian organist and composer (born 1527)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Annibale_Padovano",
+                    "normalizedtitle": "Annibale Padovano",
+                    "description": "Italian composer",
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Annibale_Padovano"
+                        }
+                    },
+                    "wikibase_item": "Q164045"
+                }
+            ],
+            "year": 1575
+        },
+        {
+            "text": "Pargalı Ibrahim Pasha, Ottoman politician, Grand Vizier of the Ottoman Empire (born 1493)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Pargalı_Ibrahim_Pasha",
+                    "normalizedtitle": "Pargalı Ibrahim Pasha",
+                    "description": "Grand Vizier of the Ottoman Empire from 1523 to 1536",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/Ibrahim_Pasha_%28detail%29_suppresses_the_Kalender_%C3%87elebi_rebellion_in_1527._S%C3%BCleymanname%2C_TSM_Haz_1517%2C_f.248a.jpg/330px-Ibrahim_Pasha_%28detail%29_suppresses_the_Kalender_%C3%87elebi_rebellion_in_1527._S%C3%BCleymanname%2C_TSM_Haz_1517%2C_f.248a.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 338
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Pargal%C4%B1_Ibrahim_Pasha"
+                        }
+                    },
+                    "wikibase_item": "Q511943"
+                },
+                {
+                    "type": "standard",
+                    "title": "List_of_Ottoman_grand_viziers",
+                    "normalizedtitle": "List of Ottoman grand viziers",
+                    "description": "",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/Seal_of_the_Ottoman_Grand_Vizier_%28with_flags%29.png/330px-Seal_of_the_Ottoman_Grand_Vizier_%28with_flags%29.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 332
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/List_of_Ottoman_grand_viziers"
+                        }
+                    },
+                    "wikibase_item": "Q1142289"
+                }
+            ],
+            "year": 1536
+        },
+        {
+            "text": "Walter V, Count of Brienne",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Walter_V_of_Brienne",
+                    "normalizedtitle": "Walter V of Brienne",
+                    "description": "Duke of Athens (c. 1275 – 1311)",
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Walter_V_of_Brienne"
+                        }
+                    },
+                    "wikibase_item": "Q721440"
+                }
+            ],
+            "year": 1311
+        },
+        {
+            "text": "Isabella of Hainault, queen of Philip II of France (born 1170)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Isabella_of_Hainault",
+                    "normalizedtitle": "Isabella of Hainault",
+                    "description": "Queen of France from 1180 to 1190",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b3/Seal_of_Isabella_of_Hainaut.jpg/330px-Seal_of_Isabella_of_Hainaut.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 503
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Isabella_of_Hainault"
+                        }
+                    },
+                    "wikibase_item": "Q230050"
+                },
+                {
+                    "type": "standard",
+                    "title": "Philip_II_of_France",
+                    "normalizedtitle": "Philip II of France",
+                    "description": "King of France from 1180 to 1223",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Sceau_de_Philippe_Auguste._-_Archives_Nationales_-_SC-D157.jpg/330px-Sceau_de_Philippe_Auguste._-_Archives_Nationales_-_SC-D157.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 331
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Philip_II_of_France"
+                        }
+                    },
+                    "wikibase_item": "Q34428"
+                }
+            ],
+            "year": 1190
+        },
+        {
+            "text": "Ernulf, Bishop of Rochester",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Ernulf",
+                    "normalizedtitle": "Ernulf",
+                    "description": "French Benedictine monk (1040–1124)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Vitrail_Ernulf.jpg/330px-Vitrail_Ernulf.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 493
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Ernulf"
+                        }
+                    },
+                    "wikibase_item": "Q1361078"
+                },
+                {
+                    "type": "standard",
+                    "title": "Bishop_of_Rochester",
+                    "normalizedtitle": "Bishop of Rochester",
+                    "description": "Diocesan bishop in the Church of England",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Diocese_of_Rochester_arms.svg/330px-Diocese_of_Rochester_arms.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 438
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Bishop_of_Rochester"
+                        }
+                    },
+                    "wikibase_item": "Q1307504"
+                }
+            ],
+            "year": 1124
+        },
+        {
+            "text": "Siegfried I (the Older), German nobleman",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Siegfried_I_the_Elder",
+                    "normalizedtitle": "Siegfried I the Elder",
+                    "description": "German count (d. 990)",
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Siegfried_I_the_Elder"
+                        }
+                    },
+                    "wikibase_item": "Q4191783"
+                },
+                {
+                    "type": "standard",
+                    "title": "Nobility",
+                    "normalizedtitle": "Nobility",
+                    "description": "Official privileged social class",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/Queen_Anne_in_the_House_of_Lords.jpg/330px-Queen_Anne_in_the_House_of_Lords.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 383
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Nobility"
+                        }
+                    },
+                    "wikibase_item": "Q134737"
+                }
+            ],
+            "year": 990
+        },
+        {
+            "text": "Romanos II, Byzantine emperor",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Romanos_II",
+                    "normalizedtitle": "Romanos II",
+                    "description": "Byzantine emperor from 959 to 963",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/Romanos_et_Eudoxie_%28cropped2%29.JPG/330px-Romanos_et_Eudoxie_%28cropped2%29.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 463
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Romanos_II"
+                        }
+                    },
+                    "wikibase_item": "Q41847"
+                }
+            ],
+            "year": 963
+        },
+        {
+            "text": "Odoacer, first king of Italy after the fall of the Western Roman Empire (born 433)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Odoacer",
+                    "normalizedtitle": "Odoacer",
+                    "description": "Ruler of Italy (c. 433 – 493)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Coin_of_Odoacer_at_the_British_Museum_%28obverse%29.png/330px-Coin_of_Odoacer_at_the_British_Museum_%28obverse%29.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 359
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Odoacer"
+                        }
+                    },
+                    "wikibase_item": "Q103333"
+                },
+                {
+                    "type": "standard",
+                    "title": "Western_Roman_Empire",
+                    "normalizedtitle": "Western Roman Empire",
+                    "description": "Western half of the Roman Empire (395–476)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Mapa_Imperio_Occidental_a%C3%B1o_418.svg/330px-Mapa_Imperio_Occidental_a%C3%B1o_418.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 334
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Western_Roman_Empire"
+                        }
+                    },
+                    "wikibase_item": "Q42834"
+                }
+            ],
+            "year": 493
+        },
+        {
+            "text": "Cao Cao, Chinese general, warlord and statesman",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Cao_Cao",
+                    "normalizedtitle": "Cao Cao",
+                    "description": "Chinese warlord and statesman (155–220)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Cao_Cao_scth.jpg/330px-Cao_Cao_scth.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 504
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Cao_Cao"
+                        }
+                    },
+                    "wikibase_item": "Q204077"
+                }
+            ],
+            "year": 220
+        },
+        {
+            "text": "Julius Caesar, Roman general and statesman (born 100 BC)",
+            "pages": [
+                {
+                    "type": "standard",
+                    "title": "Julius_Caesar",
+                    "normalizedtitle": "Julius Caesar",
+                    "description": "Roman general and dictator (100–44 BC)",
+                    "thumbnail": {
+                        "source": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/Retrato_de_Julio_C%C3%A9sar_%2826724093101%29_%28cropped%29.jpg/330px-Retrato_de_Julio_C%C3%A9sar_%2826724093101%29_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+                        "width": 330,
+                        "height": 448
+                    },
+                    "content_urls": {
+                        "desktop": {
+                            "page": "https://en.wikipedia.org/wiki/Julius_Caesar"
+                        }
+                    },
+                    "wikibase_item": "Q1048"
+                }
+            ],
+            "year": -44
+        }
+    ]
+}

@@ -1,0 +1,41 @@
+{
+    "date-out-of-range.json": {
+        "url": "https://api.nasa.gov/planetary/apod?date=1995-06-15",
+        "status": 400,
+        "recordedOn": "2026-11-20",
+        "headers": {}
+    },
+    "passthrough-2024-03-15.json": {
+        "url": "https://science.nasa.gov/wp-json/wp/v2/apod-basic/240315",
+        "status": 200,
+        "recordedOn": "2026-11-20",
+        "headers": {
+            "content-type": "application/json; charset=UTF-8",
+            "date": "Fri, 20 Nov 2026 17:27:58 GMT"
+        }
+    },
+    "passthrough-first-picture-1995-06-16.json": {
+        "url": "https://science.nasa.gov/wp-json/wp/v2/apod-basic/950616",
+        "status": 200,
+        "recordedOn": "2026-11-20",
+        "headers": {
+            "content-type": "application/json; charset=UTF-8",
+            "date": "Fri, 20 Nov 2026 17:28:07 GMT"
+        }
+    },
+    "passthrough-video-2021-06-23.json": {
+        "url": "https://science.nasa.gov/wp-json/wp/v2/apod-basic/210623",
+        "status": 200,
+        "recordedOn": "2026-11-20",
+        "headers": {
+            "content-type": "application/json; charset=UTF-8",
+            "date": "Fri, 20 Nov 2026 17:28:05 GMT"
+        }
+    },
+    "placeholder-2026-11-18.json": {
+        "url": "https://api.nasa.gov/planetary/apod?date=2026-11-18",
+        "status": 200,
+        "recordedOn": "2026-11-20",
+        "headers": {}
+    }
+}

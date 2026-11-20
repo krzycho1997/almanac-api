@@ -11,6 +11,7 @@
         "ext-curl": "*",
         "ext-dom": "*",
         "ext-iconv": "*",
+        "ext-intl": "*",
         "doctrine/doctrine-bundle": "^3.4",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.8",
@@ -59,7 +60,7 @@
         "bump-after-update": true,
         "sort-packages": true,
         "platform": {
-            "php": "8.5.12"
+            "php": "8.5.13"
         },
         "process-timeout": 0
     },

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Support\Briefing;
 
-use App\Briefing\SourceName;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 final class UpstreamMockResponseFactory
@@ -20,7 +19,7 @@ final class UpstreamMockResponseFactory
     private array $served = [];
 
     /**
-     * @param list<array{source: string, baseUri: string}> $routes
+     * @param list<array{upstream: string, baseUri: string}> $routes
      */
     public function __construct(
         private readonly array $routes,
@@ -38,9 +37,9 @@ final class UpstreamMockResponseFactory
      */
     public function __invoke(string $method, string $url, array $options): MockResponse
     {
-        $source = $this->sourceFor($url);
-        $this->pending[$source->value] ??= [];
-        $response = array_shift($this->pending[$source->value]);
+        $upstream = $this->upstreamFor($url);
+        $this->pending[$upstream] ??= [];
+        $response = array_shift($this->pending[$upstream]);
 
         if ($response instanceof MockResponse) {
             $this->served[] = $response;
@@ -48,7 +47,7 @@ final class UpstreamMockResponseFactory
             return $response;
         }
 
-        throw new \LogicException("No response planned for the request to {$source->value}: {$method} {$url}");
+        throw new \LogicException("No response planned for the request to {$upstream}: {$method} {$url}");
     }
 
     /**
@@ -59,11 +58,19 @@ final class UpstreamMockResponseFactory
         return $this->served;
     }
 
-    private function sourceFor(string $url): SourceName
+    /**
+     * @return array<string, int>
+     */
+    public function unserved(): array
+    {
+        return array_filter(array_map(\count(...), $this->pending), static fn (int $left): bool => $left > 0);
+    }
+
+    private function upstreamFor(string $url): string
     {
         foreach ($this->routes as $route) {
             if (str_starts_with($url, $route['baseUri'])) {
-                return SourceName::from($route['source']);
+                return $route['upstream'];
             }
         }
 

@@ -7,6 +7,7 @@ namespace App\Tests\Briefing\Unit\Source\Apod;
 use App\Briefing\Exception\InvalidUpstreamPayloadException;
 use App\Briefing\Exception\PayloadDefect;
 use App\Briefing\Model\ApodPicture;
+use App\Briefing\Model\Attribution;
 use App\Briefing\Model\MediaType;
 use App\Briefing\Source\Apod\ApodApiResponse;
 use App\Briefing\Source\Apod\ApodMapper;
@@ -31,7 +32,7 @@ final class ApodMapperTest extends TestCase
 
         // Then
         self::assertEquals(
-            new ApodPicture(new \DateTimeImmutable('2026-11-18 00:00:00 UTC'), self::TITLE, self::EXPLANATION, MediaType::Image, self::URL, self::HD_URL, 'Jane Doe'),
+            new ApodPicture(new \DateTimeImmutable('2026-11-18 00:00:00 UTC'), self::TITLE, self::EXPLANATION, MediaType::Image, self::URL, self::HD_URL, 'Jane Doe', new Attribution('Astronomy Picture of the Day', 'https://apod.nasa.gov/', null, null, true, null)),
             $picture,
         );
     }

@@ -9,7 +9,6 @@ framework:
             nasa.client:
                 base_uri: '%env(NASA_BASE_URI)%'
                 <<: &upstream_options
-                    timeout: 2
                     max_duration: 3
                     max_redirects: 0
                     retry_failed:

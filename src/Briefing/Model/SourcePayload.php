@@ -6,4 +6,5 @@ namespace App\Briefing\Model;
 
 interface SourcePayload
 {
+    public Attribution $attribution { get; }
 }

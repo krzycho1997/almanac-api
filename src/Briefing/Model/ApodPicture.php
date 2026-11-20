@@ -14,6 +14,7 @@ final readonly class ApodPicture implements SourcePayload
         public ?string $url,
         public ?string $hdUrl,
         public ?string $credit,
+        public Attribution $attribution,
     ) {
     }
 }

@@ -2,6 +2,7 @@
 
 parameters:
     app.briefing.retry_delay_ms: 250
+    app.briefing.fetch_deadline_seconds: 3.5
 
 services:
     _defaults:
@@ -56,6 +57,18 @@ services:
         arguments:
             - { max_connect_duration: 1.0 }
 
+    app.briefing.upstream_stream:
+        alias: nasa.client
+
+    app.briefing.fetch_clock:
+        class: Symfony\Component\Clock\MonotonicClock
+
+    App\Briefing\Source\ConcurrentFetcher:
+        arguments:
+            $upstream: '@app.briefing.upstream_stream'
+            $clock: '@app.briefing.fetch_clock'
+            $deadlineSeconds: '%app.briefing.fetch_deadline_seconds%'
+
     App\Briefing\Source\UpstreamRetryStrategy:
         arguments:
             $transientFailures: '@app.briefing.transient_failure_retry_strategy'
@@ -83,10 +96,10 @@ when@test:
             public: true
             arguments:
                 $routes:
-                    - { source: apod, baseUri: '%env(NASA_BASE_URI)%' }
-                    - { source: on_this_day, baseUri: '%env(WIKIPEDIA_BASE_URI)%' }
-                    - { source: weather, baseUri: '%env(OPEN_METEO_BASE_URI)%' }
-                    - { source: weather, baseUri: '%env(OPEN_METEO_ARCHIVE_BASE_URI)%' }
+                    - { upstream: nasa, baseUri: '%env(NASA_BASE_URI)%' }
+                    - { upstream: wikipedia, baseUri: '%env(WIKIPEDIA_BASE_URI)%' }
+                    - { upstream: open_meteo, baseUri: '%env(OPEN_METEO_BASE_URI)%' }
+                    - { upstream: open_meteo_archive, baseUri: '%env(OPEN_METEO_ARCHIVE_BASE_URI)%' }
 
         test.nasa.client:
             alias: nasa.client
@@ -103,3 +116,8 @@ when@test:
         test.open_meteo_archive.client:
             alias: open_meteo_archive.client
             public: true
+
+        app.briefing.fetch_clock:
+            class: App\Tests\Support\TickingClock
+            arguments:
+                $tickSeconds: 0.001

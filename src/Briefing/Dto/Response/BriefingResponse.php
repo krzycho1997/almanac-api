@@ -7,7 +7,11 @@ namespace App\Briefing\Dto\Response;
 final readonly class BriefingResponse
 {
     /**
-     * @param list<SourceKey> $missing
+     * @param list<SourceKey>      $missing
+     * @param list<EventDto>       $events
+     * @param list<PersonDto>      $births
+     * @param list<PersonDto>      $deaths
+     * @param list<AttributionDto> $attributions
      */
     public function __construct(
         public string $date,
@@ -15,6 +19,11 @@ final readonly class BriefingResponse
         public SourcesDto $sources,
         public array $missing,
         public ?ApodDto $apod,
+        public array $events,
+        public array $births,
+        public array $deaths,
+        public ?WeatherDto $weather,
+        public array $attributions,
     ) {
     }
 }

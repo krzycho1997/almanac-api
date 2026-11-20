@@ -132,7 +132,7 @@ components:
     Briefing:
       type: object
       additionalProperties: false
-      required: [date, location, sources, missing, apod]
+      required: [date, location, sources, missing, apod, events, births, deaths, weather, attributions]
       properties:
         date:
           type: string
@@ -142,9 +142,13 @@ components:
         sources:
           type: object
           additionalProperties: false
-          required: [apod]
+          required: [apod, onThisDay, weather]
           properties:
             apod:
+              $ref: '#/components/schemas/SourceStatus'
+            onThisDay:
+              $ref: '#/components/schemas/SourceStatus'
+            weather:
               $ref: '#/components/schemas/SourceStatus'
         missing:
           type: array
@@ -157,6 +161,31 @@ components:
           allOf:
             - $ref: '#/components/schemas/Apod'
           nullable: true
+        events:
+          type: array
+          description: Selected events of this day in history, in the order Wikipedia lists them; empty when On This Day has no data.
+          items:
+            $ref: '#/components/schemas/Event'
+        births:
+          type: array
+          description: People born on this day, spread across the centuries and newest first; empty when On This Day has no data.
+          items:
+            $ref: '#/components/schemas/Person'
+        deaths:
+          type: array
+          description: People who died on this day, spread across the centuries and newest first; empty when On This Day has no data.
+          items:
+            $ref: '#/components/schemas/Person'
+        weather:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/Weather'
+          nullable: true
+        attributions:
+          type: array
+          description: Credits that the sources' licences require next to their data, one for each source with data in this briefing, in the order of sources.
+          items:
+            $ref: '#/components/schemas/Attribution'
     Location:
       type: object
       additionalProperties: false
@@ -177,7 +206,7 @@ components:
           type: boolean
     SourceKey:
       type: string
-      enum: [apod]
+      enum: [apod, onThisDay, weather]
     SourceStatus:
       type: object
       oneOf:
@@ -251,6 +280,149 @@ components:
         credit:
           type: string
           nullable: true
+    Event:
+      type: object
+      additionalProperties: false
+      required: [year, text, pages]
+      properties:
+        year:
+          type: integer
+          description: Negative for years BC.
+          example: 1990
+        text:
+          type: string
+        pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Page'
+    Person:
+      type: object
+      additionalProperties: false
+      required: [year, name, description, url, thumbnail]
+      properties:
+        year:
+          type: integer
+          description: Negative for years BC.
+          example: 1947
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        url:
+          type: string
+          format: uri
+          nullable: true
+          description: The page about the person; null when no page of the entry is about this person.
+        thumbnail:
+          type: string
+          format: uri
+          nullable: true
+    Page:
+      type: object
+      additionalProperties: false
+      required: [title, url, thumbnail]
+      properties:
+        title:
+          type: string
+        url:
+          type: string
+          format: uri
+        thumbnail:
+          type: string
+          format: uri
+          nullable: true
+    Weather:
+      type: object
+      additionalProperties: false
+      description: Daily summary for the place, with times in its own time zone; measures without data are null. Each day is summed up with the place's UTC offset of the day the data is fetched, so on dates with the other daylight-saving state the daily window is shifted by an hour.
+      required: [kind, timezone, temperatureMin, temperatureMax, precipitationSum, windSpeedMax, weatherCode, description, sunrise, sunset, daylightDuration]
+      properties:
+        kind:
+          type: string
+          enum: [final, provisional, forecast]
+          description: final for days more than five days before today in UTC, from the reanalysis archive; provisional for the five days before today (the values may still change), forecast from today; days from 1940 up to 14 days ahead.
+        timezone:
+          type: string
+          description: IANA time zone of the place.
+          example: Europe/Warsaw
+        temperatureMin:
+          type: number
+          nullable: true
+          description: Degrees Celsius.
+        temperatureMax:
+          type: number
+          nullable: true
+          description: Degrees Celsius.
+        precipitationSum:
+          type: number
+          nullable: true
+          minimum: 0
+          description: Millimetres.
+        windSpeedMax:
+          type: number
+          nullable: true
+          minimum: 0
+          description: Kilometres per hour.
+        weatherCode:
+          type: integer
+          nullable: true
+          description: WMO weather interpretation code.
+        description:
+          type: string
+          nullable: true
+          example: Overcast
+        sunrise:
+          type: string
+          format: date-time
+          nullable: true
+          description: Local time with offset; null when the sun does not rise and set that day.
+          example: '2024-07-01T05:51:31+02:00'
+        sunset:
+          type: string
+          format: date-time
+          nullable: true
+          description: Local time with offset, possibly after midnight; null when the sun does not rise and set that day.
+          example: '2024-07-01T21:57:45+02:00'
+        daylightDuration:
+          type: integer
+          nullable: true
+          minimum: 0
+          maximum: 86400
+          description: Seconds of daylight; 0 in polar night, 86400 in polar day.
+    Attribution:
+      type: object
+      additionalProperties: false
+      description: Credit that a source's licence or terms require next to its data.
+      required: [source, name, url, license, licenseUrl, modified, notice]
+      properties:
+        source:
+          $ref: '#/components/schemas/SourceKey'
+        name:
+          type: string
+          example: Open-Meteo
+        url:
+          type: string
+          format: uri
+          example: https://open-meteo.com/
+        license:
+          type: string
+          nullable: true
+          description: Null when the data comes without a named licence.
+          example: CC BY 4.0
+        licenseUrl:
+          type: string
+          format: uri
+          nullable: true
+          example: https://creativecommons.org/licenses/by/4.0/
+        modified:
+          type: boolean
+          description: True when the data was changed, for example trimmed, cleaned of markup or converted to the place's time zone.
+        notice:
+          type: string
+          nullable: true
+          description: Further acknowledgement the original data requires.
+          example: Generated using Copernicus Climate Change Service information
     Health:
       type: object
       additionalProperties: false

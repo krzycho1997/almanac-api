@@ -174,6 +174,82 @@ final class PendingFetchTest extends TestCase
         yield 'JSON decoded by the mapper itself' => ['{"title":', static fn (ResponseInterface $response): SourcePayload => new FakePayload((array) json_decode($response->getContent(), true, flags: \JSON_THROW_ON_ERROR)), new FailureCause('JsonException')];
     }
 
+    public function testMapsSeveralResponsesTogether(): void
+    {
+        // Given
+        $responses = self::responses(new MockResponse('{"title":"Pillars"}'), new MockResponse('{"title":"Creation"}'));
+        $fetch = new PendingFetch($responses, static fn (): SourcePayload => new FakePayload(['titles' => [$responses[0]->toArray()['title'], $responses[1]->toArray()['title']]]), new MockClock(self::NOW));
+
+        // When
+        $result = $fetch->resolve(SourceName::OnThisDay);
+
+        // Then
+        self::assertEquals(new FakePayload(['titles' => ['Pillars', 'Creation']]), $result->payload);
+    }
+
+    #[DataProvider('oneFailedResponse')]
+    public function testReportsTheFirstFailedResponseOfSeveral(MockResponse $second, MockResponse $third, FailureKind $kind, ?int $status, ?string $retryAt): void
+    {
+        // Given
+        $responses = self::responses(new MockResponse(self::BODY), $second, $third);
+        $fetch = new PendingFetch($responses, static fn (): SourcePayload => throw new \LogicException('A failed fetch must not be mapped.'), new MockClock(self::NOW));
+
+        // When
+        $result = $fetch->resolve(SourceName::OnThisDay);
+
+        // Then
+        self::assertSame($kind, $result->failureKind);
+        self::assertSame($status, $result->httpStatus);
+        self::assertSame($retryAt, $result->retryAt?->format(\DateTimeInterface::ATOM));
+    }
+
+    /**
+     * @return iterable<string, array{MockResponse, MockResponse, FailureKind, ?int, ?string}>
+     */
+    public static function oneFailedResponse(): iterable
+    {
+        yield 'second rate limited' => [new MockResponse('', ['http_code' => Response::HTTP_TOO_MANY_REQUESTS, 'response_headers' => ['Retry-After' => '60']]), new MockResponse(self::BODY), FailureKind::RateLimited, Response::HTTP_TOO_MANY_REQUESTS, '2026-11-20T12:01:00+00:00'];
+        yield 'second and third failed' => [new MockResponse('', ['http_code' => Response::HTTP_NOT_FOUND]), new MockResponse('', ['http_code' => Response::HTTP_INTERNAL_SERVER_ERROR]), FailureKind::Rejected, Response::HTTP_NOT_FOUND, null];
+        yield 'third without a connection' => [new MockResponse(self::BODY), new MockResponse('', ['error' => 'Connection refused']), FailureKind::Unavailable, null, null];
+    }
+
+    public function testGivesNoStatusForAnInvalidPayloadFromResponsesWithDifferentStatuses(): void
+    {
+        // Given
+        $fetch = new PendingFetch(self::responses(new MockResponse(self::BODY), new MockResponse(self::BODY, ['http_code' => Response::HTTP_NON_AUTHORITATIVE_INFORMATION])), static fn (): SourcePayload => throw InvalidUpstreamPayloadException::notJson(FakePayload::class), new MockClock(self::NOW));
+
+        // When
+        $result = $fetch->resolve(SourceName::OnThisDay);
+
+        // Then
+        self::assertSame(FailureKind::InvalidPayload, $result->failureKind);
+        self::assertNull($result->httpStatus);
+    }
+
+    public function testLeavesNoUnreadFailedResponseBehind(): void
+    {
+        // Given
+        $fetch = new PendingFetch(self::responses(new MockResponse('', ['http_code' => Response::HTTP_NOT_FOUND]), new MockResponse('', ['http_code' => Response::HTTP_INTERNAL_SERVER_ERROR])), static fn (): SourcePayload => new FakePayload([]), new MockClock(self::NOW));
+        $result = $fetch->resolve(SourceName::OnThisDay);
+
+        // When
+        unset($fetch);
+        gc_collect_cycles();
+
+        // Then
+        self::assertSame(FailureKind::Rejected, $result->failureKind);
+    }
+
+    /**
+     * @return non-empty-list<ResponseInterface>
+     */
+    private static function responses(MockResponse $first, MockResponse ...$others): array
+    {
+        $client = new MockHttpClient([$first, ...$others]);
+
+        return array_map(static fn (int $index): ResponseInterface => $client->request('GET', self::URL.'/'.$index), range(0, \count($others)));
+    }
+
     /**
      * @param (\Closure(ResponseInterface): SourcePayload)|null $map
      */
@@ -181,7 +257,9 @@ final class PendingFetchTest extends TestCase
     {
         $response = new MockHttpClient($mockResponse)->request('GET', self::URL);
 
-        return new PendingFetch($response, $map ?? self::decodedPayload(...), new MockClock(self::NOW));
+        $payload = $map ?? self::decodedPayload(...);
+
+        return new PendingFetch([$response], static fn (): SourcePayload => $payload($response), new MockClock(self::NOW));
     }
 
     private static function decodedPayload(ResponseInterface $response): SourcePayload

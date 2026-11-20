@@ -1,0 +1,49 @@
+{
+    "latitude": -48.822495,
+    "longitude": -123.406784,
+    "generationtime_ms": 0.14495849609375,
+    "utc_offset_seconds": -28800,
+    "timezone": "Etc/GMT+8",
+    "timezone_abbreviation": "GMT-8",
+    "elevation": 0.0,
+    "daily_units": {
+        "time": "unixtime",
+        "weather_code": "wmo code",
+        "temperature_2m_max": "°C",
+        "temperature_2m_min": "°C",
+        "precipitation_sum": "mm",
+        "wind_speed_10m_max": "km/h",
+        "sunrise": "unixtime",
+        "sunset": "unixtime",
+        "daylight_duration": "s"
+    },
+    "daily": {
+        "time": [
+            1710489600
+        ],
+        "weather_code": [
+            3
+        ],
+        "temperature_2m_max": [
+            11.4
+        ],
+        "temperature_2m_min": [
+            9.9
+        ],
+        "precipitation_sum": [
+            0.0
+        ],
+        "wind_speed_10m_max": [
+            30.8
+        ],
+        "sunrise": [
+            1710511743
+        ],
+        "sunset": [
+            1710556479
+        ],
+        "daylight_duration": [
+            44748.06
+        ]
+    }
+}

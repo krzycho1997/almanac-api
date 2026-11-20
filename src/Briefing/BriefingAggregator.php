@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Briefing;
 
+use App\Briefing\Source\ConcurrentFetcher;
+use App\Briefing\Source\SettledFetch;
 use App\Briefing\Source\Source;
+use App\Briefing\Source\SourceFetch;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
@@ -21,62 +24,109 @@ final readonly class BriefingAggregator
     public function __construct(
         #[AutowireIterator(Source::class)]
         iterable $sources,
+        private ConcurrentFetcher $fetcher,
         private ClockInterface $clock,
         private SourceFailureLog $failureLog,
     ) {
-        $this->sources = array_values([...$sources]);
+        $this->sources = self::inNameOrder([...$sources]);
+    }
+
+    /**
+     * @param array<Source> $sources
+     *
+     * @return list<Source>
+     */
+    private static function inNameOrder(array $sources): array
+    {
+        usort($sources, static fn (Source $first, Source $second): int => self::positionOf($first) <=> self::positionOf($second));
+
+        return $sources;
+    }
+
+    private static function positionOf(Source $source): int
+    {
+        return (int) array_search($source->name(), SourceName::cases(), true);
     }
 
     public function briefingFor(\DateTimeImmutable $date, Location $location): BriefingResult
     {
-        $results = self::settleAll($this->startAll($date, $location));
-        $this->recordFailures($results, $date);
+        $settled = $this->fetcher->settleAll(self::startAll($this->sourcesCovering($date), $date, $location));
+        $this->recordFailures($settled, $date);
 
-        return new BriefingResult($date, $location, $results, $this->clock->now());
+        return new BriefingResult($date, $location, $this->inSourceOrder($settled), $this->clock->now());
     }
 
     /**
-     * @return list<\Closure(): SourceResult>
+     * @return list<Source>
      */
-    private function startAll(\DateTimeImmutable $date, Location $location): array
+    private function sourcesCovering(\DateTimeImmutable $date): array
     {
-        return array_map(fn (Source $source): \Closure => $this->start($source, $date, $location), $this->sources);
+        return array_values(array_filter($this->sources, static fn (Source $source): bool => $source->client()->covers($date)));
     }
 
     /**
-     * @param list<\Closure(): SourceResult> $fetches
+     * @param list<Source> $sources
+     *
+     * @return list<SourceFetch>
+     */
+    private static function startAll(array $sources, \DateTimeImmutable $date, Location $location): array
+    {
+        $fetches = [];
+
+        try {
+            foreach ($sources as $source) {
+                $fetches[] = new SourceFetch($source->name(), $source->client()->request($date, $location));
+            }
+        } catch (\Throwable $exception) {
+            self::cancelAll($fetches);
+
+            throw $exception;
+        }
+
+        return $fetches;
+    }
+
+    /**
+     * @param list<SourceFetch> $fetches
+     */
+    private static function cancelAll(array $fetches): void
+    {
+        foreach ($fetches as $fetch) {
+            $fetch->pending->cancel();
+        }
+    }
+
+    /**
+     * @param list<SettledFetch> $settled
      *
      * @return list<SourceResult>
      */
-    private static function settleAll(array $fetches): array
+    private function inSourceOrder(array $settled): array
     {
-        return array_map(static fn (\Closure $settle): SourceResult => $settle(), $fetches);
+        return array_map(static fn (Source $source): SourceResult => self::resultOf($source->name(), $settled), $this->sources);
     }
 
     /**
-     * @param list<SourceResult> $results
+     * @param list<SettledFetch> $settled
      */
-    private function recordFailures(array $results, \DateTimeImmutable $date): void
+    private static function resultOf(SourceName $source, array $settled): SourceResult
     {
-        foreach ($results as $result) {
-            $this->failureLog->record($result, $date);
+        foreach ($settled as $fetch) {
+            if ($source === $fetch->result->source) {
+                return $fetch->result;
+            }
         }
+
+        return SourceResult::notApplicable($source);
     }
 
     /**
-     * @return \Closure(): SourceResult
+     * @param list<SettledFetch> $settled
      */
-    private function start(Source $source, \DateTimeImmutable $date, Location $location): \Closure
+    private function recordFailures(array $settled, \DateTimeImmutable $date): void
     {
-        $name = $source->name();
-        $client = $source->client();
-
-        if ($client->covers($date)) {
-            $pending = $client->request($date, $location);
-
-            return static fn (): SourceResult => $pending->resolve($name);
+        foreach ($settled as $fetch) {
+            $this->failureLog->record($fetch->result, $date, $fetch->durationMs);
         }
-
-        return static fn (): SourceResult => SourceResult::notApplicable($name);
     }
 }

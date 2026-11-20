@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
+use App\Briefing\DependencyInjection\OneSourcePerNamePass;
 use App\Shared\ErrorHandler\ClientErrorLevelErrorListener;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -18,6 +19,11 @@ class Kernel extends BaseKernel implements CompilerPassInterface
     private const string ERROR_RENDERER = 'error_handler.error_renderer.serializer';
     private const string EXCEPTION_LISTENER = 'exception_listener';
     private const int ERROR_RENDERER_FORMAT_ARGUMENT = 1;
+
+    protected function build(ContainerBuilder $container): void
+    {
+        $container->addCompilerPass(new OneSourcePerNamePass());
+    }
 
     public function process(ContainerBuilder $container): void
     {

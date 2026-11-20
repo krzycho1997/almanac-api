@@ -51,8 +51,9 @@ final readonly class ApodClient implements SourceClient
     public function request(\DateTimeImmutable $date, Location $location): PendingFetch
     {
         $day = $date->format(self::DATE_FORMAT);
+        $response = $this->fetch($day);
 
-        return new PendingFetch($this->fetch($day), $this->pictureFor($day), $this->clock);
+        return new PendingFetch([$response], $this->pictureFor($response, $day), $this->clock);
     }
 
     private function fetch(string $day): ResponseInterface
@@ -63,11 +64,11 @@ final readonly class ApodClient implements SourceClient
     }
 
     /**
-     * @return \Closure(ResponseInterface): ApodPicture
+     * @return \Closure(): ApodPicture
      */
-    private function pictureFor(string $day): \Closure
+    private function pictureFor(ResponseInterface $response, string $day): \Closure
     {
-        return fn (ResponseInterface $response): ApodPicture => $this->pictureOf($response, $day);
+        return fn (): ApodPicture => $this->pictureOf($response, $day);
     }
 
     private function pictureOf(ResponseInterface $response, string $day): ApodPicture

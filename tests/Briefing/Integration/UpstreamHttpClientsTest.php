@@ -50,8 +50,8 @@ final class UpstreamHttpClientsTest extends KernelTestCase
     {
         yield 'NASA' => [self::NASA, UpstreamMock::create()->apod(), self::PATH, 'https://api.nasa.gov/planetary/apod', true];
         yield 'Wikipedia' => [self::WIKIPEDIA, UpstreamMock::create()->onThisDay(), 'feed/onthisday/all/11/20', 'https://en.wikipedia.org/api/rest_v1/feed/onthisday/all/11/20', false];
-        yield 'Open-Meteo forecast' => [self::OPEN_METEO, UpstreamMock::create()->weather(), 'v1/forecast', 'https://api.open-meteo.com/v1/forecast', false];
-        yield 'Open-Meteo archive' => [self::OPEN_METEO_ARCHIVE, UpstreamMock::create()->weather(), 'v1/archive', 'https://archive-api.open-meteo.com/v1/archive', false];
+        yield 'Open-Meteo forecast' => [self::OPEN_METEO, UpstreamMock::create()->forecast(), 'v1/forecast', 'https://api.open-meteo.com/v1/forecast', false];
+        yield 'Open-Meteo archive' => [self::OPEN_METEO_ARCHIVE, UpstreamMock::create()->archive(), 'v1/archive', 'https://archive-api.open-meteo.com/v1/archive', false];
     }
 
     #[DataProvider('clientNames')]
@@ -65,7 +65,7 @@ final class UpstreamHttpClientsTest extends KernelTestCase
 
         // Then
         $options = self::onlyServedRequest()->getRequestOptions();
-        self::assertSame(2.0, $options['timeout']);
+        self::assertSame((float) \ini_get('default_socket_timeout'), $options['timeout']);
         self::assertSame(3.0, $options['max_duration']);
         self::assertSame(0, $options['max_redirects']);
         self::assertSame(1.0, $options['max_connect_duration']);
@@ -78,8 +78,8 @@ final class UpstreamHttpClientsTest extends KernelTestCase
     {
         yield 'NASA' => [self::NASA, UpstreamMock::create()->apod()];
         yield 'Wikipedia' => [self::WIKIPEDIA, UpstreamMock::create()->onThisDay()];
-        yield 'Open-Meteo forecast' => [self::OPEN_METEO, UpstreamMock::create()->weather()];
-        yield 'Open-Meteo archive' => [self::OPEN_METEO_ARCHIVE, UpstreamMock::create()->weather()];
+        yield 'Open-Meteo forecast' => [self::OPEN_METEO, UpstreamMock::create()->forecast()];
+        yield 'Open-Meteo archive' => [self::OPEN_METEO_ARCHIVE, UpstreamMock::create()->archive()];
     }
 
     #[DataProvider('retries')]
@@ -130,7 +130,7 @@ final class UpstreamHttpClientsTest extends KernelTestCase
     public function testDoesNotRetryABodyThatStallsAfterTheHeaders(): void
     {
         // Given
-        self::factory()->respondWith(UpstreamMock::create()->apod()->timeout()->apod());
+        self::factory()->respondWith(UpstreamMock::create()->apod()->idleTimeout()->apod());
         $response = self::client(self::NASA)->request(Request::METHOD_GET, self::PATH);
 
         try {
