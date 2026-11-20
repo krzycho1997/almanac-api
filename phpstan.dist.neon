@@ -33,6 +33,10 @@ services:
         tags:
             - phpstan.doctrine.typeDescriptor
     -
+        factory: PHPStan\Type\Doctrine\Descriptors\ReflectionDescriptor('App\Identity\Doctrine\EmailType')
+        tags:
+            - phpstan.doctrine.typeDescriptor
+    -
         class: App\Tests\Architecture\ModuleBoundaryTest
         tags:
             - phpat.test

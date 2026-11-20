@@ -85,6 +85,23 @@ final class LayerTest
             ->nonIgnorable();
     }
 
+    #[TestRule]
+    public function entitiesStayBelowServices(): Rule
+    {
+        return PHPat::rule()
+            ->classes(Codebase::layer(self::ENTITY))
+            ->shouldNot()
+            ->dependOn()
+            ->classes(
+                self::http(),
+                self::edge(),
+                self::services(),
+                Codebase::layer('Mapper', 'Dto', 'Source'),
+            )
+            ->because('entities are the storage model that services work with, so they know neither the services nor the edge')
+            ->nonIgnorable();
+    }
+
     /**
      * @return iterable<string, Rule>
      */
@@ -173,6 +190,11 @@ final class LayerTest
     private static function edge(): SelectorInterface
     {
         return Codebase::layer('Controller', 'Command', 'MessageHandler', 'ValueResolver', 'Security', 'ErrorHandler', 'RequestId');
+    }
+
+    private static function services(): SelectorInterface
+    {
+        return Selector::AllOf(Codebase::moduleRoot(), Selector::classname('/(?:Aggregator|Issuer|Prefetcher|Service)$/', regex: true));
     }
 
     private static function doctrine(): SelectorInterface
