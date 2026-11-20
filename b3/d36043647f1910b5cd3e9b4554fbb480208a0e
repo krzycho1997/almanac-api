@@ -1,0 +1,58 @@
+src/Identity/IssuedToken.php
+  s_ecd702649c3f02::t_3217265ec14b12 1-17
+migrations/Version20261120195001.php
+  s_ecd702649c3f02::t_b8879750106659 14
+  s_ecd702649c3f02::t_63f83a1bdbaeb5 1-13,15-33
+phpstan.dist.neon
+  s_ecd702649c3f02::t_63f83a1bdbaeb5 36-38
+  s_ecd702649c3f02::t_59f196a83fbd0c 35
+tests/Architecture/LayerTest.php
+  s_ecd702649c3f02::t_1df8fbef535da0 88-105,196-199
+  s_ecd702649c3f02::t_d3a83d40bf9eec 200
+tools/phpstan/tests/Architecture/Fixtures/Identity/ProbeTokenIssuer.php
+  s_ecd702649c3f02::t_1df8fbef535da0 1-9
+src/Identity/Email.php
+  s_ecd702649c3f02::t_3217265ec14b12 1-36
+src/Identity/Repository/AccessTokenRepository.php
+  s_ecd702649c3f02::t_3217265ec14b12 1-20
+src/Identity/Entity/User.php
+  s_ecd702649c3f02::t_3217265ec14b12 1-38
+tests/Identity/Unit/EmailTest.php
+  s_ecd702649c3f02::t_31a07dbe4954ba 1-60
+src/Identity/Entity/AccessToken.php
+  s_ecd702649c3f02::t_3217265ec14b12 1-66
+tests/Identity/Unit/Doctrine/EmailTypeTest.php
+  s_ecd702649c3f02::t_31a07dbe4954ba 1-57
+tests/Identity/Unit/Entity/AccessTokenTest.php
+  s_ecd702649c3f02::t_31a07dbe4954ba 1-79
+config/packages/doctrine.yaml
+  s_ecd702649c3f02::t_63f83a1bdbaeb5 7,13-19
+tools/phpstan/tests/Architecture/ArchitectureRulesTest.php
+  s_ecd702649c3f02::t_1df8fbef535da0 37
+src/Identity/Doctrine/EmailType.php
+  s_ecd702649c3f02::t_3217265ec14b12 1-44
+tools/phpstan/tests/Architecture/Fixtures/Identity/Entity/ProbeEntityUsesServiceAndHttp.php
+  s_ecd702649c3f02::t_1df8fbef535da0 1-17
+tools/phpstan/tests/Architecture/Fixtures/Identity/Entity/ProbeEntityUsesValueObject.php
+  s_ecd702649c3f02::t_1df8fbef535da0 1-19
+src/Identity/Repository/UserRepository.php
+  s_ecd702649c3f02::t_3217265ec14b12 1-20
+src/Identity/Exception/InvalidEmailException.php
+  s_ecd702649c3f02::t_3217265ec14b12 1-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b3d36043647f1910b5cd3e9b4554fbb480208a0e",
+  "prompts": {},
+  "sessions": {
+    "s_ecd702649c3f02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79d0416-bbd9-40b6-9497-5f9421576080",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}

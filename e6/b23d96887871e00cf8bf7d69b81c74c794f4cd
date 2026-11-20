@@ -1,0 +1,36 @@
+composer.json
+  s_ecd702649c3f02::t_31a78e9545e5bb 32
+composer.lock
+  s_ecd702649c3f02::t_292e52d22bc406 7,4093-4176,5024-5102
+symfony.lock
+  s_ecd702649c3f02::t_6bfd5f56f9735d 166-174
+tests/Identity/Unit/Contract/UserIdTest.php
+  s_ecd702649c3f02::t_28a4e96295e107 1-13,16-23,25-46,48-58
+  s_ecd702649c3f02::t_b9fe4ecef76b65 14-15,24,47
+src/Identity/Contract/UserIdType.php
+  s_ecd702649c3f02::t_28a4e96295e107 1-32
+config/packages/doctrine.yaml
+  s_ecd702649c3f02::t_b9fe4ecef76b65 5-6
+src/Identity/Contract/UserId.php
+  s_ecd702649c3f02::t_28a4e96295e107 1-11
+tests/Identity/Integration/UserIdTypeTest.php
+  s_ecd702649c3f02::t_b9fe4ecef76b65 1-40
+phpstan.dist.neon
+  s_ecd702649c3f02::t_0ea3e6057eb298 25,31-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e6b23d96887871e00cf8bf7d69b81c74c794f4cd",
+  "prompts": {},
+  "sessions": {
+    "s_ecd702649c3f02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79d0416-bbd9-40b6-9497-5f9421576080",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
