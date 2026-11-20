@@ -1,0 +1,319 @@
+openapi: 3.0.3
+info:
+  title: Almanac API
+  version: 1.0.0
+  description: Daily briefing of NASA's Astronomy Picture of the Day, events from Wikipedia's On This Day and the weather, with bookmarks.
+  license:
+    name: Proprietary
+    url: https://github.com/krzycho1997/almanac-api
+servers:
+  - url: http://127.0.0.1:8080
+    description: Local Docker Compose stack
+tags:
+  - name: briefing
+    description: Daily briefing for a date
+  - name: health
+    description: Liveness of the application
+paths:
+  /api/health:
+    get:
+      operationId: getHealth
+      summary: Report that the application is up
+      tags: [health]
+      security: []
+      responses:
+        '200':
+          description: The application is up.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/briefings/{date}:
+    get:
+      operationId: getBriefing
+      summary: Build the briefing for a date
+      tags: [briefing]
+      security: []
+      parameters:
+        - name: date
+          in: path
+          required: true
+          description: Calendar date from 1995-06-16 to 15 days after today, in the application's time zone.
+          schema:
+            type: string
+            format: date
+        - name: lat
+          in: query
+          required: false
+          description: Latitude in plain decimal notation, given together with lon; without both the default place is used. Rounded to two decimal places.
+          schema:
+            type: number
+            minimum: -90
+            maximum: 90
+            example: 52.23
+        - name: lon
+          in: query
+          required: false
+          description: Longitude in plain decimal notation, given together with lat. Rounded to two decimal places.
+          schema:
+            type: number
+            minimum: -180
+            maximum: 180
+            example: 21.01
+      responses:
+        '200':
+          description: The briefing, with the status of every source.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Briefing'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '502':
+          $ref: '#/components/responses/BadGateway'
+components:
+  headers:
+    RequestId:
+      description: Id of the request, taken from nginx or the client when it is safe, otherwise generated; also written to every log entry.
+      required: true
+      schema:
+        type: string
+        pattern: '^[A-Za-z0-9._-]{1,64}$'
+  responses:
+    BadRequest:
+      description: The request is malformed, for example the date is not a calendar date in Y-m-d.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ValidationProblem'
+    UnprocessableEntity:
+      description: The request is well formed but not allowed, for example the date is outside the briefing window, or a coordinate is not a plain decimal in range or comes without its pair.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ValidationProblem'
+    BadGateway:
+      description: No source has data for this briefing.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    InternalServerError:
+      description: The application failed; the details are only in the logs.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    Briefing:
+      type: object
+      additionalProperties: false
+      required: [date, location, sources, missing, apod]
+      properties:
+        date:
+          type: string
+          format: date
+        location:
+          $ref: '#/components/schemas/Location'
+        sources:
+          type: object
+          additionalProperties: false
+          required: [apod]
+          properties:
+            apod:
+              $ref: '#/components/schemas/SourceStatus'
+        missing:
+          type: array
+          description: Sources without data in this briefing.
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/SourceKey'
+        apod:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/Apod'
+          nullable: true
+    Location:
+      type: object
+      additionalProperties: false
+      required: [latitude, longitude, name, isDefault]
+      properties:
+        latitude:
+          type: number
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          minimum: -180
+          maximum: 180
+        name:
+          type: string
+          nullable: true
+        isDefault:
+          type: boolean
+    SourceKey:
+      type: string
+      enum: [apod]
+    SourceStatus:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/SourceOk'
+        - $ref: '#/components/schemas/SourceFailed'
+        - $ref: '#/components/schemas/SourceNotApplicable'
+      discriminator:
+        propertyName: status
+        mapping:
+          ok: '#/components/schemas/SourceOk'
+          failed: '#/components/schemas/SourceFailed'
+          not_applicable: '#/components/schemas/SourceNotApplicable'
+    SourceOk:
+      type: object
+      additionalProperties: false
+      required: [status, fetchedAt, stale]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        fetchedAt:
+          type: string
+          format: date-time
+          pattern: 'Z$'
+        stale:
+          type: boolean
+    SourceFailed:
+      type: object
+      additionalProperties: false
+      required: [status, error, lastAttemptAt]
+      properties:
+        status:
+          type: string
+          enum: [failed]
+        error:
+          type: string
+          description: Why the source has no fresh data; new values may be added.
+          enum: [unavailable, rate_limited, rejected, misconfigured, invalid_payload]
+        lastAttemptAt:
+          type: string
+          format: date-time
+          pattern: 'Z$'
+    SourceNotApplicable:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [not_applicable]
+    Apod:
+      type: object
+      additionalProperties: false
+      required: [title, explanation, mediaType, url, hdUrl, credit]
+      properties:
+        title:
+          type: string
+        explanation:
+          type: string
+        mediaType:
+          type: string
+          enum: [image, video, other]
+        url:
+          type: string
+          format: uri
+          nullable: true
+        hdUrl:
+          type: string
+          format: uri
+          nullable: true
+        credit:
+          type: string
+          nullable: true
+    Health:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+    Problem:
+      description: Problem Details (RFC 9457) without internals.
+      type: object
+      additionalProperties: false
+      required: [type, title, status, detail]
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+          minimum: 400
+          maximum: 599
+        detail:
+          type: string
+        instance:
+          type: string
+    ValidationProblem:
+      description: Problem Details (RFC 9457) for invalid input, with one entry per violated rule.
+      type: object
+      additionalProperties: false
+      required: [type, title, status, detail, violations]
+      properties:
+        type:
+          type: string
+          enum: ['https://symfony.com/errors/validation']
+        title:
+          type: string
+        status:
+          type: integer
+          enum: [400, 422]
+        detail:
+          type: string
+        violations:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Violation'
+    Violation:
+      type: object
+      additionalProperties: false
+      required: [propertyPath, title, template, parameters, type]
+      properties:
+        propertyPath:
+          type: string
+        title:
+          type: string
+        template:
+          type: string
+        parameters:
+          type: object
+          additionalProperties:
+            type: string
+        type:
+          type: string
+          description: urn:uuid of the violated constraint's error code.
+          pattern: '^urn:uuid:[0-9a-f-]{36}$'

@@ -25,8 +25,14 @@ final class ArchitectureRulesTest extends TestCase
             'Identity/Exception/ProbeHttpException.php' => ['phpat.servicesAndExceptionsDoNotKnowHttp'],
             'Bookmark/Contract/ProbeContractUsesInternal.php' => ['phpat.contractsDependOnlyOnContracts'],
             'Bookmark/Contract/ProbeContractUsesDoctrineBridge.php' => ['phpat.modelAndContractsStayPure'],
-            'Briefing/Model/ProbeDayIdType.php' => ['phpat.modelAndContractsStayPure'],
+            'Briefing/Model/ProbeDayIdType.php' => ['phpat.modelAndContractsStayPure', 'phpat.modelCarriesReadonlyData'],
+            'Briefing/Model/ProbeMutableModel.php' => ['phpat.modelCarriesReadonlyData'],
+            'Briefing/ProbeUsesSourceInterior.php' => ['phpat.sourceInteriorsStayPrivate.Apod'],
+            'Briefing/Source/Apod/ProbeClientKnowsItsWiring.php' => ['phpat.sourceInteriorsKnowNoWiring', 'phpat.sourceInteriorsKnowNoWiring'],
+            'Briefing/Source/Apod/ProbeClientUsesStorage.php' => ['phpat.sourceInteriorsKnowNoWiring'],
             'Briefing/Model/ProbeModelUsesEntity.php' => ['phpat.modelAndContractsStayPure'],
+            'Briefing/Dto/Response/ProbeResponseUsesDomainEnum.php' => ['phpat.responseDtosOwnTheirTypes'],
+            'Briefing/Dto/Response/ProbeResponseUsesModel.php' => ['phpat.responseDtosOwnTheirTypes'],
             'Shared/ProbeNotFinal.php' => ['phpat.classesAreFinal'],
         ];
 

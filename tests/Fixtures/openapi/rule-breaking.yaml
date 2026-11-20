@@ -1,0 +1,62 @@
+openapi: 3.0.3
+info:
+  title: Rule-breaking fixture
+  version: 1.0.0
+paths:
+  /items:
+    get:
+      responses:
+        '200':
+          description: Listed.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+        '404':
+          description: JSON error.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '4XX':
+          description: Problem media type with another schema.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/problem+json:
+              schema:
+                type: object
+        '503':
+          description: Problem without the request id.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        default:
+          description: Any other error, as plain text.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            text/plain:
+              schema:
+                type: string
+components:
+  headers:
+    RequestId:
+      required: true
+      schema:
+        type: string
+  schemas:
+    Problem:
+      type: object
+    TypedChoice:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/Problem'
+    UntypedChoice:
+      oneOf:
+        - $ref: '#/components/schemas/Problem'

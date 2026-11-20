@@ -1,5 +1,8 @@
 # yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
 
+parameters:
+    app.briefing.retry_delay_ms: 250
+
 services:
     _defaults:
         autowire: true
@@ -9,6 +12,8 @@ services:
         resource: '../src/'
         exclude:
             - '../src/Briefing/Location.php'
+            - '../src/*/Model/'
+            - '../src/*/Source/*/*ApiResponse.php'
 
     app.briefing.default_location:
         class: App\Briefing\Location
@@ -27,3 +32,74 @@ services:
             - { name: monolog.processor, channel: app }
             - { name: monolog.processor, channel: briefing }
             - { name: monolog.processor, channel: identity }
+
+    app.briefing.transient_failure_retry_strategy:
+        class: Symfony\Component\HttpClient\Retry\GenericRetryStrategy
+        arguments:
+            $statusCodes: !php/const App\Briefing\Source\UpstreamRetryStrategy::RETRIED_STATUSES
+            $delayMs: '%app.briefing.retry_delay_ms%'
+
+    app.clock.app_timezone:
+        class: Symfony\Component\Clock\Clock
+        decorates: clock
+        autowire: false
+        autoconfigure: false
+        factory: ['@.inner', 'withTimeZone']
+        arguments: ['%env(APP_TIMEZONE)%']
+
+    app.http_client.transport.connect_deadline:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        decorates: http_client.transport
+        autowire: false
+        autoconfigure: false
+        factory: ['@.inner', 'withOptions']
+        arguments:
+            - { max_connect_duration: 1.0 }
+
+    App\Briefing\Source\UpstreamRetryStrategy:
+        arguments:
+            $transientFailures: '@app.briefing.transient_failure_retry_strategy'
+
+when@test:
+    parameters:
+        app.briefing.retry_delay_ms: 0
+
+    services:
+        serializer.normalizer.problem:
+            class: Symfony\Component\Serializer\Normalizer\ProblemNormalizer
+            arguments:
+                $debug: false
+                $translator: '@?translator'
+            tags:
+                - { name: serializer.normalizer, built_in: true, priority: -890 }
+
+        test.client:
+            class: App\Tests\Support\OpenApi\OpenApiValidatingBrowser
+            shared: false
+            public: true
+            arguments: ['@kernel', '%test.client.parameters%', '@test.client.history', '@test.client.cookiejar']
+
+        App\Tests\Support\Briefing\UpstreamMockResponseFactory:
+            public: true
+            arguments:
+                $routes:
+                    - { source: apod, baseUri: '%env(NASA_BASE_URI)%' }
+                    - { source: on_this_day, baseUri: '%env(WIKIPEDIA_BASE_URI)%' }
+                    - { source: weather, baseUri: '%env(OPEN_METEO_BASE_URI)%' }
+                    - { source: weather, baseUri: '%env(OPEN_METEO_ARCHIVE_BASE_URI)%' }
+
+        test.nasa.client:
+            alias: nasa.client
+            public: true
+
+        test.wikipedia.client:
+            alias: wikipedia.client
+            public: true
+
+        test.open_meteo.client:
+            alias: open_meteo.client
+            public: true
+
+        test.open_meteo_archive.client:
+            alias: open_meteo_archive.client
+            public: true

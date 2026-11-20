@@ -1,0 +1,10 @@
+extends:
+  - recommended-strict
+
+rules:
+  operation-operationId: error
+  operation-2xx-response: error
+  operation-4xx-response: off
+  no-unused-components: error
+  security-defined: error
+  paths-kebab-case: error

@@ -24,5 +24,6 @@ abstract class FunctionalTestCase extends WebTestCase
 
         self::mockTime(new \DateTimeImmutable(self::NOW, new \DateTimeZone(self::TIMEZONE)));
         $this->client = self::createClient();
+        $this->client->disableReboot();
     }
 }

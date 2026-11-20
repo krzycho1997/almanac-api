@@ -6,7 +6,7 @@ namespace App\Briefing\Model;
 
 use App\Briefing\Entity\ProbeEntity;
 
-final class ProbeModelUsesEntity
+final readonly class ProbeModelUsesEntity
 {
     public function run(ProbeEntity $entity): void
     {

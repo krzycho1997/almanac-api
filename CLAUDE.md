@@ -14,6 +14,7 @@ Everything runs in the `php` container.
 - One module: `docker compose exec php vendor/bin/phpunit --testsuite briefing` (also `identity`, `bookmark`, `shared`); a module with no tests yet fails with "No tests executed!" unless you add `--do-not-fail-on-empty-test-suite`
 - PHPStan rules and the architecture check: `docker compose exec php vendor/bin/phpunit --testsuite phpstan`
 - Static analysis and style: `composer phpstan`, `composer cs-check`, `composer cs-fix`
+- OpenAPI lint (on the host, as in CI): `docker compose run --rm --no-deps redocly lint docs/openapi.yaml`
 - New migration: `docker compose exec php bin/console doctrine:migrations:diff`
 - Git hooks, once per clone: `git config core.hooksPath .githooks`
 
@@ -41,6 +42,7 @@ Custom PHPStan rules and loaders live in `tools/phpstan/` (`App\PHPStan`).
 
 - Every PHPUnit test has `// Given`, `// When`, `// Then` sections. Merge them where a split would be artificial (`// Given / When`, `// When / Then`, `// Then / When` for `expectException()`); drop `// Given` when there is nothing to prepare. phpat classes in `tests/Architecture/` are rule declarations, not PHPUnit tests, so they have no sections.
 - Write the functional test for an endpoint before the endpoint.
+- Every functional request goes through `OpenApiValidatingBrowser` (the `test.client` service): a documented operation must match `docs/openapi.yaml` (the request too when the answer is 2xx), HEAD is checked against the GET operation's status and headers, anything else must be a 4xx/5xx Problem Details. Change `docs/openapi.yaml` with every endpoint.
 - Upstream HTTP is always mocked (`MockHttpClient`); tests never hit the network, except the `live` suite.
 - The `e2e` suite sends real HTTP requests from the `php` container to nginx (`E2E_BASE_URL`, default `http://nginx`), so it needs the running stack; nginx behaviour (headers, limits) is tested there, not in CI scripts.
 - Use `ClockInterface` instead of `new \DateTimeImmutable()` in application code; functional tests freeze the clock in `FunctionalTestCase`.

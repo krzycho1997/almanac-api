@@ -35,6 +35,15 @@ services:
       retries: 3
       start_period: 300s
 
+  redocly:
+    security_opt:
+      - no-new-privileges:true
+    profiles: [tools]
+    image: docker.io/redocly/cli:2.76.0@sha256:bd2a1637e39de2d7fc403b3a114b6f8ecbb7edcb6f814516c79b38be409747e9
+    working_dir: /spec
+    volumes:
+      - .:/spec:ro,z
+
   database:
     security_opt:
       - no-new-privileges:true
