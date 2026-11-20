@@ -39,6 +39,14 @@ services:
             $statusCodes: !php/const App\Briefing\Source\UpstreamRetryStrategy::RETRIED_STATUSES
             $delayMs: '%app.briefing.retry_delay_ms%'
 
+    app.clock.app_timezone:
+        class: Symfony\Component\Clock\Clock
+        decorates: clock
+        autowire: false
+        autoconfigure: false
+        factory: ['@.inner', 'withTimeZone']
+        arguments: ['%env(APP_TIMEZONE)%']
+
     app.http_client.transport.connect_deadline:
         class: Symfony\Contracts\HttpClient\HttpClientInterface
         decorates: http_client.transport

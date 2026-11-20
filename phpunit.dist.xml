@@ -25,6 +25,7 @@
         <env name="ALMANAC_DEFAULT_LAT" value="48.8566" force="true"/>
         <env name="ALMANAC_DEFAULT_LON" value="2.3522" force="true"/>
         <env name="ALMANAC_DEFAULT_LOCATION_NAME" value="Paris" force="true"/>
+        <env name="APP_TIMEZONE" value="UTC" force="true"/>
     </php>
 
     <testsuites>
