@@ -84,6 +84,7 @@ final class ErrorFormatTest extends FunctionalTestCase
         yield 'malformed JSON' => [Request::METHOD_POST, '/_test/payload', ['CONTENT_TYPE' => 'application/json'], '{"name":'];
         yield 'unsupported content type' => [Request::METHOD_POST, '/_test/payload', ['CONTENT_TYPE' => 'text/plain'], 'name'];
         yield 'forbidden' => [Request::METHOD_GET, '/_test/http-error/'.Response::HTTP_FORBIDDEN, [], null];
+        yield 'too many requests' => [Request::METHOD_GET, '/_test/http-error/'.Response::HTTP_TOO_MANY_REQUESTS, [], null];
         yield 'client error without its own exception class' => [Request::METHOD_GET, '/_test/http-error/'.Response::HTTP_I_AM_A_TEAPOT, [], null];
     }
 

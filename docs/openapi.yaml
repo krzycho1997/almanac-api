@@ -79,6 +79,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '422':
           $ref: '#/components/responses/UnprocessableEntity'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
         '502':
@@ -91,6 +93,12 @@ components:
       schema:
         type: string
         pattern: '^[A-Za-z0-9._-]{1,64}$'
+    RetryAfter:
+      description: Seconds to wait before the next request is accepted.
+      required: true
+      schema:
+        type: integer
+        minimum: 0
   responses:
     BadRequest:
       description: The request is malformed, for example the date is not a calendar date in Y-m-d.
@@ -110,6 +118,17 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ValidationProblem'
+    TooManyRequests:
+      description: The client sent more than 60 briefing requests within a sliding minute. The limit counts every GET and HEAD with a valid date in the briefing window, whatever the date, from one IPv4 address or one IPv6 /64 network; requests rejected for their date are not counted, requests with invalid coordinates are.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
     BadGateway:
       description: No source has data for this briefing.
       headers:
