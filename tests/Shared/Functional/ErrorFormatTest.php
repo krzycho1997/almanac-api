@@ -7,7 +7,6 @@ namespace App\Tests\Shared\Functional;
 use App\Shared\ErrorHandler\ProblemJsonErrorRenderer;
 use App\Tests\Support\FunctionalTestCase;
 use Monolog\Level;
-use Monolog\LogRecord;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,8 +17,6 @@ final class ErrorFormatTest extends FunctionalTestCase
     private const string HEALTH = '/api/health';
     private const string PROBLEM_TYPE = 'https://tools.ietf.org/html/rfc2616#section-10';
     private const string PROBLEM_TITLE = 'An error occurred';
-    private const string REQUEST_CHANNEL = 'request';
-    private const string EXCEPTION = 'exception';
 
     /**
      * @param array<string, string> $server
@@ -118,6 +115,15 @@ final class ErrorFormatTest extends FunctionalTestCase
         self::assertResponseHeaderSame('Allow', Request::METHOD_GET);
     }
 
+    public function testSendsProblemDetailsWithoutEscapedSlashes(): void
+    {
+        // When
+        $this->client->request(Request::METHOD_GET, '/_test/http-error/'.Response::HTTP_NOT_FOUND);
+
+        // Then
+        self::assertStringContainsString('"type":"https://tools.ietf.org/html/rfc2616#section-10"', (string) $this->client->getResponse()->getContent());
+    }
+
     public function testKeepsJsonForSuccessfulResponses(): void
     {
         // When
@@ -126,28 +132,5 @@ final class ErrorFormatTest extends FunctionalTestCase
         // Then
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame(self::CONTENT_TYPE, ProblemJsonErrorRenderer::JSON);
-    }
-
-    /**
-     * @return list<Level>
-     */
-    private static function loggedExceptionLevels(): array
-    {
-        $records = array_filter(
-            self::logHandler()->getRecords(),
-            static fn (LogRecord $record): bool => self::REQUEST_CHANNEL === $record->channel && isset($record->context[self::EXCEPTION]),
-        );
-
-        return array_values(array_map(static fn (LogRecord $record): Level => $record->level, $records));
-    }
-
-    /**
-     * @return list<Level>
-     */
-    private static function levelsFrom(Level $minimum): array
-    {
-        $levels = array_map(static fn (LogRecord $record): Level => $record->level, self::logHandler()->getRecords());
-
-        return array_values(array_filter($levels, static fn (Level $level): bool => $minimum->includes($level)));
     }
 }

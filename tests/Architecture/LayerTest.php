@@ -124,6 +124,22 @@ final class LayerTest
     }
 
     #[TestRule]
+    public function responseDtosOwnTheirTypes(): Rule
+    {
+        return PHPat::rule()
+            ->classes(Codebase::layer('Dto\\Response'))
+            ->shouldNot()
+            ->dependOn()
+            ->classes(
+                Codebase::moduleRoot(),
+                Codebase::layer('Model', self::ENTITY, self::REPOSITORY),
+                Selector::inNamespace('App\Briefing\Source'),
+            )
+            ->because('the API contract changes only when the mapper says so, not when a domain enum or the model is renamed')
+            ->nonIgnorable();
+    }
+
+    #[TestRule]
     public function modelCarriesReadonlyData(): Rule
     {
         return PHPat::rule()

@@ -65,10 +65,6 @@ when@test:
         app.briefing.retry_delay_ms: 0
 
     services:
-        test.App\Briefing\Source\Apod\ApodSource:
-            alias: App\Briefing\Source\Apod\ApodSource
-            public: true
-
         serializer.normalizer.problem:
             class: Symfony\Component\Serializer\Normalizer\ProblemNormalizer
             arguments:

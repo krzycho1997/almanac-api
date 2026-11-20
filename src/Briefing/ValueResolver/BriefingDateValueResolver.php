@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[AsTargetedValueResolver]
 final readonly class BriefingDateValueResolver implements ValueResolverInterface
 {
-    private const string MIDNIGHT_FORMAT = '!Y-m-d';
+    private const string MIDNIGHT_FORMAT = '!'.BriefingDate::FORMAT;
 
     public function __construct(
         private ValidatorInterface $validator,

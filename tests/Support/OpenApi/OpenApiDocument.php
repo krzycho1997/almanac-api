@@ -18,6 +18,7 @@ final class OpenApiDocument
 {
     public const string PATH = __DIR__.'/../../../docs/openapi.yaml';
     private const string PROBLEM_SCHEMA = 'Problem';
+    private const array PROBLEM_SCHEMAS = [self::PROBLEM_SCHEMA, 'ValidationProblem'];
     private const string ANY_STATUS = 'default';
     private const string STATUS_RANGE = '%dXX';
     private const int STATUSES_PER_RANGE = 100;
@@ -100,6 +101,26 @@ final class OpenApiDocument
         }
 
         throw new \LogicException('openapi.yaml has no Problem schema.');
+    }
+
+    /**
+     * @return array<string, Schema>
+     */
+    public function schemas(): array
+    {
+        $schemas = $this->document->components->schemas ?? [];
+
+        return array_filter($schemas, static fn (mixed $schema): bool => $schema instanceof Schema);
+    }
+
+    /**
+     * @return list<Schema>
+     */
+    public function problemSchemas(): array
+    {
+        $schemas = array_map(fn (string $name): mixed => $this->document->components?->schemas[$name] ?? null, self::PROBLEM_SCHEMAS);
+
+        return array_values(array_filter($schemas, static fn (mixed $schema): bool => $schema instanceof Schema));
     }
 
     public function header(string $name): Header

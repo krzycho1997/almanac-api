@@ -53,3 +53,10 @@ components:
   schemas:
     Problem:
       type: object
+    TypedChoice:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/Problem'
+    UntypedChoice:
+      oneOf:
+        - $ref: '#/components/schemas/Problem'

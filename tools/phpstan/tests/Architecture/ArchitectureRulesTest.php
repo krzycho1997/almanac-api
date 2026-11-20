@@ -31,6 +31,8 @@ final class ArchitectureRulesTest extends TestCase
             'Briefing/Source/Apod/ProbeClientKnowsItsWiring.php' => ['phpat.sourceInteriorsKnowNoWiring', 'phpat.sourceInteriorsKnowNoWiring'],
             'Briefing/Source/Apod/ProbeClientUsesStorage.php' => ['phpat.sourceInteriorsKnowNoWiring'],
             'Briefing/Model/ProbeModelUsesEntity.php' => ['phpat.modelAndContractsStayPure'],
+            'Briefing/Dto/Response/ProbeResponseUsesDomainEnum.php' => ['phpat.responseDtosOwnTheirTypes'],
+            'Briefing/Dto/Response/ProbeResponseUsesModel.php' => ['phpat.responseDtosOwnTheirTypes'],
             'Shared/ProbeNotFinal.php' => ['phpat.classesAreFinal'],
         ];
 

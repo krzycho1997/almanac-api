@@ -1,5 +1,9 @@
 framework:
     secret: '%env(APP_SECRET)%'
+    exceptions:
+        App\Briefing\Exception\NoSourceDataException:
+            status_code: 502
+            log_level: warning
     http_client:
         scoped_clients:
             nasa.client:

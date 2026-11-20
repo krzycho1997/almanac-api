@@ -23,6 +23,19 @@ final readonly class SourceResult
         return new self($source, SourceStatus::Ok, $payload, null, null, null);
     }
 
+    public static function notApplicable(SourceName $source): self
+    {
+        return new self($source, SourceStatus::NotApplicable, null, null, null, null);
+    }
+
+    /**
+     * @phpstan-assert-if-true !null $this->payload
+     */
+    public function hasData(): bool
+    {
+        return $this->payload instanceof SourcePayload;
+    }
+
     public static function failed(SourceName $source, FailureKind $kind, ?int $httpStatus = null, ?\DateTimeImmutable $retryAt = null): self
     {
         return new self($source, SourceStatus::Failed, null, $kind, $httpStatus, $retryAt);

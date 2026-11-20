@@ -7,8 +7,8 @@ namespace App\Tests\Shared\Integration\OpenApi;
 use App\Shared\ErrorHandler\ProblemJsonErrorRenderer;
 use App\Shared\RequestId\RequestIdListener;
 use App\Tests\Support\OpenApi\OpenApiDocument;
-use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\Response;
+use cebe\openapi\spec\Schema;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -18,6 +18,8 @@ final class OpenApiDocumentTest extends TestCase
     private const string ANY_STATUS = 'default';
     private const string STATUS_SEPARATOR = ' ';
     private const array ERROR_RANGES = ['4', '5'];
+    private const string TYPE = 'type';
+    private const array COMPOSITIONS = ['oneOf', 'anyOf', 'allOf'];
 
     /**
      * @param list<string> $expected
@@ -64,6 +66,39 @@ final class OpenApiDocumentTest extends TestCase
     }
 
     /**
+     * @param list<string> $expected
+     */
+    #[DataProvider('documentsWithUntypedCompositions')]
+    public function testGivesEveryComposedSchemaATypeSoNullIsNotAcceptedSilently(OpenApiDocument $document, array $expected): void
+    {
+        // When
+        $untyped = array_keys(array_filter($document->schemas(), self::isUntypedComposition(...)));
+
+        // Then
+        self::assertSame($expected, $untyped);
+    }
+
+    /**
+     * @return iterable<string, array{OpenApiDocument, list<string>}>
+     */
+    public static function documentsWithUntypedCompositions(): iterable
+    {
+        yield 'openapi.yaml' => [OpenApiDocument::instance(), []];
+        yield 'rule-breaking fixture' => [OpenApiDocument::fromFile(self::RULE_BREAKING), ['UntypedChoice']];
+    }
+
+    private static function isUntypedComposition(Schema $schema): bool
+    {
+        $keywords = array_keys((array) $schema->getSerializableData());
+
+        if (\in_array(self::TYPE, $keywords, true)) {
+            return false;
+        }
+
+        return [] !== array_intersect(self::COMPOSITIONS, $keywords);
+    }
+
+    /**
      * @return list<string>
      */
     private static function errorsOutsideProblemDetails(OpenApiDocument $document): array
@@ -75,9 +110,11 @@ final class OpenApiDocumentTest extends TestCase
 
     private static function isOutsideProblemDetails(OpenApiDocument $document, Response $response): bool
     {
-        $schemas = array_map(static fn (MediaType $mediaType): mixed => $mediaType->schema, $response->content);
+        if ([ProblemJsonErrorRenderer::PROBLEM_JSON] === array_keys($response->content)) {
+            return false === \in_array($response->content[ProblemJsonErrorRenderer::PROBLEM_JSON]->schema, $document->problemSchemas(), true);
+        }
 
-        return [ProblemJsonErrorRenderer::PROBLEM_JSON => $document->problemSchema()] !== $schemas;
+        return true;
     }
 
     private static function lacksRequestId(Response $response): bool
