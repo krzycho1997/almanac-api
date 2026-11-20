@@ -1,6 +1,6 @@
 # Upstream fixtures
 
-Bodies served by `UpstreamMock::fixture()` in tests, which rejects a file that is not valid JSON. Real responses are recorded with `DEMO_KEY`, changed only where noted.
+Bodies served by `UpstreamMock::fixture()` in tests, which rejects a file that is not valid JSON. Real responses are recorded with `DEMO_KEY`, changed only where noted. Every file uses one format: four-space indentation, unescaped slashes and Unicode, zero fractions kept (`50.0`) and a final newline.
 
 ## NASA APOD (`apod/`)
 
