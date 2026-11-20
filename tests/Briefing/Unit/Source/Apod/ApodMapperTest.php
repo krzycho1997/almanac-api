@@ -151,6 +151,7 @@ final class ApodMapperTest extends TestCase
     public static function texts(): iterable
     {
         yield 'plain text' => [self::TITLE, self::EXPLANATION, self::TITLE, self::EXPLANATION];
+        yield 'control characters' => ["The Pillars\x0bof\x07Creation", "Towers of cold gas\x1b and dust in the Eagle Nebula.\x00", self::TITLE, 'Towers of cold gas and dust in the Eagle Nebula.'];
         yield 'trailing tabs' => [" The Pillars of Creation\n", "Towers of cold gas and dust in the Eagle Nebula.\t\t\t", self::TITLE, self::EXPLANATION];
         yield 'HTML with the explanation label' => [self::TITLE, '<strong>Explanation:</strong> Towers of cold gas and dust in the <a href="https://example.com">Eagle&nbsp;Nebula</a>.', self::TITLE, self::EXPLANATION];
         yield 'escaped characters' => ['Pillars &amp; Columns', 'Gas &quot;towers&quot;', 'Pillars & Columns', 'Gas "towers"'];

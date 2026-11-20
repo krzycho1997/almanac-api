@@ -31,6 +31,7 @@ final readonly class OnThisDayMapper
     private const string DISAMBIGUATION = '/\s*\([^()]*\)$/u';
     private const string COMPARABLE = 'NFD; [:Nonspacing Mark:] Remove; Lower(); NFC';
     private const string NAME_ENDS = '/^(?:$|[\s,(])/u';
+    private const string WIKIDATA_ID = '/^Q[1-9][0-9]*$/D';
 
     public function __construct(
         #[Autowire('%env(int:ALMANAC_OTD_LIMIT)%')]
@@ -113,7 +114,7 @@ final readonly class OnThisDayMapper
     private static function linkedPage(string $title, OnThisDayPage $page): ?PageRef
     {
         if (WebAddress::isUsable($page->url())) {
-            return new PageRef($title, $page->url(), self::thumbnail($page), $page->wikidataId);
+            return new PageRef($title, $page->url(), self::thumbnail($page), self::wikidataId($page));
         }
 
         return null;
@@ -237,6 +238,15 @@ final readonly class OnThisDayMapper
     {
         if (WebAddress::isUsable($page->thumbnailUrl())) {
             return $page->thumbnailUrl();
+        }
+
+        return null;
+    }
+
+    private static function wikidataId(OnThisDayPage $page): ?string
+    {
+        if (1 === preg_match(self::WIKIDATA_ID, (string) $page->wikidataId)) {
+            return $page->wikidataId;
         }
 
         return null;

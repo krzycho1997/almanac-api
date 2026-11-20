@@ -6,7 +6,7 @@ namespace App\Briefing\Source;
 
 final class PlainText
 {
-    private const string WHITESPACE_RUN = '/\s+/u';
+    private const string WHITESPACE_RUN = '/[\s\p{Cc}]+/u';
     private const string SPACE_BEFORE_PUNCTUATION = '/\s+([.,;:!?])(?=\s|$)/u';
     private const string SPACE = ' ';
     private const string PUNCTUATION = '$1';
