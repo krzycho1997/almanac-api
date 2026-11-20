@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Briefing\ValueResolver;
 
+use App\Briefing\BriefingDay;
 use App\Briefing\Validator\BriefingDate;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +23,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[AsTargetedValueResolver]
 final readonly class BriefingDateValueResolver implements ValueResolverInterface
 {
-    private const string MIDNIGHT_FORMAT = '!'.BriefingDate::FORMAT;
+    private const string MIDNIGHT_FORMAT = '!'.BriefingDay::FORMAT;
 
     public function __construct(
         private ValidatorInterface $validator,

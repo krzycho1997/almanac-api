@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Briefing;
 
-use App\Briefing\Validator\BriefingDate;
 use App\Shared\Logging\LogContextKey;
 use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
@@ -34,7 +33,7 @@ final readonly class SourceFailureLog
     {
         return array_filter([
             LogContextKey::Source->value => $result->source->value,
-            LogContextKey::Date->value => $date->format(BriefingDate::FORMAT),
+            LogContextKey::Date->value => $date->format(BriefingDay::FORMAT),
             LogContextKey::Kind->value => $kind->value,
             LogContextKey::HttpStatus->value => $result->httpStatus,
             LogContextKey::RetryAt->value => $result->retryAt,

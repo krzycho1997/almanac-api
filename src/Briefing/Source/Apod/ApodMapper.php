@@ -28,21 +28,26 @@ final readonly class ApodMapper
 
     public function map(ApodApiResponse $response): ApodPicture
     {
-        $title = self::requiredText(self::plainText($response->title), 'title');
-
-        if (self::PLACEHOLDER_TITLE === $title) {
-            throw InvalidUpstreamPayloadException::at('title', PayloadDefect::Placeholder, 'APOD returned the NASA Science placeholder instead of the picture of the day.');
-        }
-
         return new ApodPicture(
             self::date($response->date),
-            $title,
+            self::title($response->title),
             self::requiredText(self::explanation($response->explanation), 'explanation'),
             self::mediaType($response->mediaType),
             self::mediaUrl($response->url),
             self::mediaUrl($response->hdUrl),
             self::credit($response->copyright),
         );
+    }
+
+    private static function title(string $title): string
+    {
+        $text = self::requiredText(self::plainText($title), 'title');
+
+        if (self::PLACEHOLDER_TITLE === $text) {
+            throw InvalidUpstreamPayloadException::at('title', PayloadDefect::Placeholder, 'APOD returned the NASA Science placeholder instead of the picture of the day.');
+        }
+
+        return $text;
     }
 
     private static function date(string $date): \DateTimeImmutable

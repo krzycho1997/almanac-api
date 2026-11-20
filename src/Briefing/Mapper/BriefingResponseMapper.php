@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Briefing\Mapper;
 
+use App\Briefing\BriefingDay;
 use App\Briefing\BriefingResult;
 use App\Briefing\Dto\Response\ApodDto;
 use App\Briefing\Dto\Response\ApodMediaType;
@@ -23,7 +24,6 @@ use App\Briefing\Model\MediaType;
 use App\Briefing\SourceName;
 use App\Briefing\SourceResult;
 use App\Briefing\SourceStatus;
-use App\Briefing\Validator\BriefingDate;
 
 final readonly class BriefingResponseMapper
 {
@@ -34,12 +34,17 @@ final readonly class BriefingResponseMapper
         $apod = $briefing->resultFor(SourceName::Apod);
 
         return new BriefingResponse(
-            $briefing->date->format(BriefingDate::FORMAT),
+            self::day($briefing->date),
             self::location($briefing->location),
             new SourcesDto(self::status($apod, $briefing->checkedAt)),
             array_map(self::key(...), $briefing->missing()),
             self::apod($apod),
         );
+    }
+
+    private static function day(\DateTimeImmutable $date): string
+    {
+        return $date->format(BriefingDay::FORMAT);
     }
 
     private static function location(Location $location): LocationDto

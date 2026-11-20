@@ -29,11 +29,28 @@ final readonly class BriefingAggregator
 
     public function briefingFor(\DateTimeImmutable $date, Location $location): BriefingResult
     {
-        $fetches = array_map(fn (Source $source): \Closure => $this->start($source, $date, $location), $this->sources);
-        $results = array_map(static fn (\Closure $settle): SourceResult => $settle(), $fetches);
+        $results = self::settleAll($this->startAll($date, $location));
         $this->recordFailures($results, $date);
 
         return new BriefingResult($date, $location, $results, $this->clock->now());
+    }
+
+    /**
+     * @return list<\Closure(): SourceResult>
+     */
+    private function startAll(\DateTimeImmutable $date, Location $location): array
+    {
+        return array_map(fn (Source $source): \Closure => $this->start($source, $date, $location), $this->sources);
+    }
+
+    /**
+     * @param list<\Closure(): SourceResult> $fetches
+     *
+     * @return list<SourceResult>
+     */
+    private static function settleAll(array $fetches): array
+    {
+        return array_map(static fn (\Closure $settle): SourceResult => $settle(), $fetches);
     }
 
     /**

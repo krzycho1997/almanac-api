@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Briefing\Source\Apod;
 
+use App\Briefing\BriefingDay;
 use App\Briefing\Exception\InvalidUpstreamPayloadException;
 use App\Briefing\Location;
 use App\Briefing\Model\ApodPicture;
@@ -22,7 +23,6 @@ final readonly class ApodClient implements SourceClient
     private const string PATH = 'planetary/apod';
     private const string DATE_PARAMETER = 'date';
     private const string DATE_FORMAT = 'Y-m-d';
-    private const string FIRST_PICTURE = '1995-06-16';
     private const string PUBLISHING_TIMEZONE = 'America/New_York';
     private const string QUERY = 'query';
 
@@ -39,7 +39,7 @@ final readonly class ApodClient implements SourceClient
     {
         $day = $date->format(self::DATE_FORMAT);
 
-        if ($day < self::FIRST_PICTURE) {
+        if ($day < BriefingDay::FIRST) {
             return false;
         }
 
@@ -50,11 +50,23 @@ final readonly class ApodClient implements SourceClient
     public function request(\DateTimeImmutable $date, Location $location): PendingFetch
     {
         $day = $date->format(self::DATE_FORMAT);
-        $response = $this->nasaHttpClient->request(Request::METHOD_GET, self::PATH, [
+
+        return new PendingFetch($this->fetch($day), $this->pictureFor($day), $this->clock);
+    }
+
+    private function fetch(string $day): ResponseInterface
+    {
+        return $this->nasaHttpClient->request(Request::METHOD_GET, self::PATH, [
             self::QUERY => [self::DATE_PARAMETER => $day],
         ]);
+    }
 
-        return new PendingFetch($response, fn (ResponseInterface $response): ApodPicture => $this->pictureOf($response, $day), $this->clock);
+    /**
+     * @return \Closure(ResponseInterface): ApodPicture
+     */
+    private function pictureFor(string $day): \Closure
+    {
+        return fn (ResponseInterface $response): ApodPicture => $this->pictureOf($response, $day);
     }
 
     private function pictureOf(ResponseInterface $response, string $day): ApodPicture
