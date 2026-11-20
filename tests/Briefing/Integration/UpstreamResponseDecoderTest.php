@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Briefing\Integration;
 
 use App\Briefing\Exception\InvalidUpstreamPayloadException;
-use App\Briefing\PayloadDefect;
+use App\Briefing\Exception\PayloadDefect;
 use App\Briefing\Source\UpstreamResponseDecoder;
 use App\Tests\Support\Briefing\ExampleApiResponse;
 use App\Tests\Support\Briefing\ExampleItem;

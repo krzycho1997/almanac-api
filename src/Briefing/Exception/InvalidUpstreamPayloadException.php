@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Briefing\Exception;
 
-use App\Briefing\PayloadDefect;
-
 final class InvalidUpstreamPayloadException extends \UnexpectedValueException
 {
     private const string PATH_SEPARATOR = ', ';

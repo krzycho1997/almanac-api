@@ -53,7 +53,7 @@ final readonly class BriefingDateValueResolver implements ValueResolverInterface
             return;
         }
 
-        throw new BadRequestHttpException('The briefing date is not a calendar date in Y-m-d.', new ValidationFailedException($value, $violations));
+        throw new BadRequestHttpException('The briefing date is not a calendar date in '.BriefingDay::FORMAT.'.', new ValidationFailedException($value, $violations));
     }
 
     private function startOf(string $value): \DateTimeImmutable
@@ -64,7 +64,7 @@ final readonly class BriefingDateValueResolver implements ValueResolverInterface
             return $date;
         }
 
-        throw new \LogicException('A validated Y-m-d date could not be created.');
+        throw new \LogicException('A validated '.BriefingDay::FORMAT.' date could not be created.');
     }
 
     private function assertWithinWindow(\DateTimeImmutable $date, string $path): void

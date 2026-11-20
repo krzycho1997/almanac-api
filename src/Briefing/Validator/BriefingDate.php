@@ -10,8 +10,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER)]
 final class BriefingDate extends Assert\Compound
 {
-    public const string LAST_DAY = 'today +15 days';
-    public const string OUTSIDE_WINDOW = 'The date must be between '.BriefingDay::FIRST.' and 15 days after today.';
+    public const int DAYS_AHEAD = 15;
+    public const string LAST_DAY = 'today +'.self::DAYS_AHEAD.' days';
+    public const string OUTSIDE_WINDOW = 'The date must be between '.BriefingDay::FIRST.' and '.self::DAYS_AHEAD.' days after today.';
 
     /**
      * @param array<string, mixed> $options

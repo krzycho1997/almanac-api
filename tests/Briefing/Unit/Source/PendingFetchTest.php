@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Briefing\Unit\Source;
 
 use App\Briefing\Exception\InvalidUpstreamPayloadException;
+use App\Briefing\Exception\PayloadDefect;
 use App\Briefing\FailureCause;
 use App\Briefing\FailureKind;
 use App\Briefing\Model\SourcePayload;
-use App\Briefing\PayloadDefect;
 use App\Briefing\Source\PendingFetch;
 use App\Briefing\SourceName;
 use App\Briefing\SourceStatus;

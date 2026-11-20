@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Briefing\Unit;
 
+use App\Briefing\Exception\PayloadDefect;
 use App\Briefing\FailureCause;
 use App\Briefing\FailureKind;
-use App\Briefing\PayloadDefect;
 use App\Briefing\SourceFailureLog;
 use App\Briefing\SourceName;
 use App\Briefing\SourceResult;

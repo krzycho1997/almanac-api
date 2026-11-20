@@ -6,6 +6,8 @@ namespace App\Briefing\Exception;
 
 final class InvalidLocationException extends \InvalidArgumentException
 {
+    public const string ONLY_ONE_COORDINATE = 'Latitude and longitude must be given together.';
+
     public static function latitudeOutsideTheGlobe(): self
     {
         return new self('Latitude must be between -90 and 90.');
@@ -18,7 +20,7 @@ final class InvalidLocationException extends \InvalidArgumentException
 
     public static function withOnlyOneCoordinate(): self
     {
-        return new self('Latitude and longitude must be given together.');
+        return new self(self::ONLY_ONE_COORDINATE);
     }
 
     public static function defaultWithoutName(): self

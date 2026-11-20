@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Briefing;
 
 use App\Briefing\Exception\InvalidUpstreamPayloadException;
+use App\Briefing\Exception\PayloadDefect;
 
 final readonly class FailureCause
 {

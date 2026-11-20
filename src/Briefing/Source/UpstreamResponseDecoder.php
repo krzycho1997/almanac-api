@@ -6,10 +6,8 @@ namespace App\Briefing\Source;
 
 use App\Briefing\Exception\InvalidUpstreamPayloadException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -60,8 +58,6 @@ final readonly class UpstreamResponseDecoder
             throw InvalidUpstreamPayloadException::notJson($type);
         } catch (PartialDenormalizationException $exception) {
             throw InvalidUpstreamPayloadException::doesNotMatch($type, self::failedPaths($exception));
-        } catch (MissingConstructorArgumentsException|UnexpectedValueException) {
-            throw InvalidUpstreamPayloadException::doesNotMatch($type, []);
         }
 
         if ($decoded instanceof $type) {

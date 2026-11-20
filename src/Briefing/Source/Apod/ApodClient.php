@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Briefing\Source\Apod;
 
-use App\Briefing\BriefingDay;
 use App\Briefing\Exception\InvalidUpstreamPayloadException;
+use App\Briefing\Exception\PayloadDefect;
 use App\Briefing\Location;
 use App\Briefing\Model\ApodPicture;
-use App\Briefing\PayloadDefect;
 use App\Briefing\Source\PendingFetch;
 use App\Briefing\Source\SourceClient;
 use App\Briefing\Source\UpstreamResponseDecoder;
@@ -23,6 +22,8 @@ final readonly class ApodClient implements SourceClient
     private const string PATH = 'planetary/apod';
     private const string DATE_PARAMETER = 'date';
     private const string DATE_FORMAT = 'Y-m-d';
+    private const string FIRST_PICTURE = '1995-06-16';
+    private const string DATE_FIELD = 'date';
     private const string PUBLISHING_TIMEZONE = 'America/New_York';
     private const string QUERY = 'query';
 
@@ -39,7 +40,7 @@ final readonly class ApodClient implements SourceClient
     {
         $day = $date->format(self::DATE_FORMAT);
 
-        if ($day < BriefingDay::FIRST) {
+        if ($day < self::FIRST_PICTURE) {
             return false;
         }
 
@@ -77,7 +78,7 @@ final readonly class ApodClient implements SourceClient
             return $picture;
         }
 
-        throw InvalidUpstreamPayloadException::at('date', PayloadDefect::OtherDate, 'APOD answered with the picture of another date.');
+        throw InvalidUpstreamPayloadException::at(self::DATE_FIELD, PayloadDefect::OtherDate, 'APOD answered with the picture of another date.');
     }
 
     private function publishedToday(): string

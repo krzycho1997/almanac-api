@@ -36,8 +36,8 @@ final readonly class BriefingResponseMapper
         return new BriefingResponse(
             self::day($briefing->date),
             self::location($briefing->location),
-            new SourcesDto(self::status($apod, $briefing->checkedAt)),
-            array_map(self::key(...), $briefing->missing()),
+            self::sources($apod, $briefing->checkedAt),
+            self::missing($briefing),
             self::apod($apod),
         );
     }
@@ -45,6 +45,19 @@ final readonly class BriefingResponseMapper
     private static function day(\DateTimeImmutable $date): string
     {
         return $date->format(BriefingDay::FORMAT);
+    }
+
+    private static function sources(SourceResult $apod, \DateTimeImmutable $checkedAt): SourcesDto
+    {
+        return new SourcesDto(self::status($apod, $checkedAt));
+    }
+
+    /**
+     * @return list<SourceKey>
+     */
+    private static function missing(BriefingResult $briefing): array
+    {
+        return array_map(self::key(...), $briefing->missing());
     }
 
     private static function location(Location $location): LocationDto

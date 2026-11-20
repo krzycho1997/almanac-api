@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Briefing\Unit\Source\Apod;
 
 use App\Briefing\Exception\InvalidUpstreamPayloadException;
+use App\Briefing\Exception\PayloadDefect;
 use App\Briefing\Model\ApodPicture;
 use App\Briefing\Model\MediaType;
-use App\Briefing\PayloadDefect;
 use App\Briefing\Source\Apod\ApodApiResponse;
 use App\Briefing\Source\Apod\ApodMapper;
 use PHPUnit\Framework\Attributes\DataProvider;

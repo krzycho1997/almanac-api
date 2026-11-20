@@ -97,12 +97,17 @@ final readonly class PendingFetch
 
     private function retryAt(): ?\DateTimeImmutable
     {
-        $retryAfter = $this->response->getHeaders(false)[RetryAfter::HEADER][0] ?? null;
+        $retryAfter = $this->retryAfterHeader();
 
         if (null === $retryAfter) {
             return null;
         }
 
         return RetryAfter::parse($retryAfter, $this->clock->now());
+    }
+
+    private function retryAfterHeader(): ?string
+    {
+        return $this->response->getHeaders(false)[RetryAfter::HEADER][0] ?? null;
     }
 }

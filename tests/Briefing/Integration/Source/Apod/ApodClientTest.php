@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Briefing\Integration\Source\Apod;
 
+use App\Briefing\Exception\PayloadDefect;
 use App\Briefing\FailureCause;
 use App\Briefing\FailureKind;
 use App\Briefing\Location;
 use App\Briefing\Model\ApodPicture;
 use App\Briefing\Model\MediaType;
-use App\Briefing\PayloadDefect;
 use App\Briefing\Source\Apod\ApodSource;
 use App\Briefing\SourceResult;
 use App\Briefing\SourceStatus;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Briefing;
+namespace App\Briefing\Exception;
 
 enum PayloadDefect: string
 {
