@@ -17,6 +17,7 @@ use App\Tests\Support\Briefing\CallJournal;
 use App\Tests\Support\Briefing\FakePayload;
 use App\Tests\Support\Briefing\JournalingSource;
 use App\Tests\Support\Briefing\StubSource;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Clock\MockClock;
@@ -61,6 +62,35 @@ final class BriefingAggregatorTest extends TestCase
         self::assertSame([SourceName::Apod, SourceName::Weather], $briefing->missing());
         self::assertSame(SourceStatus::NotApplicable, $briefing->resultFor(SourceName::Apod)->status);
         self::assertSame(SourceStatus::Ok, $briefing->resultFor(SourceName::OnThisDay)->status);
+    }
+
+    /**
+     * @param list<SourceName> $given
+     */
+    #[DataProvider('orders')]
+    public function testListsTheSourcesInTheOrderOfTheirNames(array $given): void
+    {
+        // Given
+        $uncovered = static fn (): PendingFetch => throw new \LogicException('An uncovered source must not be requested.');
+        $sources = array_map(static fn (SourceName $name): StubSource => new StubSource($name, $uncovered, false), $given);
+
+        // When
+        $briefing = self::aggregator($sources, new MockClock(self::NOW))->briefingFor(new \DateTimeImmutable(self::DAY), Location::fromCoordinates(52.23, 21.01));
+
+        // Then
+        self::assertSame(SourceName::cases(), $briefing->missing());
+    }
+
+    /**
+     * @return iterable<string, array{list<SourceName>}>
+     */
+    public static function orders(): iterable
+    {
+        [$apod, $onThisDay, $weather] = SourceName::cases();
+
+        foreach ([[$apod, $onThisDay, $weather], [$apod, $weather, $onThisDay], [$onThisDay, $apod, $weather], [$onThisDay, $weather, $apod], [$weather, $apod, $onThisDay], [$weather, $onThisDay, $apod]] as $order) {
+            yield implode(' ', array_map(static fn (SourceName $name): string => $name->value, $order)) => [$order];
+        }
     }
 
     public function testCancelsTheStartedRequestsWhenAnotherCannotStart(): void

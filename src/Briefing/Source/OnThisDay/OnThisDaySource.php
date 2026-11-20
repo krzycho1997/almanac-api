@@ -10,6 +10,8 @@ use App\Briefing\SourceName;
 
 final readonly class OnThisDaySource implements Source
 {
+    public const SourceName NAME = SourceName::OnThisDay;
+
     public function __construct(
         private OnThisDayClient $client,
     ) {
@@ -17,7 +19,7 @@ final readonly class OnThisDaySource implements Source
 
     public function name(): SourceName
     {
-        return SourceName::OnThisDay;
+        return self::NAME;
     }
 
     public function client(): SourceClient

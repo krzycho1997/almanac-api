@@ -10,6 +10,8 @@ use App\Briefing\SourceName;
 
 final readonly class ApodSource implements Source
 {
+    public const SourceName NAME = SourceName::Apod;
+
     public function __construct(
         private ApodClient $client,
     ) {
@@ -17,7 +19,7 @@ final readonly class ApodSource implements Source
 
     public function name(): SourceName
     {
-        return SourceName::Apod;
+        return self::NAME;
     }
 
     public function client(): SourceClient

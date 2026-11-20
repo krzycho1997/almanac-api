@@ -10,6 +10,8 @@ use App\Briefing\SourceName;
 
 final readonly class WeatherSource implements Source
 {
+    public const SourceName NAME = SourceName::Weather;
+
     public function __construct(
         private OpenMeteoClient $client,
     ) {
@@ -17,7 +19,7 @@ final readonly class WeatherSource implements Source
 
     public function name(): SourceName
     {
-        return SourceName::Weather;
+        return self::NAME;
     }
 
     public function client(): SourceClient

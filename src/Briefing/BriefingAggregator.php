@@ -28,7 +28,24 @@ final readonly class BriefingAggregator
         private ClockInterface $clock,
         private SourceFailureLog $failureLog,
     ) {
-        $this->sources = array_values([...$sources]);
+        $this->sources = self::inNameOrder([...$sources]);
+    }
+
+    /**
+     * @param array<Source> $sources
+     *
+     * @return list<Source>
+     */
+    private static function inNameOrder(array $sources): array
+    {
+        usort($sources, static fn (Source $first, Source $second): int => self::positionOf($first) <=> self::positionOf($second));
+
+        return $sources;
+    }
+
+    private static function positionOf(Source $source): int
+    {
+        return (int) array_search($source->name(), SourceName::cases(), true);
     }
 
     public function briefingFor(\DateTimeImmutable $date, Location $location): BriefingResult
