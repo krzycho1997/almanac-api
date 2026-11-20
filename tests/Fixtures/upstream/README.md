@@ -2,6 +2,14 @@
 
 Bodies served by `UpstreamMock::fixture()` in tests, which rejects a file that is not valid JSON. Real responses are recorded with `DEMO_KEY`, changed only where noted. Every file uses one format: four-space indentation, unescaped slashes and Unicode, zero fractions kept (`50.0`) and a final newline.
 
+## Recording
+
+`tests/Support/Briefing/Recording/UpstreamFixtures.php` lists every fixture with the request it was recorded from, the status it must answer with, how it is trimmed and, when one of our clients makes that request, the date and place the client is called with. `UpstreamFixturesClientTest` checks that the client really requests that URL.
+
+`composer test:live` fetches each repeatable fixture, one request a second, and passes the trimmed answer through our own client: an answer the client no longer accepts fails before anything is written. Historical data (APOD and the Open-Meteo archive) must also match the file exactly, keys in any order and `generationtime_ms` ignored; On This Day is checked for shape only, since Wikipedia pages are edited all the time. A 429 or 503 with `Retry-After` of at most 10 seconds is retried once; any other unexpected status fails and is never written. `RECORD_FIXTURES=1 composer test:live` writes the answers that changed and their entry in the directory's `recorded.json` (URL, status, day of recording and the `content-type`, `date`, `retry-after` and rate-limit headers).
+
+Frozen fixtures (the placeholder, the forecasts and both out-of-range errors) depend on the day they were recorded or on a passing upstream state, so they are listed but never fetched again. No repeatable fixture needs the NASA key.
+
 ## NASA APOD (`apod/`)
 
 From 2026-12-01 api.nasa.gov forwards every date to `https://science.nasa.gov/wp-json/wp/v2/apod-basic/{yymmdd}`, sets `url` to `hdurl` and adds `service_version` ([nasa/apod-api](https://github.com/nasa/apod-api)). The `passthrough-*` files are those WordPress responses with the same two changes and with `basic_html` removed by us, since the forwarder keeps it and we never read it.

@@ -1,0 +1,29 @@
+{
+    "births-03-15.json": {
+        "url": "https://en.wikipedia.org/api/rest_v1/feed/onthisday/births/03/15",
+        "status": 200,
+        "recordedOn": "2026-11-20",
+        "headers": {
+            "content-type": "application/json; charset=utf-8; profile=\"https://www.mediawiki.org/wiki/Specs/OnThisDay/0.5.0\"",
+            "date": "Fri, 20 Nov 2026 17:26:56 GMT"
+        }
+    },
+    "deaths-03-15.json": {
+        "url": "https://en.wikipedia.org/api/rest_v1/feed/onthisday/deaths/03/15",
+        "status": 200,
+        "recordedOn": "2026-11-20",
+        "headers": {
+            "content-type": "application/json; charset=utf-8; profile=\"https://www.mediawiki.org/wiki/Specs/OnThisDay/0.5.0\"",
+            "date": "Fri, 20 Nov 2026 17:26:52 GMT"
+        }
+    },
+    "selected-03-15.json": {
+        "url": "https://en.wikipedia.org/api/rest_v1/feed/onthisday/selected/03/15",
+        "status": 200,
+        "recordedOn": "2026-11-20",
+        "headers": {
+            "content-type": "application/json; charset=utf-8; profile=\"https://www.mediawiki.org/wiki/Specs/OnThisDay/0.5.0\"",
+            "date": "Fri, 20 Nov 2026 17:26:50 GMT"
+        }
+    }
+}
