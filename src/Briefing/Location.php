@@ -9,8 +9,8 @@ use App\Briefing\Exception\InvalidLocationException;
 final readonly class Location
 {
     private const int PRECISION = 2;
-    private const float MAX_LATITUDE = 90.0;
-    private const float MAX_LONGITUDE = 180.0;
+    public const float MAX_LATITUDE = 90.0;
+    public const float MAX_LONGITUDE = 180.0;
 
     private function __construct(
         public float $latitude,

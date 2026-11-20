@@ -14,7 +14,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints\Date;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Constraints\Type;
 
 final class BriefingControllerTest extends FunctionalTestCase
 {
@@ -68,6 +72,103 @@ final class BriefingControllerTest extends FunctionalTestCase
         $briefing = self::json($this->client->getResponse()->getContent());
         self::assertIsArray($briefing['apod']);
         self::assertSame(['Neutron Star Earth', null, null, null], [$briefing['apod']['title'], $briefing['apod']['url'], $briefing['apod']['hdUrl'], $briefing['apod']['credit']]);
+    }
+
+    #[DataProvider('coordinates')]
+    public function testBuildsTheBriefingForTheGivenPlace(string $query, float $latitude, float $longitude): void
+    {
+        // Given
+        self::upstream()->respondWith(UpstreamMock::create()->apod()->fixture('apod/passthrough-2024-03-15.json'));
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY.$query);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        $briefing = self::json($this->client->getResponse()->getContent());
+        self::assertSame(['latitude' => $latitude, 'longitude' => $longitude, 'name' => null, 'isDefault' => false], $briefing['location']);
+    }
+
+    /**
+     * @return iterable<string, array{string, float, float}>
+     */
+    public static function coordinates(): iterable
+    {
+        yield 'Warsaw' => ['?lat=52.23&lon=21.01', 52.23, 21.01];
+        yield 'rounded to two places' => ['?lat=52.2297&lon=21.0122', 52.23, 21.01];
+        yield 'edges of the globe' => ['?lat=-90&lon=180', -90.0, 180.0];
+        yield 'the default place given explicitly' => ['?lat=48.8566&lon=2.3522', 48.86, 2.35];
+    }
+
+    /**
+     * @param list<string> $paths
+     */
+    #[DataProvider('invalidCoordinates')]
+    public function testRejectsInvalidCoordinatesWithTheirViolations(string $query, array $paths): void
+    {
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY.$query);
+
+        // Then
+        self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
+        self::assertSame($paths, self::violatedPaths(self::json($this->client->getResponse()->getContent())));
+        self::assertSame([], self::upstream()->served());
+    }
+
+    /**
+     * @return iterable<string, array{string, list<string>}>
+     */
+    public static function invalidCoordinates(): iterable
+    {
+        yield 'latitude without longitude' => ['?lat=52.23', ['lon']];
+        yield 'longitude without latitude' => ['?lon=21.01', ['lat']];
+        yield 'latitude beyond a pole' => ['?lat=90.01&lon=21.01', ['lat']];
+        yield 'longitude beyond the date line' => ['?lat=52.23&lon=-180.01', ['lon']];
+        yield 'empty values' => ['?lat=&lon=', ['lat', 'lon']];
+        yield 'not a number' => ['?lat=abc&lon=21.01', ['lat']];
+        yield 'not a number literal' => ['?lat=NaN&lon=INF', ['lat', 'lon']];
+        yield 'exponent' => ['?lat=1e1&lon=21.01', ['lat']];
+        yield 'leading space' => ['?lat=%2052.23&lon=21.01', ['lat']];
+        yield 'plus sign' => ['?lat=%2B52.23&lon=21.01', ['lat']];
+        yield 'list instead of a value' => ['?lat[]=52.23&lon=21.01', ['lat']];
+        yield 'trailing new line' => ['?lat=52.23%0A&lon=21.01', ['lat']];
+        yield 'point without decimals' => ['?lat=52.&lon=21.01', ['lat']];
+        yield 'leading zeros' => ['?lat=0052.23&lon=21.01', ['lat']];
+    }
+
+    /**
+     * @param list<string> $codes
+     */
+    #[DataProvider('coordinateErrorCodes')]
+    public function testNamesWhatIsWrongWithACoordinate(string $query, array $codes): void
+    {
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY.$query);
+
+        // Then
+        self::assertSame($codes, self::violationTypes(self::json($this->client->getResponse()->getContent())));
+    }
+
+    /**
+     * @return iterable<string, array{string, list<string>}>
+     */
+    public static function coordinateErrorCodes(): iterable
+    {
+        yield 'blank' => ['?lat=&lon=21.01', [self::URN.NotBlank::IS_BLANK_ERROR]];
+        yield 'list' => ['?lat[]=52.23&lon=21.01', [self::URN.Type::INVALID_TYPE_ERROR]];
+        yield 'not plain decimal' => ['?lat=1e1&lon=21.01', [self::URN.Regex::REGEX_FAILED_ERROR]];
+        yield 'out of range' => ['?lat=90.01&lon=21.01', [self::URN.Range::NOT_IN_RANGE_ERROR]];
+        yield 'without its pair' => ['?lat=52.23', [self::URN.NotNull::IS_NULL_ERROR]];
+    }
+
+    public function testLogsInvalidCoordinatesAsAClientError(): void
+    {
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY.'?lat=91&lon=0');
+
+        // Then
+        self::assertSame([Level::Notice], self::loggedExceptionLevels());
+        self::assertSame([], self::levelsFrom(Level::Warning));
     }
 
     #[DataProvider('unescapedText')]
@@ -194,6 +295,42 @@ final class BriefingControllerTest extends FunctionalTestCase
         self::assertIsArray($decoded);
 
         return $decoded;
+    }
+
+    /**
+     * @param array<mixed> $problem
+     *
+     * @return list<mixed>
+     */
+    private static function violatedPaths(array $problem): array
+    {
+        return self::violationField($problem, 'propertyPath');
+    }
+
+    /**
+     * @param array<mixed> $problem
+     *
+     * @return list<mixed>
+     */
+    private static function violationTypes(array $problem): array
+    {
+        return self::violationField($problem, 'type');
+    }
+
+    /**
+     * @param array<mixed> $problem
+     *
+     * @return list<mixed>
+     */
+    private static function violationField(array $problem, string $field): array
+    {
+        self::assertIsArray($problem['violations']);
+
+        return array_values(array_map(static function (mixed $violation) use ($field): mixed {
+            self::assertIsArray($violation);
+
+            return $violation[$field];
+        }, $problem['violations']));
     }
 
     /**

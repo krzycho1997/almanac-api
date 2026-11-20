@@ -47,6 +47,24 @@ paths:
           schema:
             type: string
             format: date
+        - name: lat
+          in: query
+          required: false
+          description: Latitude in plain decimal notation, given together with lon; without both the default place is used. Rounded to two decimal places.
+          schema:
+            type: number
+            minimum: -90
+            maximum: 90
+            example: 52.23
+        - name: lon
+          in: query
+          required: false
+          description: Longitude in plain decimal notation, given together with lat. Rounded to two decimal places.
+          schema:
+            type: number
+            minimum: -180
+            maximum: 180
+            example: 21.01
       responses:
         '200':
           description: The briefing, with the status of every source.
@@ -84,7 +102,7 @@ components:
           schema:
             $ref: '#/components/schemas/ValidationProblem'
     UnprocessableEntity:
-      description: The request is well formed but not allowed, for example the date is outside the briefing window.
+      description: The request is well formed but not allowed, for example the date is outside the briefing window, or a coordinate is not a plain decimal in range or comes without its pair.
       headers:
         X-Request-Id:
           $ref: '#/components/headers/RequestId'
