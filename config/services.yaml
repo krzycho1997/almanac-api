@@ -124,3 +124,7 @@ when@test:
 
         App\Tests\Support\Command\FailingCommand:
             autoconfigure: true
+
+        test.identity.access_token_handler:
+            alias: App\Identity\Security\AccessTokenHandler
+            public: true

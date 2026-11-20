@@ -21,6 +21,7 @@ class AccessToken
     private const string HASH_ALGORITHM = 'sha256';
     private const int HASH_LENGTH = 64;
     private const int RANDOM_BYTES = 32;
+    private const string ISSUED_SHAPE = '/^[0-9a-f]{'.(self::RANDOM_BYTES * 2).'}$/D';
 
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME)]
@@ -58,6 +59,11 @@ class AccessToken
         }
 
         throw InvalidTokenLifetimeException::notPositive();
+    }
+
+    public static function couldHaveBeenIssued(#[\SensitiveParameter] string $plainToken): bool
+    {
+        return 1 === preg_match(self::ISSUED_SHAPE, $plainToken);
     }
 
     public static function hash(#[\SensitiveParameter] string $plainToken): string

@@ -11,12 +11,15 @@ use App\Identity\Email;
 use App\Identity\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'identity_user')]
 #[ORM\UniqueConstraint(name: 'uniq_identity_user_email', columns: ['email'])]
-class User
+class User implements UserInterface
 {
+    private const string ROLE = 'ROLE_USER';
+
     #[ORM\Id]
     #[ORM\Column(type: UserIdType::NAME)]
     public private(set) UserId $id;
@@ -32,5 +35,21 @@ class User
         $this->id = new UserId();
         $this->email = $email;
         $this->createdAt = $createdAt->setTimestamp($createdAt->getTimestamp());
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    public function getUserIdentifier(): string
+    {
+        return $this->id->toRfc4122();
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getRoles(): array
+    {
+        return [self::ROLE];
     }
 }

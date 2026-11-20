@@ -20,6 +20,20 @@ final class AccessTokenRepository extends ServiceEntityRepository
         parent::__construct($registry, AccessToken::class);
     }
 
+    public function findOneByHash(string $tokenHash): ?AccessToken
+    {
+        $token = $this->getEntityManager()
+            ->createQuery('SELECT token, owner FROM '.AccessToken::class.' token JOIN token.user owner WHERE token.tokenHash = :tokenHash')
+            ->setParameter('tokenHash', $tokenHash)
+            ->getOneOrNullResult();
+
+        if ($token instanceof AccessToken) {
+            return $token;
+        }
+
+        return null;
+    }
+
     public function add(AccessToken $token): void
     {
         $this->getEntityManager()->persist($token);
