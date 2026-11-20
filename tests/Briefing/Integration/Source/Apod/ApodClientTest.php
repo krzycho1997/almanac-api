@@ -155,6 +155,32 @@ final class ApodClientTest extends KernelTestCase
         self::assertEquals(new FailureCause('InvalidUpstreamPayloadException', ['date'], PayloadDefect::OtherDate), $result->cause);
     }
 
+    #[DataProvider('unusableMediaAddresses')]
+    public function testKeepsAPictureWhoseMediaAddressIsUnusable(string $body, ?string $url, ?string $hdUrl): void
+    {
+        // Given
+        self::upstream()->respondWith(UpstreamMock::create()->apod()->json($body));
+
+        // When
+        $result = self::fetch(self::DATE);
+
+        // Then
+        self::assertInstanceOf(ApodPicture::class, $result->payload);
+        self::assertSame('Pillars', $result->payload->title);
+        self::assertSame($url, $result->payload->url);
+        self::assertSame($hdUrl, $result->payload->hdUrl);
+    }
+
+    /**
+     * @return iterable<string, array{string, ?string, ?string}>
+     */
+    public static function unusableMediaAddresses(): iterable
+    {
+        yield 'empty picture address' => ['{"date":"2024-03-15","title":"Pillars","explanation":"Gas","media_type":"image","url":""}', null, null];
+        yield 'relative picture address' => ['{"date":"2024-03-15","title":"Pillars","explanation":"Gas","media_type":"image","url":"/apod/image.jpg"}', null, null];
+        yield 'high-resolution address with an unsafe scheme' => ['{"date":"2024-03-15","title":"Pillars","explanation":"Gas","media_type":"image","url":"https://apod.nasa.gov/a.jpg","hdurl":"javascript:alert(1)"}', 'https://apod.nasa.gov/a.jpg', null];
+    }
+
     #[DataProvider('failures')]
     public function testReportsAFailedPicture(UpstreamMock $scenario, FailureKind $kind): void
     {
@@ -179,10 +205,7 @@ final class ApodClientTest extends KernelTestCase
         yield 'server error twice' => [UpstreamMock::create()->apod()->status(Response::HTTP_INTERNAL_SERVER_ERROR)->apod()->status(Response::HTTP_INTERNAL_SERVER_ERROR), FailureKind::Unavailable];
         yield 'empty object' => [UpstreamMock::create()->apod(), FailureKind::InvalidPayload];
         yield 'null byte in the date' => [UpstreamMock::create()->apod()->json('{"date":"2024-03-15\\u0000","title":"Pillars","explanation":"Gas","media_type":"image","url":"https://apod.nasa.gov/a.jpg"}'), FailureKind::InvalidPayload];
-        yield 'empty picture address' => [UpstreamMock::create()->apod()->json('{"date":"2024-03-15","title":"Pillars","explanation":"Gas","media_type":"image","url":""}'), FailureKind::InvalidPayload];
         yield 'blank media type' => [UpstreamMock::create()->apod()->json('{"date":"2024-03-15","title":"Pillars","explanation":"Gas","media_type":" ","url":"https://apod.nasa.gov/a.jpg"}'), FailureKind::InvalidPayload];
-        yield 'relative picture address' => [UpstreamMock::create()->apod()->json('{"date":"2024-03-15","title":"Pillars","explanation":"Gas","media_type":"image","url":"/apod/image.jpg"}'), FailureKind::InvalidPayload];
-        yield 'high-resolution address with an unsafe scheme' => [UpstreamMock::create()->apod()->json('{"date":"2024-03-15","title":"Pillars","explanation":"Gas","media_type":"image","url":"https://apod.nasa.gov/a.jpg","hdurl":"javascript:alert(1)"}'), FailureKind::InvalidPayload];
     }
 
     private static function fetch(string $date): SourceResult

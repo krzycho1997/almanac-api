@@ -18,9 +18,8 @@ final readonly class ApodApiResponse
         public string $explanation,
         #[SerializedName('media_type'), Assert\NotBlank(normalizer: 'trim')]
         public string $mediaType,
-        #[Assert\NotBlank(allowNull: true), Assert\Url(protocols: ['http', 'https'])]
         public ?string $url = null,
-        #[SerializedName('hdurl'), Assert\NotBlank(allowNull: true), Assert\Url(protocols: ['http', 'https'])]
+        #[SerializedName('hdurl')]
         public ?string $hdUrl = null,
         public ?string $copyright = null,
     ) {

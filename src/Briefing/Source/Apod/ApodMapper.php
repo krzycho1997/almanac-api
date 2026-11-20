@@ -24,6 +24,7 @@ final readonly class ApodMapper
     private const string SPACE = ' ';
     private const string EMPTY = '';
     private const string GENERIC_THUMBNAIL = '/images/misc/news-thumbnail.png';
+    private const array WEB_SCHEMES = ['http', 'https'];
 
     public function map(ApodApiResponse $response): ApodPicture
     {
@@ -93,16 +94,29 @@ final readonly class ApodMapper
 
     private static function mediaUrl(?string $url): ?string
     {
-        if (self::isGenericThumbnail($url)) {
-            return null;
+        if (self::isMediaAddress((string) $url)) {
+            return $url;
         }
 
-        return $url;
+        return null;
     }
 
-    private static function isGenericThumbnail(?string $url): bool
+    private static function isMediaAddress(string $url): bool
     {
-        return str_ends_with((string) parse_url((string) $url, \PHP_URL_PATH), self::GENERIC_THUMBNAIL);
+        if (false === filter_var($url, \FILTER_VALIDATE_URL)) {
+            return false;
+        }
+
+        if (self::isGenericThumbnail($url)) {
+            return false;
+        }
+
+        return \in_array(parse_url($url, \PHP_URL_SCHEME), self::WEB_SCHEMES, true);
+    }
+
+    private static function isGenericThumbnail(string $url): bool
+    {
+        return str_ends_with((string) parse_url($url, \PHP_URL_PATH), self::GENERIC_THUMBNAIL);
     }
 
     private static function credit(?string $credit): ?string

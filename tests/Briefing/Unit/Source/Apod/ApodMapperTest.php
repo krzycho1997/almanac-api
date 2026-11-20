@@ -74,7 +74,7 @@ final class ApodMapperTest extends TestCase
     }
 
     #[DataProvider('mediaUrls')]
-    public function testDropsTheGenericThumbnailNasaGivesInsteadOfTheMedia(string $url, ?string $expected): void
+    public function testKeepsOnlyAUsableMediaAddress(string $url, ?string $expected): void
     {
         // Given
         $response = new ApodApiResponse(self::DATE, self::TITLE, self::EXPLANATION, 'video', $url, $url);
@@ -95,6 +95,13 @@ final class ApodMapperTest extends TestCase
         yield 'generic thumbnail' => ['https://assets.science.nasa.gov/dynamicimage/assets/science/astro/programs/cosmic-origins/images/misc/news-thumbnail.png?w=594&h=516&fit=clip', null];
         yield 'picture' => [self::HD_URL, self::HD_URL];
         yield 'thumbnail named only in the query' => ['https://www.youtube.com/embed/abc?poster=/images/misc/news-thumbnail.png', 'https://www.youtube.com/embed/abc?poster=/images/misc/news-thumbnail.png'];
+        yield 'plain http picture' => ['http://apod.nasa.gov/apod/image/9506/neutron.gif', 'http://apod.nasa.gov/apod/image/9506/neutron.gif'];
+        yield 'empty' => ['', null];
+        yield 'relative' => ['/apod/image.jpg', null];
+        yield 'without a scheme' => ['//www.youtube.com/embed/abc', null];
+        yield 'script' => ['javascript:alert(1)', null];
+        yield 'another scheme' => ['ftp://apod.nasa.gov/a.jpg', null];
+        yield 'with a space' => ['https://apod.nasa.gov/a b.jpg', null];
     }
 
     #[DataProvider('credits')]
