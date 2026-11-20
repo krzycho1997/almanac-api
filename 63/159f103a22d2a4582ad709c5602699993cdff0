@@ -1,0 +1,21 @@
+composer.json
+  s_ecd702649c3f02::t_9403ba5a270ec0 15,25,35-36
+composer.lock
+  s_ecd702649c3f02::t_44dd4aa36f5eb4 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "63159f103a22d2a4582ad709c5602699993cdff0",
+  "prompts": {},
+  "sessions": {
+    "s_ecd702649c3f02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79d0416-bbd9-40b6-9497-5f9421576080",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
