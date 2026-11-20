@@ -1,0 +1,21 @@
+tests/Identity/Unit/Contract/UserIdTypeTest.php
+  s_ecd702649c3f02::t_1f3f81a5c01097 1-106
+src/Identity/Contract/UserIdType.php
+  s_ecd702649c3f02::t_1f3f81a5c01097 8,15-20,25,27-28,34-43,49-66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e308dc6de34715f6d3c4fd27ba42de9b9c3e6223",
+  "prompts": {},
+  "sessions": {
+    "s_ecd702649c3f02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79d0416-bbd9-40b6-9497-5f9421576080",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
