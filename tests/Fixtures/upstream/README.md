@@ -23,3 +23,20 @@ Recorded with a plain User-Agent, without the NASA key. Every entry of each list
 | `selected-03-15.json` | `GET https://en.wikipedia.org/api/rest_v1/feed/onthisday/selected/03/15`; 22 entries, so a limit of 20 trims it, the last one in 44 BC | 2026-11-20 |
 | `births-03-15.json` | `GET https://en.wikipedia.org/api/rest_v1/feed/onthisday/births/03/15`; 189 entries | 2026-11-20 |
 | `deaths-03-15.json` | `GET https://en.wikipedia.org/api/rest_v1/feed/onthisday/deaths/03/15`; 86 entries, including Julius Caesar (44 BC) | 2026-11-20 |
+
+## Open-Meteo (`open_meteo/`)
+
+Recorded on 2026-11-20 (winter, UTC+1 in Europe) with a plain User-Agent and the query the client sends (`daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,sunrise,sunset,daylight_duration&timezone=auto&timeformat=unixtime&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm`), pretty-printed. Open-Meteo applies today's UTC offset to every date, so the summer files carry `utc_offset_seconds: 3600` although the place was on summer time; Unix times stay correct. `UpstreamMock::archiveOn()` and `forecastOn()` serve `archive-2024-03-15.json` with its times shifted to the requested day.
+
+| File | Source |
+|---|---|
+| `archive-2024-03-15.json` | `GET https://archive-api.open-meteo.com/v1/archive?latitude=48.86&longitude=2.35&start_date=2024-03-15&end_date=2024-03-15` (Paris) |
+| `archive-summer-2024-07-01.json` | the same place on 2024-07-01; sunrise 05:51 CEST, which the local-time format would give as 04:51 |
+| `archive-sunset-after-midnight-2024-05-17.json` | `latitude=69.65&longitude=18.96` (Tromsø) on 2024-05-17; the sun sets at 00:22 on 18 May |
+| `archive-polar-day-2024-06-21.json` | `latitude=78.22&longitude=15.65` (Longyearbyen) on 2024-06-21; `daylight_duration` 86400 |
+| `archive-polar-night-2024-12-21.json` | the same place on 2024-12-21; `daylight_duration` 0 |
+| `archive-point-nemo-2024-03-15.json` | `latitude=-48.88&longitude=-123.39` (Point Nemo, open ocean); time zone `Etc/GMT+8` |
+| `archive-north-pole-2024-03-15.json` | `latitude=90.00&longitude=0.00`; time zone `Etc/GMT`, `daylight_duration` 0 |
+| `forecast-2026-11-20.json` | `GET https://api.open-meteo.com/v1/forecast?latitude=48.86&longitude=2.35&start_date=2026-11-20&end_date=2026-11-20` |
+| `forecast-beyond-the-horizon-2026-12-05.json` | `latitude=21.30&longitude=-157.85` (Honolulu) on 2026-12-05; HTTP 200 with every measure null, since the local day lies beyond the forecast |
+| `forecast-out-of-range.json` | `start_date=2026-12-06`, HTTP 400 |

@@ -8,6 +8,7 @@ use App\Briefing\BriefingDay;
 use App\Briefing\BriefingResult;
 use App\Briefing\Dto\Response\ApodDto;
 use App\Briefing\Dto\Response\ApodMediaType;
+use App\Briefing\Dto\Response\AttributionDto;
 use App\Briefing\Dto\Response\BriefingResponse;
 use App\Briefing\Dto\Response\EventDto;
 use App\Briefing\Dto\Response\LocationDto;
@@ -20,14 +21,21 @@ use App\Briefing\Dto\Response\SourceNotApplicableDto;
 use App\Briefing\Dto\Response\SourceOkDto;
 use App\Briefing\Dto\Response\SourcesDto;
 use App\Briefing\Dto\Response\SourceStatusDto;
+use App\Briefing\Dto\Response\WeatherDto;
+use App\Briefing\Dto\Response\WeatherKindValue;
 use App\Briefing\FailureKind;
 use App\Briefing\Location;
 use App\Briefing\Model\ApodPicture;
+use App\Briefing\Model\Attribution;
+use App\Briefing\Model\DailyWeather;
 use App\Briefing\Model\HistoricalEvent;
 use App\Briefing\Model\MediaType;
 use App\Briefing\Model\NotablePerson;
 use App\Briefing\Model\OnThisDayFeed;
 use App\Briefing\Model\PageRef;
+use App\Briefing\Model\SourcePayload;
+use App\Briefing\Model\WeatherKind;
+use App\Briefing\Model\WmoCode;
 use App\Briefing\SourceName;
 use App\Briefing\SourceResult;
 use App\Briefing\SourceStatus;
@@ -47,9 +55,11 @@ final readonly class BriefingResponseMapper
             self::sources($briefing),
             self::missing($briefing),
             self::apod($apod),
-            array_map(self::event(...), $onThisDay->events),
-            array_map(self::person(...), $onThisDay->births),
-            array_map(self::person(...), $onThisDay->deaths),
+            array_map(self::event(...), $onThisDay->events ?? []),
+            array_map(self::person(...), $onThisDay->births ?? []),
+            array_map(self::person(...), $onThisDay->deaths ?? []),
+            self::weather($briefing->resultFor(SourceName::Weather)),
+            self::attributions($briefing),
         );
     }
 
@@ -63,6 +73,7 @@ final readonly class BriefingResponseMapper
         return new SourcesDto(
             self::status($briefing->resultFor(SourceName::Apod), $briefing->checkedAt),
             self::status($briefing->resultFor(SourceName::OnThisDay), $briefing->checkedAt),
+            self::status($briefing->resultFor(SourceName::Weather), $briefing->checkedAt),
         );
     }
 
@@ -122,7 +133,7 @@ final readonly class BriefingResponseMapper
         };
     }
 
-    private static function feed(SourceResult $result): OnThisDayFeed
+    private static function feed(SourceResult $result): ?OnThisDayFeed
     {
         $feed = $result->payload;
 
@@ -130,7 +141,7 @@ final readonly class BriefingResponseMapper
             return $feed;
         }
 
-        return new OnThisDayFeed([], [], []);
+        return null;
     }
 
     private static function event(HistoricalEvent $event): EventDto
@@ -146,6 +157,75 @@ final readonly class BriefingResponseMapper
     private static function person(NotablePerson $person): PersonDto
     {
         return new PersonDto($person->year, $person->name, $person->description, $person->url, $person->thumbnail);
+    }
+
+    private static function weather(SourceResult $result): ?WeatherDto
+    {
+        $weather = $result->payload;
+
+        if ($weather instanceof DailyWeather) {
+            return new WeatherDto(
+                kind: self::weatherKind($weather->kind),
+                timezone: $weather->timezone,
+                temperatureMin: $weather->temperatureMin,
+                temperatureMax: $weather->temperatureMax,
+                precipitationSum: $weather->precipitationSum,
+                windSpeedMax: $weather->windSpeedMax,
+                weatherCode: $weather->weatherCode,
+                description: self::weatherDescription($weather->weatherCode),
+                sunrise: $weather->sunrise,
+                sunset: $weather->sunset,
+                daylightDuration: $weather->daylightDuration,
+            );
+        }
+
+        return null;
+    }
+
+    /**
+     * @return list<AttributionDto>
+     */
+    private static function attributions(BriefingResult $briefing): array
+    {
+        $attributions = [];
+
+        foreach (SourceName::cases() as $source) {
+            $attributions[] = self::attributionOf($briefing->resultFor($source));
+        }
+
+        return array_values(array_filter($attributions));
+    }
+
+    private static function attributionOf(SourceResult $result): ?AttributionDto
+    {
+        if ($result->payload instanceof SourcePayload) {
+            return self::attribution(self::key($result->source), $result->payload->attribution);
+        }
+
+        return null;
+    }
+
+    private static function attribution(SourceKey $source, Attribution $attribution): AttributionDto
+    {
+        return new AttributionDto($source, $attribution->name, $attribution->url, $attribution->license, $attribution->licenseUrl, $attribution->modified, $attribution->notice);
+    }
+
+    private static function weatherDescription(?int $code): ?string
+    {
+        if (null === $code) {
+            return null;
+        }
+
+        return WmoCode::tryFrom($code)?->description();
+    }
+
+    private static function weatherKind(WeatherKind $kind): WeatherKindValue
+    {
+        return match ($kind) {
+            WeatherKind::Final => WeatherKindValue::Final,
+            WeatherKind::Provisional => WeatherKindValue::Provisional,
+            WeatherKind::Forecast => WeatherKindValue::Forecast,
+        };
     }
 
     private static function apod(SourceResult $result): ?ApodDto

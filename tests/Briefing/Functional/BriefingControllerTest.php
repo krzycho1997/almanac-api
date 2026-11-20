@@ -30,6 +30,7 @@ final class BriefingControllerTest extends FunctionalTestCase
     private const string URN = 'urn:uuid:';
     private const string BRIEFING_CHANNEL = 'briefing';
     private const string HISTORY_DAY = '03-15';
+    private const string FIRST_FORECAST_DAY = '2026-11-13';
     private const array FRESH = ['status' => 'ok', 'fetchedAt' => '2026-11-18T12:00:00Z', 'stale' => false];
 
     public function testBuildsTheBriefingFromThePictureOfTheDay(): void
@@ -46,7 +47,7 @@ final class BriefingControllerTest extends FunctionalTestCase
         $briefing = self::json($this->client->getResponse()->getContent());
         self::assertSame(self::PICTURE_DAY, $briefing['date']);
         self::assertSame(['latitude' => 48.86, 'longitude' => 2.35, 'name' => 'Paris', 'isDefault' => true], $briefing['location']);
-        self::assertSame(['apod' => self::FRESH, 'onThisDay' => self::FRESH], $briefing['sources']);
+        self::assertSame(['apod' => self::FRESH, 'onThisDay' => self::FRESH, 'weather' => self::FRESH], $briefing['sources']);
         self::assertSame([], $briefing['missing']);
         self::assertSame(
             [
@@ -60,6 +61,30 @@ final class BriefingControllerTest extends FunctionalTestCase
             $briefing['apod'],
         );
         self::assertStringStartsWith('Big, beautiful spiral galaxy NGC 1055', self::apodExplanation($briefing));
+        self::assertSame(
+            [
+                'kind' => 'final',
+                'timezone' => 'Europe/Paris',
+                'temperatureMin' => 11.1,
+                'temperatureMax' => 16.2,
+                'precipitationSum' => 9.7,
+                'windSpeedMax' => 28.9,
+                'weatherCode' => 61,
+                'description' => 'Slight rain',
+                'sunrise' => '2024-03-15T07:03:30+01:00',
+                'sunset' => '2024-03-15T18:56:37+01:00',
+                'daylightDuration' => 42786,
+            ],
+            $briefing['weather'],
+        );
+        self::assertSame(
+            [
+                ['source' => 'apod', 'name' => 'Astronomy Picture of the Day', 'url' => 'https://apod.nasa.gov/', 'license' => null, 'licenseUrl' => null, 'modified' => true, 'notice' => null],
+                ['source' => 'onThisDay', 'name' => 'Wikipedia', 'url' => 'https://en.wikipedia.org/', 'license' => 'CC BY-SA 4.0', 'licenseUrl' => 'https://creativecommons.org/licenses/by-sa/4.0/', 'modified' => true, 'notice' => null],
+                ['source' => 'weather', 'name' => 'Open-Meteo', 'url' => 'https://open-meteo.com/', 'license' => 'CC BY 4.0', 'licenseUrl' => 'https://creativecommons.org/licenses/by/4.0/', 'modified' => true, 'notice' => 'Generated using Copernicus Climate Change Service information'],
+            ],
+            $briefing['attributions'],
+        );
     }
 
     public function testBuildsTheBriefingWithThisDayInHistory(): void
@@ -83,7 +108,7 @@ final class BriefingControllerTest extends FunctionalTestCase
     public function testBuildsTheBriefingForAPictureWithoutMediaOrCredit(): void
     {
         // Given
-        self::upstream()->respondWith(self::scenario()->apod()->fixture('apod/passthrough-first-picture-1995-06-16.json'));
+        self::upstream()->respondWith(self::scenario('1995-06-16')->apod()->fixture('apod/passthrough-first-picture-1995-06-16.json'));
 
         // When
         $this->client->request(Request::METHOD_GET, self::BRIEFING.'1995-06-16');
@@ -196,7 +221,7 @@ final class BriefingControllerTest extends FunctionalTestCase
     public function testSendsLinksAndAccentsWithoutEscaping(string $fixture, string $date, string $text): void
     {
         // Given
-        self::upstream()->respondWith(self::scenario()->apod()->fixture($fixture));
+        self::upstream()->respondWith(self::scenario($date)->apod()->fixture($fixture));
 
         // When
         $this->client->request(Request::METHOD_GET, self::BRIEFING.$date);
@@ -220,6 +245,7 @@ final class BriefingControllerTest extends FunctionalTestCase
         self::upstream()->respondWith(self::scenario()
             ->apod()->fixture('apod/passthrough-2024-03-15.json')
             ->onThisDayFrom(self::HISTORY_DAY)
+            ->archiveOn('1995-06-16')
             ->apod()->fixture('apod/passthrough-first-picture-1995-06-16.json'));
         $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
 
@@ -228,7 +254,7 @@ final class BriefingControllerTest extends FunctionalTestCase
 
         // Then
         self::assertResponseIsSuccessful();
-        self::assertCount(8, self::upstream()->served());
+        self::assertCount(10, self::upstream()->served());
     }
 
     #[DataProvider('briefingsWithoutData')]
@@ -251,8 +277,8 @@ final class BriefingControllerTest extends FunctionalTestCase
      */
     public static function briefingsWithoutData(): iterable
     {
-        yield 'picture and history unavailable' => [self::PICTURE_DAY, self::onThisDayRejected()->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)];
-        yield 'picture not published yet, history unavailable' => ['2026-11-25', self::onThisDayRejected()];
+        yield 'every source unavailable' => [self::PICTURE_DAY, self::onThisDayRejected()->archive()->status(Response::HTTP_BAD_REQUEST)->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)];
+        yield 'picture not published yet, history and weather unavailable' => ['2026-11-25', self::onThisDayRejected()->forecast()->status(Response::HTTP_BAD_REQUEST)];
     }
 
     /**
@@ -294,7 +320,7 @@ final class BriefingControllerTest extends FunctionalTestCase
     public function testLogsNothingOnTheBriefingChannelForADayThePictureDoesNotCover(): void
     {
         // Given
-        self::upstream()->respondWith(self::scenario());
+        self::upstream()->respondWith(self::scenario('2026-11-25'));
 
         // When
         $this->client->request(Request::METHOD_GET, self::BRIEFING.'2026-11-25');
@@ -427,9 +453,15 @@ final class BriefingControllerTest extends FunctionalTestCase
         return $briefing['apod']['explanation'];
     }
 
-    private static function scenario(): UpstreamMock
+    private static function scenario(string $day = self::PICTURE_DAY): UpstreamMock
     {
-        return UpstreamMock::create()->onThisDayFrom(self::HISTORY_DAY);
+        $scenario = UpstreamMock::create()->onThisDayFrom(self::HISTORY_DAY);
+
+        if ($day < self::FIRST_FORECAST_DAY) {
+            return $scenario->archiveOn($day);
+        }
+
+        return $scenario->forecastOn($day);
     }
 
     private static function onThisDayRejected(): UpstreamMock

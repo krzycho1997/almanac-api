@@ -6,6 +6,7 @@ namespace App\Briefing\Source\OnThisDay;
 
 use App\Briefing\Exception\InvalidUpstreamPayloadException;
 use App\Briefing\Exception\PayloadDefect;
+use App\Briefing\Model\Attribution;
 use App\Briefing\Model\HistoricalEvent;
 use App\Briefing\Model\NotablePerson;
 use App\Briefing\Model\OnThisDayFeed;
@@ -20,6 +21,10 @@ final readonly class OnThisDayMapper
     private const string BIRTHS_FIELD = 'births';
     private const string DEATHS_FIELD = 'deaths';
     private const int SMALLEST_LIMIT = 1;
+    private const string ATTRIBUTION_NAME = 'Wikipedia';
+    private const string ATTRIBUTION_URL = 'https://en.wikipedia.org/';
+    private const string LICENSE = 'CC BY-SA 4.0';
+    private const string LICENSE_URL = 'https://creativecommons.org/licenses/by-sa/4.0/';
     private const int YEARS_PER_CENTURY = 100;
     private const string EMPTY = '';
     private const string COMMA = ',';
@@ -42,6 +47,7 @@ final readonly class OnThisDayMapper
             $this->trimmed(self::required(self::events($selected->selected), self::SELECTED_FIELD)),
             $this->spread(self::required(self::people($births->births), self::BIRTHS_FIELD)),
             $this->spread(self::required(self::people($deaths->deaths), self::DEATHS_FIELD)),
+            new Attribution(self::ATTRIBUTION_NAME, self::ATTRIBUTION_URL, self::LICENSE, self::LICENSE_URL, true, null),
         );
     }
 

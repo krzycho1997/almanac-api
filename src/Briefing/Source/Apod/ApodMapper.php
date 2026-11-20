@@ -7,6 +7,7 @@ namespace App\Briefing\Source\Apod;
 use App\Briefing\Exception\InvalidUpstreamPayloadException;
 use App\Briefing\Exception\PayloadDefect;
 use App\Briefing\Model\ApodPicture;
+use App\Briefing\Model\Attribution;
 use App\Briefing\Model\MediaType;
 use App\Briefing\Source\PlainText;
 use App\Briefing\Source\WebAddress;
@@ -24,6 +25,8 @@ final readonly class ApodMapper
     private const string PAGE_TRAILER = '/(?:^|(?<=[.!?]))\s*(?:Portal Universe|Tomorrow[\'’]s picture):.*$/su';
     private const string BODY = '<body>';
     private const string EMPTY = '';
+    private const string ATTRIBUTION_NAME = 'Astronomy Picture of the Day';
+    private const string ATTRIBUTION_URL = 'https://apod.nasa.gov/';
     private const string GENERIC_THUMBNAIL = '/images/misc/news-thumbnail.png';
 
     public function map(ApodApiResponse $response): ApodPicture
@@ -36,6 +39,7 @@ final readonly class ApodMapper
             self::mediaUrl($response->url),
             self::mediaUrl($response->hdUrl),
             self::credit($response->copyright),
+            new Attribution(self::ATTRIBUTION_NAME, self::ATTRIBUTION_URL, null, null, true, null),
         );
     }
 

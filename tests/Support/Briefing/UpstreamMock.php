@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Support\Briefing;
 
-use App\Briefing\SourceName;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,6 +21,14 @@ final readonly class UpstreamMock
     private const string JSON = 'application/json';
     private const array ON_THIS_DAY_LISTS = ['selected', 'births', 'deaths'];
     private const string ON_THIS_DAY_FIXTURE = 'on_this_day/%s-%s.json';
+    private const string WEATHER_TEMPLATE = 'open_meteo/archive-2024-03-15.json';
+    private const string WEATHER_TEMPLATE_DAY = '2024-03-15';
+    private const string UTC_MIDNIGHT = ' 00:00 UTC';
+    private const array WEATHER_TIMES = ['time', 'sunrise', 'sunset'];
+    private const string NASA = 'nasa';
+    private const string WIKIPEDIA = 'wikipedia';
+    private const string OPEN_METEO = 'open_meteo';
+    private const string OPEN_METEO_ARCHIVE = 'open_meteo_archive';
     private const string PICK_THE_UPSTREAM_FIRST = 'Pick the upstream first, e.g. UpstreamMock::create()->apod().';
 
     /**
@@ -29,7 +36,7 @@ final readonly class UpstreamMock
      */
     private function __construct(
         private array $responses,
-        private ?SourceName $source,
+        private ?string $upstream,
     ) {
     }
 
@@ -40,12 +47,12 @@ final readonly class UpstreamMock
 
     public function apod(): self
     {
-        return $this->nextResponseFrom(SourceName::Apod);
+        return $this->nextResponseFrom(self::NASA);
     }
 
     public function onThisDay(): self
     {
-        return $this->nextResponseFrom(SourceName::OnThisDay);
+        return $this->nextResponseFrom(self::WIKIPEDIA);
     }
 
     public function onThisDayFrom(string $monthDay): self
@@ -59,9 +66,24 @@ final readonly class UpstreamMock
         return $scenario;
     }
 
-    public function weather(): self
+    public function forecast(): self
     {
-        return $this->nextResponseFrom(SourceName::Weather);
+        return $this->nextResponseFrom(self::OPEN_METEO);
+    }
+
+    public function archive(): self
+    {
+        return $this->nextResponseFrom(self::OPEN_METEO_ARCHIVE);
+    }
+
+    public function archiveOn(string $day): self
+    {
+        return $this->archive()->json(self::weatherBodyOn($day));
+    }
+
+    public function forecastOn(string $day): self
+    {
+        return $this->forecast()->json(self::weatherBodyOn($day));
     }
 
     public function json(string $body): self
@@ -76,17 +98,7 @@ final readonly class UpstreamMock
 
     public function fixture(string $path): self
     {
-        $body = file_get_contents(self::FIXTURES.$path);
-
-        if (false === $body) {
-            throw new \LogicException("Missing upstream fixture {$path}.");
-        }
-
-        if (json_validate($body)) {
-            return $this->json($body);
-        }
-
-        throw new \LogicException("Upstream fixture {$path} is not valid JSON.");
+        return $this->json(self::fixtureBody($path));
     }
 
     public function status(int $code): self
@@ -125,6 +137,34 @@ final readonly class UpstreamMock
         });
     }
 
+    private static function fixtureBody(string $path): string
+    {
+        $body = file_get_contents(self::FIXTURES.$path);
+
+        if (false === $body) {
+            throw new \LogicException("Missing upstream fixture {$path}.");
+        }
+
+        if (json_validate($body)) {
+            return $body;
+        }
+
+        throw new \LogicException("Upstream fixture {$path} is not valid JSON.");
+    }
+
+    private static function weatherBodyOn(string $day): string
+    {
+        /** @var array{daily: array<string, list<int>>} $body */
+        $body = json_decode(self::fixtureBody(self::WEATHER_TEMPLATE), true, flags: \JSON_THROW_ON_ERROR);
+        $shift = new \DateTimeImmutable($day.self::UTC_MIDNIGHT)->getTimestamp() - new \DateTimeImmutable(self::WEATHER_TEMPLATE_DAY.self::UTC_MIDNIGHT)->getTimestamp();
+
+        foreach (self::WEATHER_TIMES as $times) {
+            $body['daily'][$times] = array_map(static fn (int $time): int => $time + $shift, $body['daily'][$times]);
+        }
+
+        return json_encode($body, \JSON_THROW_ON_ERROR);
+    }
+
     /**
      * @return array<string, list<MockResponse>>
      */
@@ -136,12 +176,12 @@ final readonly class UpstreamMock
         );
     }
 
-    private function nextResponseFrom(SourceName $source): self
+    private function nextResponseFrom(string $upstream): self
     {
         $responses = $this->responses;
-        $responses[$source->value][] = ['body' => self::EMPTY_JSON, 'info' => [self::HTTP_CODE => Response::HTTP_OK, self::RESPONSE_HEADERS => []]];
+        $responses[$upstream][] = ['body' => self::EMPTY_JSON, 'info' => [self::HTTP_CODE => Response::HTTP_OK, self::RESPONSE_HEADERS => []]];
 
-        return clone($this, ['responses' => $responses, 'source' => $source]);
+        return clone($this, ['responses' => $responses, 'upstream' => $upstream]);
     }
 
     /**
@@ -149,12 +189,12 @@ final readonly class UpstreamMock
      */
     private function withLastResponse(\Closure $change): self
     {
-        if (null === $this->source) {
+        if (null === $this->upstream) {
             throw new \LogicException(self::PICK_THE_UPSTREAM_FIRST);
         }
 
         $responses = $this->responses;
-        $sourceResponses = $responses[$this->source->value] ?? [];
+        $sourceResponses = $responses[$this->upstream] ?? [];
         $last = array_pop($sourceResponses);
 
         if (null === $last) {
@@ -162,7 +202,7 @@ final readonly class UpstreamMock
         }
 
         $sourceResponses[] = $change($last);
-        $responses[$this->source->value] = $sourceResponses;
+        $responses[$this->upstream] = $sourceResponses;
 
         return clone($this, ['responses' => $responses]);
     }

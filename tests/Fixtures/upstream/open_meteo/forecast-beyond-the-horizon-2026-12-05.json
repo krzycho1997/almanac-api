@@ -1,0 +1,49 @@
+{
+    "latitude": 21.335676,
+    "longitude": -157.88991,
+    "generationtime_ms": 0.4385709762573242,
+    "utc_offset_seconds": -36000,
+    "timezone": "Pacific/Honolulu",
+    "timezone_abbreviation": "GMT-10",
+    "elevation": 4.0,
+    "daily_units": {
+        "time": "unixtime",
+        "weather_code": "wmo code",
+        "temperature_2m_max": "°C",
+        "temperature_2m_min": "°C",
+        "precipitation_sum": "mm",
+        "wind_speed_10m_max": "km/h",
+        "sunrise": "unixtime",
+        "sunset": "unixtime",
+        "daylight_duration": "s"
+    },
+    "daily": {
+        "time": [
+            1796464800
+        ],
+        "weather_code": [
+            null
+        ],
+        "temperature_2m_max": [
+            null
+        ],
+        "temperature_2m_min": [
+            null
+        ],
+        "precipitation_sum": [
+            null
+        ],
+        "wind_speed_10m_max": [
+            null
+        ],
+        "sunrise": [
+            1796489729
+        ],
+        "sunset": [
+            1796528950
+        ],
+        "daylight_duration": [
+            39210.42
+        ]
+    }
+}

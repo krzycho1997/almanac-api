@@ -83,10 +83,10 @@ when@test:
             public: true
             arguments:
                 $routes:
-                    - { source: apod, baseUri: '%env(NASA_BASE_URI)%' }
-                    - { source: on_this_day, baseUri: '%env(WIKIPEDIA_BASE_URI)%' }
-                    - { source: weather, baseUri: '%env(OPEN_METEO_BASE_URI)%' }
-                    - { source: weather, baseUri: '%env(OPEN_METEO_ARCHIVE_BASE_URI)%' }
+                    - { upstream: nasa, baseUri: '%env(NASA_BASE_URI)%' }
+                    - { upstream: wikipedia, baseUri: '%env(WIKIPEDIA_BASE_URI)%' }
+                    - { upstream: open_meteo, baseUri: '%env(OPEN_METEO_BASE_URI)%' }
+                    - { upstream: open_meteo_archive, baseUri: '%env(OPEN_METEO_ARCHIVE_BASE_URI)%' }
 
         test.nasa.client:
             alias: nasa.client

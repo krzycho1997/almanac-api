@@ -15,6 +15,7 @@ final readonly class OnThisDayFeed implements SourcePayload
         public array $events,
         public array $births,
         public array $deaths,
+        public Attribution $attribution,
     ) {
     }
 }
