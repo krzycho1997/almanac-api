@@ -1,0 +1,19 @@
+tests/Identity/Unit/Entity/UserTest.php
+  s_ecd702649c3f02::t_86c679ca3e05c2 13,16,19,22,25,27-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8e9d1e1844a1bb5a9611d0ec4548144920d4f56e",
+  "prompts": {},
+  "sessions": {
+    "s_ecd702649c3f02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79d0416-bbd9-40b6-9497-5f9421576080",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
