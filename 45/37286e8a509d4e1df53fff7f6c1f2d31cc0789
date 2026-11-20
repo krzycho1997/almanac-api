@@ -1,0 +1,30 @@
+tests/Identity/Unit/EmailTest.php
+  s_ecd702649c3f02::t_8c3ab747db1c8a 70-71,79-86
+  s_ecd702649c3f02::t_5e02d8c28ed68f 87
+tests/Identity/Unit/Doctrine/EmailTypeTest.php
+  s_ecd702649c3f02::t_8c3ab747db1c8a 9,54-63
+tests/Architecture/LayerTest.php
+  s_ecd702649c3f02::t_6da51b52c4144b 99
+src/Identity/Email.php
+  s_ecd702649c3f02::t_6da51b52c4144b 12
+src/Identity/Entity/User.php
+  s_ecd702649c3f02::t_6da51b52c4144b 38
+src/Identity/Exception/InvalidEmailException.php
+  s_ecd702649c3f02::t_6da51b52c4144b 7-8,13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4537286e8a509d4e1df53fff7f6c1f2d31cc0789",
+  "prompts": {},
+  "sessions": {
+    "s_ecd702649c3f02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79d0416-bbd9-40b6-9497-5f9421576080",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
