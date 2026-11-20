@@ -1,0 +1,23 @@
+src/Briefing/Model/ApodPicture.php
+  s_6c053d529e2d5a::t_c09bc1edc5d441 16
+tests/Briefing/Unit/Source/Apod/ApodMapperTest.php
+  s_6c053d529e2d5a::t_c09bc1edc5d441 72,99-100,109,115
+src/Briefing/Source/Apod/ApodMapper.php
+  s_6c053d529e2d5a::t_c09bc1edc5d441 39,99,101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "92fb768f1074ed7ce1658586cbe95fc163f9e6d7",
+  "prompts": {},
+  "sessions": {
+    "s_6c053d529e2d5a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "35f9ae03-8ef4-4d84-a5b8-4715dc947dfe",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
