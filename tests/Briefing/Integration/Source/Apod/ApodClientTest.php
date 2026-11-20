@@ -27,6 +27,7 @@ final class ApodClientTest extends KernelTestCase
     use InteractsWithTestServices;
 
     private const string DATE = '2024-03-15';
+    private const string PAYLOAD_ERROR = 'InvalidUpstreamPayloadException';
 
     #[DataProvider('dates')]
     public function testCoversDaysFromTheFirstPictureToTodayInTheUnitedStates(string $now, string $date, bool $covered): void
@@ -182,7 +183,7 @@ final class ApodClientTest extends KernelTestCase
     }
 
     #[DataProvider('failures')]
-    public function testReportsAFailedPicture(UpstreamMock $scenario, FailureKind $kind): void
+    public function testReportsAFailedPicture(UpstreamMock $scenario, FailureKind $kind, ?FailureCause $cause): void
     {
         // Given
         self::upstream()->respondWith($scenario);
@@ -193,19 +194,20 @@ final class ApodClientTest extends KernelTestCase
         // Then
         self::assertSame(SourceStatus::Failed, $result->status);
         self::assertSame($kind, $result->failureKind);
+        self::assertEquals($cause, $result->cause);
     }
 
     /**
-     * @return iterable<string, array{UpstreamMock, FailureKind}>
+     * @return iterable<string, array{UpstreamMock, FailureKind, ?FailureCause}>
      */
     public static function failures(): iterable
     {
-        yield 'NASA Science placeholder' => [UpstreamMock::create()->apod()->fixture('apod/placeholder-2026-11-18.json'), FailureKind::InvalidPayload];
-        yield 'date out of range' => [UpstreamMock::create()->apod()->fixture('apod/date-out-of-range.json')->status(Response::HTTP_BAD_REQUEST), FailureKind::Rejected];
-        yield 'server error twice' => [UpstreamMock::create()->apod()->status(Response::HTTP_INTERNAL_SERVER_ERROR)->apod()->status(Response::HTTP_INTERNAL_SERVER_ERROR), FailureKind::Unavailable];
-        yield 'empty object' => [UpstreamMock::create()->apod(), FailureKind::InvalidPayload];
-        yield 'null byte in the date' => [UpstreamMock::create()->apod()->json('{"date":"2024-03-15\\u0000","title":"Pillars","explanation":"Gas","media_type":"image","url":"https://apod.nasa.gov/a.jpg"}'), FailureKind::InvalidPayload];
-        yield 'blank media type' => [UpstreamMock::create()->apod()->json('{"date":"2024-03-15","title":"Pillars","explanation":"Gas","media_type":" ","url":"https://apod.nasa.gov/a.jpg"}'), FailureKind::InvalidPayload];
+        yield 'NASA Science placeholder' => [UpstreamMock::create()->apod()->fixture('apod/placeholder-2026-11-18.json'), FailureKind::InvalidPayload, new FailureCause(self::PAYLOAD_ERROR, ['title'], PayloadDefect::Placeholder)];
+        yield 'date out of range' => [UpstreamMock::create()->apod()->fixture('apod/date-out-of-range.json')->status(Response::HTTP_BAD_REQUEST), FailureKind::Rejected, null];
+        yield 'server error twice' => [UpstreamMock::create()->apod()->status(Response::HTTP_INTERNAL_SERVER_ERROR)->apod()->status(Response::HTTP_INTERNAL_SERVER_ERROR), FailureKind::Unavailable, null];
+        yield 'empty object' => [UpstreamMock::create()->apod(), FailureKind::InvalidPayload, new FailureCause(self::PAYLOAD_ERROR, ['date', 'title', 'explanation', 'mediaType'], PayloadDefect::WrongShape)];
+        yield 'null byte in the date' => [UpstreamMock::create()->apod()->json('{"date":"2024-03-15\\u0000","title":"Pillars","explanation":"Gas","media_type":"image","url":"https://apod.nasa.gov/a.jpg"}'), FailureKind::InvalidPayload, new FailureCause(self::PAYLOAD_ERROR, ['date'], PayloadDefect::InvalidValue)];
+        yield 'blank media type' => [UpstreamMock::create()->apod()->json('{"date":"2024-03-15","title":"Pillars","explanation":"Gas","media_type":" ","url":"https://apod.nasa.gov/a.jpg"}'), FailureKind::InvalidPayload, new FailureCause(self::PAYLOAD_ERROR, ['mediaType'], PayloadDefect::InvalidValue)];
     }
 
     private static function fetch(string $date): SourceResult

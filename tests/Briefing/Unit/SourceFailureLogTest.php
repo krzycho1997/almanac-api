@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 
 final class SourceFailureLogTest extends TestCase
 {
-    private const string DATE = '2026-11-20';
+    private const string DATE = '2026-11-05';
     private const string MESSAGE = 'Source {source} fetch failed: {kind}';
 
     private TestHandler $handler;

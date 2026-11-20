@@ -27,7 +27,7 @@ use PHPUnit\Framework\TestCase;
 
 final class BriefingResponseMapperTest extends TestCase
 {
-    private const string DATE = '2026-11-18';
+    private const string DATE = '2026-11-05';
     private const string WARSAW = 'Europe/Warsaw';
 
     public function testMapsAPictureWithItsSourceStatus(): void
