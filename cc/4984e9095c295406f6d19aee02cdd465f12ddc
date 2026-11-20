@@ -1,0 +1,19 @@
+tests/Briefing/Functional/BriefingControllerTest.php
+  s_a463f0f3bbc4ea::t_918d53a156f1b8 241,253,258,262-266
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cc4984e9095c295406f6d19aee02cdd465f12ddc",
+  "prompts": {},
+  "sessions": {
+    "s_a463f0f3bbc4ea": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e80e7e02-debb-4938-91ba-befdb4b4d71a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
