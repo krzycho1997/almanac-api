@@ -1,0 +1,19 @@
+tests/Briefing/Integration/Source/Apod/ApodClientTest.php
+  s_6c053d529e2d5a::t_c09bc1edc5d441 86,126
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c240809a6b4ff65a3acd562a3162cda94c477a10",
+  "prompts": {},
+  "sessions": {
+    "s_6c053d529e2d5a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "35f9ae03-8ef4-4d84-a5b8-4715dc947dfe",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
