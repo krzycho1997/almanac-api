@@ -22,11 +22,16 @@ parameters:
         consoleApplicationLoader: tools/phpstan/console-application.php
     doctrine:
         objectManagerLoader: tools/phpstan/object-manager.php
+        reportUnknownTypes: true
 
 rules:
     - App\PHPStan\Rule\DeclareStrictTypesRule
 
 services:
+    -
+        factory: PHPStan\Type\Doctrine\Descriptors\ReflectionDescriptor('App\Identity\Contract\UserIdType')
+        tags:
+            - phpstan.doctrine.typeDescriptor
     -
         class: App\Tests\Architecture\ModuleBoundaryTest
         tags:
