@@ -1,0 +1,43 @@
+tests/Identity/Functional/AccessTokenAuthenticationTest.php
+  s_ecd702649c3f02::t_d6130323f3d661 1-46
+composer.json
+  s_ecd702649c3f02::t_fa8c0c8d66a79b 31
+tests/Support/Controller/AuthenticatedUserProbeController.php
+  s_ecd702649c3f02::t_d6130323f3d661 1-25
+src/Identity/Entity/User.php
+  s_ecd702649c3f02::t_2e7eb825506e7b 14,19,22,40-55
+config/packages/security.yaml
+  s_ecd702649c3f02::t_2e7eb825506e7b 3-7,10
+  s_ecd702649c3f02::t_fa8c0c8d66a79b 1-2,8-9
+config/bundles.php
+  s_ecd702649c3f02::t_fa8c0c8d66a79b 11
+src/Identity/Repository/AccessTokenRepository.php
+  s_ecd702649c3f02::t_2e7eb825506e7b 23-36
+src/Identity/Security/AccessTokenHandler.php
+  s_ecd702649c3f02::t_2e7eb825506e7b 1-46
+tests/Identity/Integration/AccessTokenHandlerTest.php
+  s_ecd702649c3f02::t_d6130323f3d661 1-80,82-83
+  s_ecd702649c3f02::t_bb5ad13b5ca175 81
+config/services.yaml
+  s_ecd702649c3f02::t_fc276fdbb816e2 106-109
+composer.lock
+  s_ecd702649c3f02::t_80e51e3eeb2270 7,3588-3661,4586-4935
+symfony.lock
+  s_ecd702649c3f02::t_2d80f09267be2a 166-178
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "82a79781db125f138b37dcd6c76ca9be1608faee",
+  "prompts": {},
+  "sessions": {
+    "s_ecd702649c3f02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79d0416-bbd9-40b6-9497-5f9421576080",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
