@@ -1,0 +1,136 @@
+tests/Fixtures/upstream/on_this_day/selected-03-15.json
+  s_fed034d574131b::t_a77b8cd1762b01 1-19,22-42,45-59,62-82,85-99,102-111,114-128,131-151,154-168,171-185,188-202,205-225,228-242,245-265,268-282,285-299,302-322,325-339,342-362,365-385,388-402,405-419,422-436,439-459,462-476,479-493,496-510,513-533,536-550,553-567,570-584,587-607,610-624,627-641,644-658,661-681,684-698,701-715,718-732,735-755,758-772,775-789,792-812,815-829,832-846,849-864,867-881,884-904,907-921,924-938,941-961,964-978,981-995,998-1012,1015-1029,1032-1052,1055-1069,1072-1081,1084-1098,1101-1115,1118-1138,1141-1155,1158-1172,1175-1189,1192-1206,1209-1229,1232-1246,1249-1269,1272-1286,1289-1303,1306-1320,1323-1337,1340-1345
+  s_fed034d574131b::t_0e913fb9b8be8b 20-21,43-44,60-61,83-84,100-101,112-113,129-130,152-153,169-170,186-187,203-204,226-227,243-244,266-267,283-284,300-301,323-324,340-341,363-364,386-387,403-404,420-421,437-438,460-461,477-478,494-495,511-512,534-535,551-552,568-569,585-586,608-609,625-626,642-643,659-660,682-683,699-700,716-717,733-734,756-757,773-774,790-791,813-814,830-831,847-848,865-866,882-883,905-906,922-923,939-940,962-963,979-980,996-997,1013-1014,1030-1031,1053-1054,1070-1071,1082-1083,1099-1100,1116-1117,1139-1140,1156-1157,1173-1174,1190-1191,1207-1208,1230-1231,1247-1248,1270-1271,1287-1288,1304-1305,1321-1322,1338-1339
+src/Briefing/Model/OnThisDayFeed.php
+  s_fed034d574131b::t_eb3980f5ccefe7 1-20
+src/Briefing/Dto/Response/PageDto.php
+  s_fed034d574131b::t_9f18868f80eddf 1-15
+tests/Briefing/Unit/Source/OnThisDay/OnThisDayMapperTest.php
+  s_fed034d574131b::t_b92660252e827b 13,15,18,25,31,38,43-44,47,50-51,54-71,74,86-101,104-105,108-112,115,134,137-138,144-145,167,224-227,232,237-241,243-245,248,250
+  s_fed034d574131b::t_4ce7a3c620e9ae 79-82,106,228,230-231,233
+  s_fed034d574131b::t_b8604d38a4941b 72-73,83-85,107,118
+  s_fed034d574131b::t_a79016f24470a0 1-12,14,16-17,19-24,26-30,32-37,39-42,45-46,48-49,52-53,102-103,113-114,116-117,119-133,135-136,139-143,146-166,168-223,229,234-236,242,246-247,249,251-252
+  s_fed034d574131b::t_d031d80b29a94d 75-78
+src/Briefing/Source/Apod/ApodClient.php
+  s_fed034d574131b::t_657861eb196b72 54,56,67,69,71
+src/Briefing/Source/PendingFetch.php
+  s_fed034d574131b::t_3ec7f569c00be2 125
+  s_fed034d574131b::t_11575b68289c49 26,35,38-39,43,45-52,55-59,61,67,70,126-132,134,143,145
+  s_fed034d574131b::t_73460636f57a33 23
+  s_fed034d574131b::t_0e913fb9b8be8b 69,114-124
+  s_fed034d574131b::t_089e39028530f8 22,72
+tests/Briefing/Integration/BriefingResponseSchemaTest.php
+  s_fed034d574131b::t_73460636f57a33 11-14,37,40,47-68,72,77,80-85,95
+  s_fed034d574131b::t_1eca5f1425c1f4 89
+tests/Briefing/Unit/Mapper/BriefingResponseMapperTest.php
+  s_fed034d574131b::t_73460636f57a33 11,13-14,25,27-29,39-41,57,60-62,101,127,131,133-157
+src/Briefing/Source/PlainText.php
+  s_fed034d574131b::t_292f496f40e179 1-18
+tests/Fixtures/upstream/on_this_day/deaths-03-15.json
+  s_fed034d574131b::t_a77b8cd1762b01 1-14,17-37,40-60,63-67,69-71,75,77,79-81,389,2133-2138
+  s_fed034d574131b::t_0e913fb9b8be8b 15-16,38-39,61-62,68,72-74,76,78,82-388,390-2132
+src/Briefing/Dto/Response/EventDto.php
+  s_fed034d574131b::t_9f18868f80eddf 1-18
+src/Briefing/Dto/Response/BriefingResponse.php
+  s_fed034d574131b::t_9f18868f80eddf 11-13,21-23
+src/Briefing/Exception/PayloadDefect.php
+  s_fed034d574131b::t_120218f0cd7612 16
+src/Briefing/Source/WebAddress.php
+  s_fed034d574131b::t_eb3980f5ccefe7 1-19
+src/Briefing/Source/OnThisDay/OnThisDayMapper.php
+  s_fed034d574131b::t_4465f65fa7c61a 174-179,181-184,186,188-190,192-193
+  s_fed034d574131b::t_25e4fc6a5dba53 23,25-28,42-44,48-64,66-72,93-100,102-105,129-133,135-146,152,155,169-173,180,185,187,191,194-204,207,209,211,215,220-221,225-234,263-323,325-332
+  s_fed034d574131b::t_bc998258c210fd 24,153,167-168,205-206
+  s_fed034d574131b::t_01692a87b035db 324
+  s_fed034d574131b::t_120218f0cd7612 1-12,14-22,29-41,45-47,65,73-92,101,106-128,134,147-151,208,210,212-214,216-219,222-224,235-262,333-334
+  s_fed034d574131b::t_292f496f40e179 13
+  s_fed034d574131b::t_d031d80b29a94d 154,156-166
+src/Briefing/Dto/Response/SourcesDto.php
+  s_fed034d574131b::t_9f18868f80eddf 11
+src/Briefing/Source/Apod/ApodMapper.php
+  s_fed034d574131b::t_292f496f40e179 11,136
+  s_fed034d574131b::t_eb3980f5ccefe7 12,115
+src/Briefing/Source/OnThisDay/OnThisDayApiResponse.php
+  s_fed034d574131b::t_eb3980f5ccefe7 1-20
+.env
+  s_fed034d574131b::t_bc998258c210fd 22
+tests/Support/Briefing/UpstreamMock.php
+  s_fed034d574131b::t_d208304761dcc0 23-24,51-59
+  s_fed034d574131b::t_a4d7eefb4ac6a6 60-61
+tests/Briefing/Unit/Source/PendingFetchTest.php
+  s_fed034d574131b::t_657861eb196b72 260-262
+  s_fed034d574131b::t_f6a138fe4565de 177-215,229-252
+  s_fed034d574131b::t_4ce7a3c620e9ae 216-228
+src/Briefing/Source/OnThisDay/OnThisDayEntry.php
+  s_fed034d574131b::t_eb3980f5ccefe7 1-18
+tests/Fixtures/upstream/README.md
+  s_fed034d574131b::t_8ef8c2728dbf42 19,23-25
+  s_fed034d574131b::t_2b7658fb616094 16-18,20-22
+src/Briefing/Model/HistoricalEvent.php
+  s_fed034d574131b::t_eb3980f5ccefe7 1-18
+src/Briefing/Source/OnThisDay/OnThisDayPage.php
+  s_fed034d574131b::t_a78ce6e8c0bcc6 12,14-15,17-19,21-30
+  s_fed034d574131b::t_eb3980f5ccefe7 1-11,13,16,20,31-32
+tests/Briefing/Integration/Source/OnThisDay/OnThisDayClientTest.php
+  s_fed034d574131b::t_3ec7f569c00be2 87,89-104
+  s_fed034d574131b::t_d031d80b29a94d 81,85-86,156,159-167,172
+  s_fed034d574131b::t_f62509eb0eed49 1-80,82-84,88,105-155,157-158,168-171,173-192
+docs/openapi.yaml
+  s_fed034d574131b::t_a78ce6e8c0bcc6 303-304
+  s_fed034d574131b::t_a1fd7100f97c22 135,145,149-150,162-163,165-176,197,271-302,305-322
+  s_fed034d574131b::t_e250e90e2afcc9 164
+src/Briefing/Source/OnThisDay/OnThisDayContentUrls.php
+  s_fed034d574131b::t_a78ce6e8c0bcc6 1-13
+src/Briefing/Model/PageRef.php
+  s_fed034d574131b::t_eb3980f5ccefe7 1-12,14-16
+  s_fed034d574131b::t_a78ce6e8c0bcc6 13
+tests/Fixtures/upstream/on_this_day/births-03-15.json
+  s_fed034d574131b::t_a77b8cd1762b01 1-19,22-42,45-65,68-83,86-88,4512-4514
+  s_fed034d574131b::t_0e913fb9b8be8b 20-21,43-44,66-67,84-85,89-4511
+src/Briefing/Source/OnThisDay/OnThisDaySource.php
+  s_fed034d574131b::t_bc998258c210fd 1-27
+src/Briefing/Mapper/BriefingResponseMapper.php
+  s_fed034d574131b::t_9f18868f80eddf 12,14-15,26,28-30,42,47,50-52,61,63-66,125-149
+  s_fed034d574131b::t_bf8f2280494784 150
+src/Briefing/Dto/Response/PersonDto.php
+  s_fed034d574131b::t_9f18868f80eddf 1-12,14-17
+  s_fed034d574131b::t_a78ce6e8c0bcc6 13
+src/Briefing/Model/NotablePerson.php
+  s_fed034d574131b::t_eb3980f5ccefe7 1-12,14,16-18
+  s_fed034d574131b::t_a78ce6e8c0bcc6 13,15
+tests/Briefing/Functional/BriefingControllerTest.php
+  s_fed034d574131b::t_d208304761dcc0 32-33,38,49,86,102,199,220,222,231,254-255,283-291,294,296-298,429-441
+  s_fed034d574131b::t_3ec7f569c00be2 77,80
+  s_fed034d574131b::t_7c19079a65b9ae 75-76,78-79
+  s_fed034d574131b::t_d05e25014e237b 65-74,81-82
+src/Briefing/Source/OnThisDay/OnThisDayLink.php
+  s_fed034d574131b::t_a78ce6e8c0bcc6 1-13
+.env.example
+  s_fed034d574131b::t_bc998258c210fd 14
+tests/Support/Briefing/JournalingSource.php
+  s_fed034d574131b::t_4bd0735fe14cc4 52
+src/Briefing/Source/OnThisDay/OnThisDayClient.php
+  s_fed034d574131b::t_bc998258c210fd 1-68
+src/Briefing/Source/OnThisDay/OnThisDayThumbnail.php
+  s_fed034d574131b::t_a78ce6e8c0bcc6 1-13
+composer.json
+  s_fed034d574131b::t_4465f65fa7c61a 14
+composer.lock
+  s_fed034d574131b::t_1d6deb3f2cd1a2 7,10376-10377
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "588763f8c1725111edde2e4ec7af819737b4d47c",
+  "prompts": {},
+  "sessions": {
+    "s_fed034d574131b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a219eb1-3a68-425a-9ad2-3f6e3c13ed58",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
