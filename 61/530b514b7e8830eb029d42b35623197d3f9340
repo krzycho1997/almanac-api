@@ -1,0 +1,88 @@
+composer.json
+  s_ecd702649c3f02::t_31a78e9545e5bb 32
+composer.lock
+  s_ecd702649c3f02::t_292e52d22bc406 7,4093-4176,5024-5102
+symfony.lock
+  s_ecd702649c3f02::t_6bfd5f56f9735d 166-174
+tests/Identity/Unit/Contract/UserIdTest.php
+  s_ecd702649c3f02::t_28a4e96295e107 1-13,16-23,25-46,48-58
+  s_ecd702649c3f02::t_b9fe4ecef76b65 14-15,24,47
+src/Identity/Contract/UserIdType.php
+  s_ecd702649c3f02::t_28a4e96295e107 1-7,9-14,21-24,26,29-33,44-48,67
+config/packages/doctrine.yaml
+  s_ecd702649c3f02::t_b9fe4ecef76b65 5-6
+  s_ecd702649c3f02::t_63f83a1bdbaeb5 7,13-19
+src/Identity/Contract/UserId.php
+  s_ecd702649c3f02::t_28a4e96295e107 1-11
+tests/Identity/Integration/UserIdTypeTest.php
+  s_ecd702649c3f02::t_b9fe4ecef76b65 1-30,31
+phpstan.dist.neon
+  s_ecd702649c3f02::t_0ea3e6057eb298 25,31-34
+  s_ecd702649c3f02::t_63f83a1bdbaeb5 36-38
+  s_ecd702649c3f02::t_59f196a83fbd0c 35
+src/Identity/IssuedToken.php
+  s_ecd702649c3f02::t_3217265ec14b12 1-17
+migrations/Version20261120195001.php
+  s_ecd702649c3f02::t_b8879750106659 14
+  s_ecd702649c3f02::t_63f83a1bdbaeb5 1-13,15-33
+tests/Architecture/LayerTest.php
+  s_ecd702649c3f02::t_1df8fbef535da0 88-105,196-199
+  s_ecd702649c3f02::t_d3a83d40bf9eec 200
+tools/phpstan/tests/Architecture/Fixtures/Identity/ProbeTokenIssuer.php
+  s_ecd702649c3f02::t_1df8fbef535da0 1-9
+src/Identity/Email.php
+  s_ecd702649c3f02::t_3217265ec14b12 1-10,15-25,28-29,31-36,58
+src/Identity/Repository/AccessTokenRepository.php
+  s_ecd702649c3f02::t_3217265ec14b12 1-6,8,10-21,35
+  s_ecd702649c3f02::t_a4d9ace0a49185 30
+  s_ecd702649c3f02::t_a878cdfc8c959f 7,9,22-29,31-34
+src/Identity/Entity/User.php
+  s_ecd702649c3f02::t_3217265ec14b12 1-19,20-23,25-36
+tests/Identity/Unit/EmailTest.php
+  s_ecd702649c3f02::t_31a07dbe4954ba 1-53,56-58,91-92
+src/Identity/Entity/AccessToken.php
+  s_ecd702649c3f02::t_3217265ec14b12 1-6,8-52,59,61-67,80-84
+tests/Identity/Unit/Doctrine/EmailTypeTest.php
+  s_ecd702649c3f02::t_31a07dbe4954ba 1-50,58-64
+tests/Identity/Unit/Entity/AccessTokenTest.php
+  s_ecd702649c3f02::t_31a07dbe4954ba 1-9,12-30,31-66,104-117
+tools/phpstan/tests/Architecture/ArchitectureRulesTest.php
+  s_ecd702649c3f02::t_1df8fbef535da0 37
+src/Identity/Doctrine/EmailType.php
+  s_ecd702649c3f02::t_3217265ec14b12 1-7,9-35,37-44,54
+tools/phpstan/tests/Architecture/Fixtures/Identity/Entity/ProbeEntityUsesServiceAndHttp.php
+  s_ecd702649c3f02::t_1df8fbef535da0 1-17
+tools/phpstan/tests/Architecture/Fixtures/Identity/Entity/ProbeEntityUsesValueObject.php
+  s_ecd702649c3f02::t_1df8fbef535da0 1-19
+src/Identity/Repository/UserRepository.php
+  s_ecd702649c3f02::t_3217265ec14b12 1-6,9-10,12-22,44
+  s_ecd702649c3f02::t_a878cdfc8c959f 7-8,11,23-25,27-31,38-43
+  s_ecd702649c3f02::t_a4d9ace0a49185 26,32-37
+src/Identity/Exception/InvalidEmailException.php
+  s_ecd702649c3f02::t_3217265ec14b12 1-8,10,12-13
+tests/Identity/Integration/AccessTokenIssuerTest.php
+  s_ecd702649c3f02::t_84524adbeb816b 94,112
+  s_ecd702649c3f02::t_a4d9ace0a49185 26,120-130,132-135,137-138
+  s_ecd702649c3f02::t_b1cfb16cfded56 1-25,27-93,95-111,113-119,131,136,139-161
+config/services.yaml
+  s_ecd702649c3f02::t_3d8cf9a6219faf 106-109
+src/Identity/AccessTokenIssuer.php
+  s_ecd702649c3f02::t_a4d9ace0a49185 35-38,41-44,53,61,64-67,71,80-90
+  s_ecd702649c3f02::t_a878cdfc8c959f 1-34,39-40,45-52,54-60,62-63,68-70,72-79,91-103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "61530b514b7e8830eb029d42b35623197d3f9340",
+  "prompts": {},
+  "sessions": {
+    "s_ecd702649c3f02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79d0416-bbd9-40b6-9497-5f9421576080",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
