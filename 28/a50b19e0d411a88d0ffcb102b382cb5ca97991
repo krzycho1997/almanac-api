@@ -1,0 +1,26 @@
+src/Identity/Issuance.php
+  s_ecd702649c3f02::t_72496015be3880 1-24
+tests/Identity/Integration/AccessTokenIssuerTest.php
+  s_ecd702649c3f02::t_fd298c7e3c4546 13-14,18,31-33,72-134,221-236
+  s_ecd702649c3f02::t_c2845d79a9af98 237
+src/Identity/AccessTokenIssuer.php
+  s_ecd702649c3f02::t_72496015be3880 35-36,38,41,44-45,51,54,59,62,66,77,79-82,87
+src/Identity/Repository/UserRepository.php
+  s_ecd702649c3f02::t_72496015be3880 23,25-30,32-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "28a50b19e0d411a88d0ffcb102b382cb5ca97991",
+  "prompts": {},
+  "sessions": {
+    "s_ecd702649c3f02": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a79d0416-bbd9-40b6-9497-5f9421576080",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
