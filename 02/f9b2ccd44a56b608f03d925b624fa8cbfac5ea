@@ -1,0 +1,19 @@
+tests/Shared/Integration/LogRedactionTest.php
+  s_a93473a25fb7d2::t_2fdc396c6a4299 19,66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "02f9b2ccd44a56b608f03d925b624fa8cbfac5ea",
+  "prompts": {},
+  "sessions": {
+    "s_a93473a25fb7d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "108be3c4-bf75-4873-86b3-52bde1a28c39",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
