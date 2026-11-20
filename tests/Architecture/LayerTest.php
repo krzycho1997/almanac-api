@@ -85,6 +85,56 @@ final class LayerTest
             ->nonIgnorable();
     }
 
+    /**
+     * @return iterable<string, Rule>
+     */
+    #[TestRule]
+    public function sourceInteriorsStayPrivate(): iterable
+    {
+        foreach (Codebase::sources() as $source) {
+            $interior = Selector::inNamespace("App\\Briefing\\Source\\{$source}");
+
+            yield ".{$source}" => PHPat::rule()
+                ->classes(Selector::inNamespace('App'))
+                ->excluding(Selector::inNamespace('App\Tests'), Selector::inNamespace('App\PHPStan'), $interior)
+                ->shouldNot()
+                ->dependOn()
+                ->classes($interior)
+                ->because("the rest of the code reaches {$source} only through Source, SourceClient and the internal model")
+                ->nonIgnorable();
+        }
+    }
+
+    #[TestRule]
+    public function sourceInteriorsKnowNoWiring(): Rule
+    {
+        return PHPat::rule()
+            ->classes(Selector::inNamespace('/^App\\\\Briefing\\\\Source\\\\[^\\\\]+$/', regex: true))
+            ->excluding(Selector::classname('/Source$/', regex: true))
+            ->shouldNot()
+            ->dependOn()
+            ->classes(
+                Selector::classname('App\Briefing\SourceName'),
+                Selector::classname('App\Briefing\Source\Source'),
+                Codebase::layer(self::ENTITY, self::REPOSITORY),
+                Selector::inNamespace('App\Briefing\CircuitBreaker'),
+            )
+            ->because('a client fetches and maps; only its Source definition names it, and storage and the breaker belong to the aggregator')
+            ->nonIgnorable();
+    }
+
+    #[TestRule]
+    public function modelCarriesReadonlyData(): Rule
+    {
+        return PHPat::rule()
+            ->classes(Selector::inNamespace('App\Briefing\Model'))
+            ->excluding(Selector::isInterface(), Selector::isEnum())
+            ->should()
+            ->beReadonly()
+            ->because('the internal model is stored in snapshots and read back, so it never changes after mapping')
+            ->nonIgnorable();
+    }
+
     #[TestRule]
     public function classesAreFinal(): Rule
     {

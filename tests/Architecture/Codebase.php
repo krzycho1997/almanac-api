@@ -25,6 +25,21 @@ final class Codebase
         return $modules;
     }
 
+    /**
+     * @return non-empty-list<string>
+     */
+    public static function sources(): array
+    {
+        $directories = glob(\dirname(__DIR__, 2).'/src/Briefing/Source/*', \GLOB_ONLYDIR);
+        $sources = array_map(basename(...), false === $directories ? [] : $directories);
+
+        if ([] === $sources) {
+            throw new \LogicException('No sources found under src/Briefing/Source/.');
+        }
+
+        return $sources;
+    }
+
     public static function namespaceOf(string $module): SelectorInterface
     {
         return Selector::inNamespace("App\\{$module}");

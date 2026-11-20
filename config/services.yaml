@@ -12,6 +12,8 @@ services:
         resource: '../src/'
         exclude:
             - '../src/Briefing/Location.php'
+            - '../src/*/Model/'
+            - '../src/*/Source/*/*ApiResponse.php'
 
     app.briefing.default_location:
         class: App\Briefing\Location
@@ -37,6 +39,15 @@ services:
             $statusCodes: !php/const App\Briefing\Source\UpstreamRetryStrategy::RETRIED_STATUSES
             $delayMs: '%app.briefing.retry_delay_ms%'
 
+    app.http_client.transport.connect_deadline:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        decorates: http_client.transport
+        autowire: false
+        autoconfigure: false
+        factory: ['@.inner', 'withOptions']
+        arguments:
+            - { max_connect_duration: 1.0 }
+
     App\Briefing\Source\UpstreamRetryStrategy:
         arguments:
             $transientFailures: '@app.briefing.transient_failure_retry_strategy'
@@ -46,8 +57,8 @@ when@test:
         app.briefing.retry_delay_ms: 0
 
     services:
-        test.App\Briefing\Source\UpstreamResponseDecoder:
-            alias: App\Briefing\Source\UpstreamResponseDecoder
+        test.App\Briefing\Source\Apod\ApodSource:
+            alias: App\Briefing\Source\Apod\ApodSource
             public: true
 
         App\Tests\Support\Briefing\UpstreamMockResponseFactory:

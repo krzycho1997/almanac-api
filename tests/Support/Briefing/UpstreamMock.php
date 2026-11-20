@@ -17,6 +17,9 @@ final readonly class UpstreamMock
     private const string RETRY_AFTER = 'Retry-After';
     private const string ERROR = 'error';
     private const string CONNECTION_REFUSED = 'Connection refused';
+    private const string FIXTURES = __DIR__.'/../../Fixtures/upstream/';
+    private const string CONTENT_TYPE = 'Content-Type';
+    private const string JSON = 'application/json';
     private const string PICK_THE_UPSTREAM_FIRST = 'Pick the upstream first, e.g. UpstreamMock::create()->apod().';
 
     /**
@@ -46,6 +49,31 @@ final readonly class UpstreamMock
     public function weather(): self
     {
         return $this->nextResponseFrom(SourceName::Weather);
+    }
+
+    public function json(string $body): self
+    {
+        return $this->withLastResponse(static function (array $response) use ($body): array {
+            $response['body'] = $body;
+            $response['info'][self::RESPONSE_HEADERS][self::CONTENT_TYPE] = self::JSON;
+
+            return $response;
+        });
+    }
+
+    public function fixture(string $path): self
+    {
+        $body = file_get_contents(self::FIXTURES.$path);
+
+        if (false === $body) {
+            throw new \LogicException("Missing upstream fixture {$path}.");
+        }
+
+        if (json_validate($body)) {
+            return $this->json($body);
+        }
+
+        throw new \LogicException("Upstream fixture {$path} is not valid JSON.");
     }
 
     public function status(int $code): self

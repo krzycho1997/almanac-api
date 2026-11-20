@@ -68,6 +68,7 @@ final class UpstreamHttpClientsTest extends KernelTestCase
         self::assertSame(2.0, $options['timeout']);
         self::assertSame(3.0, $options['max_duration']);
         self::assertSame(0, $options['max_redirects']);
+        self::assertSame(1.0, $options['max_connect_duration']);
     }
 
     /**
