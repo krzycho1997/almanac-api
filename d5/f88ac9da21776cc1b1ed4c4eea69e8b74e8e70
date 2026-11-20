@@ -1,0 +1,19 @@
+src/Briefing/RefreshPolicy.php
+  s_4da5374f6e605f::t_28db41a0c2e6b2 26,55,57,64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d5f88ac9da21776cc1b1ed4c4eea69e8b74e8e70",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
