@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity\Entity;
 
+use App\Identity\Contract\AuthenticatedUser;
 use App\Identity\Contract\UserId;
 use App\Identity\Contract\UserIdType;
 use App\Identity\Doctrine\EmailType;
@@ -16,7 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'identity_user')]
 #[ORM\UniqueConstraint(name: 'uniq_identity_user_email', columns: ['email'])]
-class User implements UserInterface
+class User implements UserInterface, AuthenticatedUser
 {
     private const string ROLE = 'ROLE_USER';
 
