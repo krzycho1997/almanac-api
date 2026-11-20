@@ -1,0 +1,147 @@
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Dto/Response/ProbeResponseUsesModel.php
+  s_205fe62faee3d5::t_34e07a9fc5082a 1-15
+tests/Briefing/Unit/Mapper/BriefingResponseMapperTest.php
+  s_51f1a5bf25d59c::t_927c926d2fca68 14,30,46,63-64,78,83-84,86-88
+  s_205fe62faee3d5::t_e6e93469219cee 1-8,10-11,13,15-29,31-45,47,49-62,65-77,79-82,85,89-90
+  s_205fe62faee3d5::t_b446c7314b25e5 9,12,48
+tests/Support/InteractsWithLogs.php
+  s_51f1a5bf25d59c::t_e742f4ee5afcea 8-9,17-19,30-52
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Dto/Response/ProbeResponseUsesDomainEnum.php
+  s_205fe62faee3d5::t_34e07a9fc5082a 1-15
+src/Briefing/SourceResult.php
+  s_205fe62faee3d5::t_d2188c88ba0103 26-38
+src/Briefing/Mapper/BriefingResponseMapper.php
+  s_205fe62faee3d5::t_9243238a25d85f 1-8,10-11,13,15-21,23-25,27-29,31-36,38-52,55-63,85-86,90-97,99-103
+  s_205fe62faee3d5::t_b446c7314b25e5 9,12,22,30,64-83,98
+  s_51f1a5bf25d59c::t_6502f971b655b1 14,26,37,53-54,84,87-89
+src/Briefing/Dto/Response/SourceKey.php
+  s_51f1a5bf25d59c::t_6502f971b655b1 1-12
+tests/Shared/Integration/OpenApi/OpenApiDocumentTest.php
+  s_205fe62faee3d5::t_bd2beaca770ffe 11,68-91,95-97,99
+  s_205fe62faee3d5::t_59a2c897ff16e8 21-22,92-94,98
+  s_205fe62faee3d5::t_bdf5182c72e5d2 113-115,117
+  s_205fe62faee3d5::t_1093c0c09e225b 100
+src/Briefing/BriefingAggregator.php
+  s_205fe62faee3d5::t_d2188c88ba0103 1-52
+src/Briefing/Dto/Response/SourceNotApplicableDto.php
+  s_205fe62faee3d5::t_d2188c88ba0103 1-8,10-12,14-15
+  s_205fe62faee3d5::t_02e00ba86325c8 9,13
+src/Briefing/Dto/Response/SourceStatusDto.php
+  s_205fe62faee3d5::t_d2188c88ba0103 1-9
+src/Briefing/ValueResolver/BriefingDateValueResolver.php
+  s_272594565be904::t_d28a57ae6c336c 25
+src/Briefing/Exception/NoSourceDataException.php
+  s_205fe62faee3d5::t_b446c7314b25e5 7
+  s_205fe62faee3d5::t_d2188c88ba0103 1-6,8-13
+src/Briefing/Dto/Response/BriefingResponse.php
+  s_205fe62faee3d5::t_d2188c88ba0103 1-9,11-20
+  s_51f1a5bf25d59c::t_6502f971b655b1 10
+docs/openapi.yaml
+  s_205fe62faee3d5::t_b446c7314b25e5 134,164,186,199,204
+  s_205fe62faee3d5::t_ae080da400a9c8 13-14,36-67,77-103,114-133,135-137,139-163,165-185,187-198,200-203,205-235,262-301
+  s_205fe62faee3d5::t_b08413472e9653 138
+tests/Architecture/LayerTest.php
+  s_205fe62faee3d5::t_34e07a9fc5082a 127-139
+  s_205fe62faee3d5::t_7adb5763809f98 124-126
+src/Briefing/Controller/BriefingController.php
+  s_205fe62faee3d5::t_55ecc5f51a1268 30
+  s_205fe62faee3d5::t_9243238a25d85f 1-29,31-41
+config/packages/framework.yaml
+  s_205fe62faee3d5::t_9243238a25d85f 3-6
+src/Briefing/Dto/Response/SourcesDto.php
+  s_205fe62faee3d5::t_d2188c88ba0103 1-13
+src/Briefing/Dto/Response/SourceFailedDto.php
+  s_51f1a5bf25d59c::t_6502f971b655b1 13
+  s_205fe62faee3d5::t_d2188c88ba0103 1-8,10-11,14,16-17
+  s_51f1a5bf25d59c::t_9bbf28c116fec9 9,12,15
+tools/phpstan/tests/Architecture/ArchitectureRulesTest.php
+  s_205fe62faee3d5::t_34e07a9fc5082a 34-35
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Dto/Response/ProbeResponseWithItsOwnEnum.php
+  s_205fe62faee3d5::t_34e07a9fc5082a 1-13
+config/packages/serializer.php
+  s_51f1a5bf25d59c::t_6502f971b655b1 8,15-16
+  s_205fe62faee3d5::t_55ecc5f51a1268 1-7,9-14,17-20
+phpstan.dist.neon
+  s_205fe62faee3d5::t_5037f1ee2f2255 11-12
+src/Briefing/Validator/BriefingDate.php
+  s_51f1a5bf25d59c::t_6502f971b655b1 12
+tests/Fixtures/openapi/rule-breaking.yaml
+  s_205fe62faee3d5::t_bd2beaca770ffe 56-62
+src/Briefing/BriefingResult.php
+  s_205fe62faee3d5::t_d2188c88ba0103 1-45
+tests/Shared/Functional/ErrorFormatTest.php
+  s_51f1a5bf25d59c::t_e742f4ee5afcea 121,124
+  s_205fe62faee3d5::t_55ecc5f51a1268 118
+  s_51f1a5bf25d59c::t_48b11a16518ee1 127,129-130,132-134
+tests/Briefing/Functional/BriefingControllerTest.php
+  s_205fe62faee3d5::t_fe24ba842cf0cf 58-72,95-110
+  s_205fe62faee3d5::t_778d04af4eeec5 16-17,26,157-160
+  s_51f1a5bf25d59c::t_3432a4a340c08e 163,172-180
+  s_205fe62faee3d5::t_e87450f03a1eb3 75-76,78-79,81-82,93-94
+  s_51f1a5bf25d59c::t_e742f4ee5afcea 164-171,181-182
+  s_205fe62faee3d5::t_4b80a418991f13 1-10,12-15,18-20,23-25,27-41,43-57,111-146,150-156,161-162,183-184,186-188,190-196,210-212,214-222
+  s_205fe62faee3d5::t_6ce50020d45e64 11,21-22,147-149,185,189,197-209,213
+  s_205fe62faee3d5::t_b446c7314b25e5 42
+  s_205fe62faee3d5::t_9b0f14ad60371d 73-74,77,80,83-92
+src/Briefing/Dto/Response/SourceOkDto.php
+  s_51f1a5bf25d59c::t_6502f971b655b1 12
+  s_205fe62faee3d5::t_d2188c88ba0103 1-8,10-11,13-14,16-17
+  s_51f1a5bf25d59c::t_a4f6237f5b8d87 9,15
+src/Briefing/Dto/Response/ApodDto.php
+  s_205fe62faee3d5::t_d2188c88ba0103 1-11,13-18
+  s_205fe62faee3d5::t_073d1d57af85b6 12
+tests/Support/OpenApi/OpenApiDocument.php
+  s_205fe62faee3d5::t_bdf5182c72e5d2 21,106,117-123
+  s_205fe62faee3d5::t_59a2c897ff16e8 111
+  s_205fe62faee3d5::t_bd2beaca770ffe 107-110,112-116,124
+  s_205fe62faee3d5::t_9f1128d9008b7c 125
+src/Briefing/Dto/Response/LocationDto.php
+  s_205fe62faee3d5::t_d2188c88ba0103 1-16
+tests/Support/FunctionalTestCase.php
+  s_205fe62faee3d5::t_9243238a25d85f 27
+tests/Briefing/Unit/BriefingResultTest.php
+  s_205fe62faee3d5::t_e6e93469219cee 1-37,39-79
+  s_205fe62faee3d5::t_56fb7cf76ae238 38
+tests/Shared/Integration/SerializerDefaultsTest.php
+  s_51f1a5bf25d59c::t_927c926d2fca68 1-30
+src/Briefing/SourceStatus.php
+  s_205fe62faee3d5::t_d2188c88ba0103 11
+src/Briefing/Dto/Response/ApodMediaType.php
+  s_205fe62faee3d5::t_bbf0b95561c852 1-12
+src/Briefing/Dto/Response/SourceError.php
+  s_205fe62faee3d5::t_ad7c11594a2f64 1-14
+src/Briefing/Dto/Response/SourceStatusValue.php
+  s_205fe62faee3d5::t_131f692413b059 1-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "efcd48b9d03e0e8598abceb1bbe3f3bcacd17be1",
+  "prompts": {},
+  "sessions": {
+    "s_205fe62faee3d5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "07317b1c-d58e-4c6f-9470-80c89a21cc43",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    },
+    "s_272594565be904": {
+      "agent_id": {
+        "tool": "github-copilot-jetbrains",
+        "id": "1795172023054",
+        "model": "unknown"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    },
+    "s_51f1a5bf25d59c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d1b2d9ca-eff4-4b80-ab92-0a2d9f95ce49",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
