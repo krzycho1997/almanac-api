@@ -17,8 +17,6 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final readonly class PendingFetch
 {
-    private const string RETRY_AFTER = 'retry-after';
-
     /**
      * @param \Closure(ResponseInterface): SourcePayload $map
      */
@@ -98,7 +96,7 @@ final readonly class PendingFetch
 
     private function retryAt(): ?\DateTimeImmutable
     {
-        $retryAfter = $this->response->getHeaders(false)[self::RETRY_AFTER][0] ?? null;
+        $retryAfter = $this->response->getHeaders(false)[RetryAfter::HEADER][0] ?? null;
 
         if (null === $retryAfter) {
             return null;

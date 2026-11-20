@@ -6,6 +6,7 @@ namespace App\Briefing\Source;
 
 final readonly class RetryAfter
 {
+    public const string HEADER = 'retry-after';
     private const array HTTP_DATE_FORMATS = [
         'D, d M Y H:i:s \G\M\T',
         'l, d-M-y H:i:s \G\M\T',

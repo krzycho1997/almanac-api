@@ -1,5 +1,8 @@
 # yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
 
+parameters:
+    app.briefing.retry_delay_ms: 250
+
 services:
     _defaults:
         autowire: true
@@ -27,3 +30,43 @@ services:
             - { name: monolog.processor, channel: app }
             - { name: monolog.processor, channel: briefing }
             - { name: monolog.processor, channel: identity }
+
+    app.briefing.transient_failure_retry_strategy:
+        class: Symfony\Component\HttpClient\Retry\GenericRetryStrategy
+        arguments:
+            $statusCodes: !php/const App\Briefing\Source\UpstreamRetryStrategy::RETRIED_STATUSES
+            $delayMs: '%app.briefing.retry_delay_ms%'
+
+    App\Briefing\Source\UpstreamRetryStrategy:
+        arguments:
+            $transientFailures: '@app.briefing.transient_failure_retry_strategy'
+
+when@test:
+    parameters:
+        app.briefing.retry_delay_ms: 0
+
+    services:
+        App\Tests\Support\Briefing\UpstreamMockResponseFactory:
+            public: true
+            arguments:
+                $routes:
+                    - { source: apod, baseUri: '%env(NASA_BASE_URI)%' }
+                    - { source: on_this_day, baseUri: '%env(WIKIPEDIA_BASE_URI)%' }
+                    - { source: weather, baseUri: '%env(OPEN_METEO_BASE_URI)%' }
+                    - { source: weather, baseUri: '%env(OPEN_METEO_ARCHIVE_BASE_URI)%' }
+
+        test.nasa.client:
+            alias: nasa.client
+            public: true
+
+        test.wikipedia.client:
+            alias: wikipedia.client
+            public: true
+
+        test.open_meteo.client:
+            alias: open_meteo.client
+            public: true
+
+        test.open_meteo_archive.client:
+            alias: open_meteo_archive.client
+            public: true

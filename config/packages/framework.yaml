@@ -1,5 +1,32 @@
 framework:
     secret: '%env(APP_SECRET)%'
+    http_client:
+        scoped_clients:
+            nasa.client:
+                base_uri: '%env(NASA_BASE_URI)%'
+                <<: &upstream_options
+                    timeout: 2
+                    max_duration: 3
+                    max_redirects: 0
+                    retry_failed:
+                        retry_strategy: App\Briefing\Source\UpstreamRetryStrategy
+                        max_retries: 1
+                headers:
+                    User-Agent: '%env(ALMANAC_USER_AGENT)%'
+                    X-Api-Key: '%env(NASA_API_KEY)%'
+            wikipedia.client:
+                base_uri: '%env(WIKIPEDIA_BASE_URI)%'
+                <<: *upstream_options
+                headers: &almanac_headers
+                    User-Agent: '%env(ALMANAC_USER_AGENT)%'
+            open_meteo.client:
+                base_uri: '%env(OPEN_METEO_BASE_URI)%'
+                <<: *upstream_options
+                headers: *almanac_headers
+            open_meteo_archive.client:
+                base_uri: '%env(OPEN_METEO_ARCHIVE_BASE_URI)%'
+                <<: *upstream_options
+                headers: *almanac_headers
 
 when@test:
     framework:
@@ -8,3 +35,5 @@ when@test:
             App\Tests\Support\Controller\ExplicitlyLoggedConflict:
                 status_code: 409
                 log_level: warning
+        http_client:
+            mock_response_factory: App\Tests\Support\Briefing\UpstreamMockResponseFactory
