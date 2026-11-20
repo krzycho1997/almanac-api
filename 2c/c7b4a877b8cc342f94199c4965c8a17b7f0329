@@ -1,0 +1,22 @@
+bin/check-prod-image
+  s_02e4949da5212d::t_1328c917e38431 21
+.github/workflows/release.yaml
+  s_02e4949da5212d::t_d6b988c64bbf4b 34-35,45-56,65,96
+  s_02e4949da5212d::t_5dd5e1ae62e1d0 206,240-242
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2cc7b4a877b8cc342f94199c4965c8a17b7f0329",
+  "prompts": {},
+  "sessions": {
+    "s_02e4949da5212d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "05351d01-d85c-422b-9e54-d8b1b82336a5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
