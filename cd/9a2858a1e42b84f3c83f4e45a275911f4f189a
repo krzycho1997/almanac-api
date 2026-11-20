@@ -1,0 +1,52 @@
+tests/Architecture/LayerTest.php
+  s_02e4949da5212d::t_f4cca0c9734b23 144-154,156,158
+  s_02e4949da5212d::t_9383802d6b32b5 7,155,157
+  s_02e4949da5212d::t_0bdea3f6c48d8d 141-143
+src/Briefing/Entity/SourceSnapshot.php
+  s_02e4949da5212d::t_9b7d19af90b341 1-40
+src/Briefing/Repository/SnapshotWrite.php
+  s_02e4949da5212d::t_d85baddc5e78f7 1-20
+migrations/Version20261120203720.php
+  s_02e4949da5212d::t_70f56a9de1d94e 14,19-36,39-40
+  s_02e4949da5212d::t_3b8de0f7163528 1-13,15-18,41-47
+  s_02e4949da5212d::t_9634048a9394eb 37-38
+tests/Briefing/Integration/Repository/SourceSnapshotRepositoryTest.php
+  s_02e4949da5212d::t_8a18cb7a927d8f 285,293,300-304
+  s_02e4949da5212d::t_9383802d6b32b5 34,36-42,46,49,59,62,71,74,77,86,89,92,96-190,197,200,203,223-224,227,230,239-240,243,246,258,261,269,271,283,291,305-312
+  s_02e4949da5212d::t_9634048a9394eb 1-19,21-22,25,27-33,35,43-45,47-48,50-58,60-61,63-70,72-73,75-76,78-85,87-88,90-91,93-95,191-196,198-199,201-202,204-222,225-226,228-229,231-238,241-242,244-245,247-257,259-260,262-268,270,272-282,289-290,292,295-299,313-339
+  s_02e4949da5212d::t_af99b4997b15f9 20,23-24,26,284,286-288,294
+config/packages/doctrine.yaml
+  s_02e4949da5212d::t_9b7d19af90b341 11-16
+  s_02e4949da5212d::t_3b8de0f7163528 10
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Entity/ProbeEntityUsesDomainTypes.php
+  s_02e4949da5212d::t_f4cca0c9734b23 1-8,10-18,20-22
+  s_02e4949da5212d::t_9383802d6b32b5 9,19
+tests/Briefing/Integration/Repository/SchemaConstraintsTest.php
+  s_02e4949da5212d::t_265e6c94f7f6bd 1-97
+tools/phpstan/tests/Architecture/ArchitectureRulesTest.php
+  s_02e4949da5212d::t_f4cca0c9734b23 37
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Entity/ProbeEntityUsesService.php
+  s_02e4949da5212d::t_f4cca0c9734b23 1-15
+src/Briefing/SnapshotScope.php
+  s_02e4949da5212d::t_9b7d19af90b341 1-24
+src/Briefing/Repository/SourceSnapshotRepository.php
+  s_02e4949da5212d::t_d85baddc5e78f7 1-117
+tests/Briefing/Unit/SnapshotScopeTest.php
+  s_02e4949da5212d::t_9705203c577371 1-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cd9a2858a1e42b84f3c83f4e45a275911f4f189a",
+  "prompts": {},
+  "sessions": {
+    "s_02e4949da5212d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "05351d01-d85c-422b-9e54-d8b1b82336a5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
