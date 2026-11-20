@@ -16,14 +16,13 @@ final readonly class ApodMapper
     private const string DATE_TIMEZONE = 'UTC';
     private const string PLACEHOLDER_TITLE = 'NASA Science';
     private const string EXPLANATION_LABEL = '/^Explanation:\s*/u';
-    private const string PAGE_TRAILER = '/\s*\b(?:Portal Universe|Tomorrow[\'’]s picture):.*$/su';
-    private const string HTML_TAG = '/<!--.*?-->|<\/?[a-z][a-z0-9]*(?:\s[^<>]*)?\/?>/isu';
-    private const string SPACE_BEFORE_PUNCTUATION = '/\s+([.,;:!?])/u';
+    private const string PAGE_TRAILER = '/(?:^|(?<=[.!?]))\s*(?:Portal Universe|Tomorrow[\'’]s picture):.*$/su';
+    private const string BODY = '<body>';
+    private const string SPACE_BEFORE_PUNCTUATION = '/\s+([.,;:!?])(?=\s|$)/u';
     private const string PUNCTUATION = '$1';
     private const string WHITESPACE_RUN = '/\s+/u';
     private const string SPACE = ' ';
     private const string EMPTY = '';
-    private const string CHARSET = 'UTF-8';
     private const string GENERIC_THUMBNAIL = '/images/misc/news-thumbnail.png';
 
     public function map(ApodApiResponse $response): ApodPicture
@@ -119,9 +118,13 @@ final readonly class ApodMapper
 
     private static function plainText(string $html): string
     {
-        $text = html_entity_decode((string) preg_replace(self::HTML_TAG, self::EMPTY, $html), \ENT_QUOTES | \ENT_HTML5, self::CHARSET);
-        $collapsed = (string) preg_replace([self::WHITESPACE_RUN, self::SPACE_BEFORE_PUNCTUATION], [self::SPACE, self::PUNCTUATION], $text);
+        $collapsed = (string) preg_replace([self::WHITESPACE_RUN, self::SPACE_BEFORE_PUNCTUATION], [self::SPACE, self::PUNCTUATION], self::textContent($html));
 
         return trim($collapsed);
+    }
+
+    private static function textContent(string $html): string
+    {
+        return \Dom\HTMLDocument::createFromString(self::BODY.$html, \LIBXML_NOERROR)->body->textContent ?? self::EMPTY;
     }
 }

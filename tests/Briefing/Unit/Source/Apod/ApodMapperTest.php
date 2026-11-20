@@ -153,6 +153,16 @@ final class ApodMapperTest extends TestCase
         yield 'explanation label inside the text' => [self::TITLE, 'Towers of gas. Explanation: none needed.', self::TITLE, 'Towers of gas. Explanation: none needed.'];
         yield 'link to a random picture after the text' => [self::TITLE, self::EXPLANATION.'<br /><br /><b> Portal Universe: </b> <a href="https://apod.nasa.gov/apod/random_apod.html">Random APOD Generator</a> <br />', self::TITLE, self::EXPLANATION];
         yield "tomorrow's picture after the text" => [self::TITLE, self::EXPLANATION."Tomorrow's picture: V-G-R\t\t\t", self::TITLE, self::EXPLANATION];
+        yield 'tomorrow’s picture with a typographic apostrophe' => [self::TITLE, self::EXPLANATION.' Tomorrow’s picture: V-G-R', self::TITLE, self::EXPLANATION];
+        yield 'portal universe inside a sentence' => [self::TITLE, 'The Portal Universe: a new exhibit opened.', self::TITLE, 'The Portal Universe: a new exhibit opened.'];
+        yield 'greater-than sign inside an attribute' => ['<a title="1>2">M31</a>', self::EXPLANATION, 'M31', self::EXPLANATION];
+        yield 'upper-case tags' => ['<B>Pillars</B> <A HREF="https://example.com">M16</A>', self::EXPLANATION, 'Pillars M16', self::EXPLANATION];
+        yield 'self-closing line break' => ['Pillars<br/>', self::EXPLANATION, 'Pillars', self::EXPLANATION];
+        yield 'comment over several lines' => ["Pillars<!-- of\nCreation -->", self::EXPLANATION, 'Pillars', self::EXPLANATION];
+        yield 'HTML5 entity' => ['Hubble&apos;s Pillars', self::EXPLANATION, "Hubble's Pillars", self::EXPLANATION];
+        yield 'comparison signs with spaces' => ['Mass < 1 and > 0', self::EXPLANATION, 'Mass < 1 and > 0', self::EXPLANATION];
+        yield 'decimal without a leading zero' => [self::TITLE, 'Dust of .5 microns.', self::TITLE, 'Dust of .5 microns.'];
+        yield 'space before a comma after a link' => [self::TITLE, 'Towers in <a href="https://example.com">M16</a> , dust and gas.', self::TITLE, 'Towers in M16, dust and gas.'];
     }
 
     public function testRejectsTheNasaSciencePlaceholder(): void
