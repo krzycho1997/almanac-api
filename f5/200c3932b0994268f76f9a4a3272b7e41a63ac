@@ -40,6 +40,7 @@ src/Identity/Repository/AccessTokenRepository.php
   s_ecd702649c3f02::t_a4d9ace0a49185 44
   s_ecd702649c3f02::t_a878cdfc8c959f 7,9,22,37-43,45-48
   s_ecd702649c3f02::t_2e7eb825506e7b 23-25,27-36
+  s_ecd702649c3f02::t_37d5f77cbb6b7a 26
 src/Identity/Entity/User.php
   s_ecd702649c3f02::t_3217265ec14b12 1-13,15-18,20,23-26,28-38,55
   s_ecd702649c3f02::t_2e7eb825506e7b 14,19,21,39-54
@@ -91,11 +92,14 @@ config/bundles.php
   s_ecd702649c3f02::t_fa8c0c8d66a79b 11
 src/Identity/Security/AccessTokenHandler.php
   s_ecd702649c3f02::t_2e7eb825506e7b 1-17,19-27,29-30,32-36,38,41-42,54,62-64
+  s_ecd702649c3f02::t_37d5f77cbb6b7a 18,28,31,37,39-40,43-46
 tests/Identity/Integration/AccessTokenHandlerTest.php
   s_ecd702649c3f02::t_d6130323f3d661 1-9,13-19,21-23,27-38,40-49,52-54,85-89,91-100,102-110,121-127,129-130
   s_ecd702649c3f02::t_bb5ad13b5ca175 128
+  s_ecd702649c3f02::t_37d5f77cbb6b7a 10-12,20,24-26,39,50-51,55-83
 config/services.yaml
   s_ecd702649c3f02::t_fc276fdbb816e2 106,110-112
+  s_ecd702649c3f02::t_37d5f77cbb6b7a 109
 ---
 {
   "schema_version": "authorship/3.0.0",
