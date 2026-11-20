@@ -270,6 +270,23 @@ final class BriefingControllerTest extends FunctionalTestCase
         self::assertCount(10, self::upstream()->served());
     }
 
+    public function testServesAStoredPastDayAgainWithoutCallingTheUpstreams(): void
+    {
+        // Given
+        self::upstream()->respondWith(self::scenario()->apod()->fixture(self::PICTURE));
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
+        $first = $this->client->getResponse()->getContent();
+        $served = \count(self::upstream()->served());
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        self::assertCount($served, self::upstream()->served());
+        self::assertSame($first, $this->client->getResponse()->getContent());
+    }
+
     /**
      * @param array<string, string> $source
      * @param array<string, mixed>  $context

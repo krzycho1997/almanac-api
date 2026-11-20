@@ -58,6 +58,6 @@ final readonly class JournalingSource implements Source, SourceClient
     {
         $this->journal->record(self::SETTLE.$this->name->value);
 
-        return new FakePayload([]);
+        return SourcePayloads::of($this->name);
     }
 }

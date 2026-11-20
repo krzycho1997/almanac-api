@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Briefing;
 
+use App\Briefing\Repository\SourceSnapshotRepository;
 use App\Briefing\Source\ConcurrentFetcher;
 use App\Briefing\Source\SettledFetch;
 use App\Briefing\Source\Source;
@@ -27,6 +28,8 @@ final readonly class BriefingAggregator
         private ConcurrentFetcher $fetcher,
         private ClockInterface $clock,
         private SourceFailureLog $failureLog,
+        private SourceSnapshotRepository $snapshots,
+        private RefreshPolicy $policy,
     ) {
         $this->sources = self::inNameOrder([...$sources]);
     }
@@ -50,10 +53,64 @@ final readonly class BriefingAggregator
 
     public function briefingFor(\DateTimeImmutable $date, Location $location): BriefingResult
     {
-        $settled = $this->fetcher->settleAll(self::startAll($this->sourcesCovering($date), $date, $location));
+        $now = $this->clock->now();
+        $covering = $this->sourcesCovering($date);
+        $scopes = self::scopesOf($covering, $date, $location);
+        $stored = $this->snapshots->findForScopes(array_values($scopes));
+        $due = $this->dueForFetch($covering, $stored, $date, $now);
+        $settled = $this->fetcher->settleAll(self::startAll($due, $date, $location));
         $this->recordFailures($settled, $date);
+        $current = $this->savedAndReread($settled, $scopes, $stored, $now);
 
-        return new BriefingResult($date, $location, $this->inSourceOrder($settled), $this->clock->now());
+        return new BriefingResult($date, $location, $this->inSourceOrder($current), $now);
+    }
+
+    /**
+     * @param list<Source> $sources
+     *
+     * @return array<value-of<SourceName>, SnapshotScope>
+     */
+    private static function scopesOf(array $sources, \DateTimeImmutable $date, Location $location): array
+    {
+        $scopes = [];
+
+        foreach ($sources as $source) {
+            $scopes[$source->name()->value] = $source->scopeFor($date, $location);
+        }
+
+        return $scopes;
+    }
+
+    /**
+     * @param list<Source>                                $sources
+     * @param array<value-of<SourceName>, StoredSnapshot> $stored
+     *
+     * @return list<Source>
+     */
+    private function dueForFetch(array $sources, array $stored, \DateTimeImmutable $date, \DateTimeImmutable $now): array
+    {
+        return array_values(array_filter(
+            $sources,
+            fn (Source $source): bool => $this->policy->decide(($stored[$source->name()->value] ?? null)?->state(), $source->refreshAfter(), $date, $now)->fetches(),
+        ));
+    }
+
+    /**
+     * @param list<SettledFetch>                          $settled
+     * @param array<value-of<SourceName>, SnapshotScope>  $scopes
+     * @param array<value-of<SourceName>, StoredSnapshot> $stored
+     *
+     * @return array<value-of<SourceName>, StoredSnapshot>
+     */
+    private function savedAndReread(array $settled, array $scopes, array $stored, \DateTimeImmutable $now): array
+    {
+        if ([] === $settled) {
+            return $stored;
+        }
+
+        $this->snapshots->saveResults(array_map(static fn (SettledFetch $fetch): SourceResult => $fetch->result, $settled), $scopes, $now);
+
+        return $this->snapshots->findForScopes(array_values($scopes));
     }
 
     /**
@@ -97,24 +154,24 @@ final readonly class BriefingAggregator
     }
 
     /**
-     * @param list<SettledFetch> $settled
+     * @param array<value-of<SourceName>, StoredSnapshot> $stored
      *
      * @return list<SourceResult>
      */
-    private function inSourceOrder(array $settled): array
+    private function inSourceOrder(array $stored): array
     {
-        return array_map(static fn (Source $source): SourceResult => self::resultOf($source->name(), $settled), $this->sources);
+        return array_map(static fn (Source $source): SourceResult => self::resultOf($source->name(), $stored), $this->sources);
     }
 
     /**
-     * @param list<SettledFetch> $settled
+     * @param array<value-of<SourceName>, StoredSnapshot> $stored
      */
-    private static function resultOf(SourceName $source, array $settled): SourceResult
+    private static function resultOf(SourceName $source, array $stored): SourceResult
     {
-        foreach ($settled as $fetch) {
-            if ($source === $fetch->result->source) {
-                return $fetch->result;
-            }
+        $snapshot = $stored[$source->value] ?? null;
+
+        if ($snapshot instanceof StoredSnapshot) {
+            return $snapshot->result();
         }
 
         return SourceResult::notApplicable($source);

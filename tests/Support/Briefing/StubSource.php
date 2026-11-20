@@ -21,7 +21,13 @@ final readonly class StubSource implements Source, SourceClient
         private SourceName $name,
         private \Closure $request,
         private bool $covers = true,
+        private ?\DateInterval $refreshAfter = null,
     ) {
+    }
+
+    public function refreshAfter(): ?\DateInterval
+    {
+        return $this->refreshAfter;
     }
 
     public function name(): SourceName

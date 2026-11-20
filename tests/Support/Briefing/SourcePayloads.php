@@ -12,7 +12,9 @@ use App\Briefing\Model\MediaType;
 use App\Briefing\Model\NotablePerson;
 use App\Briefing\Model\OnThisDayFeed;
 use App\Briefing\Model\PageRef;
+use App\Briefing\Model\SourcePayload;
 use App\Briefing\Model\WeatherKind;
+use App\Briefing\SourceName;
 
 final class SourcePayloads
 {
@@ -39,5 +41,14 @@ final class SourcePayloads
     public static function dailyWeather(WeatherKind $kind = WeatherKind::Final, ?int $weatherCode = self::OVERCAST): DailyWeather
     {
         return new DailyWeather($kind, 'Europe/Warsaw', 1.2, 6.8, 0.4, 18.0, $weatherCode, '2026-11-05T06:44:00+01:00', '2026-11-05T16:02:00+01:00', 33480, new Attribution('Open-Meteo', 'https://open-meteo.com/', 'CC BY 4.0', 'https://creativecommons.org/licenses/by/4.0/', true, 'Generated using Copernicus Climate Change Service information'));
+    }
+
+    public static function of(SourceName $source): SourcePayload
+    {
+        return match ($source) {
+            SourceName::Apod => self::apodPicture(),
+            SourceName::OnThisDay => self::onThisDayFeed(),
+            SourceName::Weather => self::dailyWeather(),
+        };
     }
 }
