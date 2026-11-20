@@ -1,0 +1,49 @@
+tests/Briefing/Integration/Source/Apod/ApodClientTest.php
+  s_a463f0f3bbc4ea::t_33c5ac9942e252 7
+src/Briefing/Source/Apod/ApodMapper.php
+  s_a463f0f3bbc4ea::t_33c5ac9942e252 8,18-20,37,47,50,64,90-95
+src/Briefing/Source/Apod/ApodClient.php
+  s_a463f0f3bbc4ea::t_33c5ac9942e252 8,25-26,43,81
+tests/Briefing/Unit/Source/PendingFetchTest.php
+  s_a463f0f3bbc4ea::t_33c5ac9942e252 8
+src/Briefing/Dto/Request/BriefingQuery.php
+  s_a463f0f3bbc4ea::t_33c5ac9942e252 7,19,24
+src/Briefing/Exception/PayloadDefect.php
+  s_a463f0f3bbc4ea::t_2aefd5a491c992 1-16
+tests/Briefing/Unit/SourceFailureLogTest.php
+  s_a463f0f3bbc4ea::t_33c5ac9942e252 7
+src/Briefing/Exception/InvalidLocationException.php
+  s_a463f0f3bbc4ea::t_33c5ac9942e252 9-10,23
+src/Briefing/Source/PendingFetch.php
+  s_a463f0f3bbc4ea::t_33c5ac9942e252 100,108-111
+  s_a463f0f3bbc4ea::t_fb8d055a76b439 112
+tests/Briefing/Unit/Source/Apod/ApodMapperTest.php
+  s_a463f0f3bbc4ea::t_33c5ac9942e252 8
+src/Briefing/Mapper/BriefingResponseMapper.php
+  s_a463f0f3bbc4ea::t_33c5ac9942e252 39-40,50-61
+  s_a463f0f3bbc4ea::t_6c8d00c5605993 62
+tests/Briefing/Integration/UpstreamResponseDecoderTest.php
+  s_a463f0f3bbc4ea::t_2aefd5a491c992 8
+src/Briefing/FailureCause.php
+  s_a463f0f3bbc4ea::t_33c5ac9942e252 8
+src/Briefing/ValueResolver/BriefingDateValueResolver.php
+  s_a463f0f3bbc4ea::t_33c5ac9942e252 56,67
+src/Briefing/Validator/BriefingDate.php
+  s_a463f0f3bbc4ea::t_33c5ac9942e252 13-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2120bb880f172c4ec63df2f9ca05baa358dd9301",
+  "prompts": {},
+  "sessions": {
+    "s_a463f0f3bbc4ea": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e80e7e02-debb-4938-91ba-befdb4b4d71a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
