@@ -188,8 +188,25 @@ final class SnapshotReadingTest extends TestCase
 
     public function testFindsNothingWithoutScopes(): void
     {
+        // Given
+        $this->repository()->saveResult(SourceResult::ok(SourceName::Apod, SourcePayloads::apodPicture()), self::apod(), self::at(self::TEN));
+
         // When / Then
         self::assertSame([], $this->repository()->findForScopes([]));
+    }
+
+    public function testReadsTheRowAgainAfterItChangedInTheDatabase(): void
+    {
+        // Given
+        $this->repository()->saveResult(SourceResult::ok(SourceName::Apod, SourcePayloads::apodPicture()), self::apod(), self::at(self::TEN));
+        $this->repository()->findForScopes([self::apod()]);
+        $this->repository()->saveResult(SourceResult::failed(SourceName::Apod, FailureKind::Unavailable), self::apod(), self::at(self::ELEVEN));
+
+        // When
+        $snapshot = $this->repository()->findForScopes([self::apod()])[SourceName::Apod->value];
+
+        // Then
+        self::assertEquals([FailureKind::Unavailable, self::at(self::ELEVEN)], [$snapshot->lastError, $snapshot->lastAttemptAt]);
     }
 
     private function storeRaw(string $status, ?string $error, string $payload): void

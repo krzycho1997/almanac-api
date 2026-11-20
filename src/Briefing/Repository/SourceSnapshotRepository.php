@@ -17,7 +17,6 @@ use App\Briefing\SourceResult;
 use App\Briefing\SourceStatus;
 use App\Briefing\StoredSnapshot;
 use App\Shared\Logging\LogContextKey;
-use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
@@ -90,7 +89,7 @@ final readonly class SourceSnapshotRepository
             return [];
         }
 
-        return $this->storedIn($this->snapshotsFor($scopes), $scopes);
+        return $this->storedIn($this->snapshotsFor($scopes));
     }
 
     /**
@@ -152,40 +151,34 @@ final readonly class SourceSnapshotRepository
     }
 
     /**
-     * @param list<SnapshotScope> $scopes
+     * @param non-empty-list<SnapshotScope> $scopes
      *
      * @return list<SourceSnapshot>
      */
     private function snapshotsFor(array $scopes): array
     {
-        return $this->entityManager->createQueryBuilder()
-            ->select(self::ALIAS)
-            ->from(SourceSnapshot::class, self::ALIAS)
-            ->where(self::ALIAS.'.source IN (:sources)')
-            ->andWhere(self::ALIAS.'.scopeKey IN (:keys)')
-            ->setParameter('sources', array_map(static fn (SnapshotScope $scope): string => $scope->source->value, $scopes), ArrayParameterType::STRING)
-            ->setParameter('keys', array_map(static fn (SnapshotScope $scope): string => $scope->key, $scopes), ArrayParameterType::STRING)
-            ->getQuery()
-            ->setHint(Query::HINT_REFRESH, true)
-            ->getResult();
+        $query = $this->entityManager->createQueryBuilder()->select(self::ALIAS)->from(SourceSnapshot::class, self::ALIAS);
+
+        foreach ($scopes as $index => $scope) {
+            $query->orWhere(self::ALIAS.".source = :source{$index} AND ".self::ALIAS.".scopeKey = :key{$index}")
+                ->setParameter("source{$index}", $scope->source->value)
+                ->setParameter("key{$index}", $scope->key);
+        }
+
+        return $query->getQuery()->setHint(Query::HINT_REFRESH, true)->getResult();
     }
 
     /**
      * @param list<SourceSnapshot> $snapshots
-     * @param list<SnapshotScope>  $scopes
      *
      * @return array<value-of<SourceName>, StoredSnapshot>
      */
-    private function storedIn(array $snapshots, array $scopes): array
+    private function storedIn(array $snapshots): array
     {
         $stored = [];
 
-        foreach ($scopes as $scope) {
-            $snapshot = array_find($snapshots, static fn (SourceSnapshot $snapshot): bool => [$scope->source, $scope->key] === [$snapshot->source, $snapshot->scopeKey]);
-
-            if ($snapshot instanceof SourceSnapshot) {
-                $stored[$scope->source->value] = $this->stored($snapshot);
-            }
+        foreach ($snapshots as $snapshot) {
+            $stored[$snapshot->source->value] = $this->stored($snapshot);
         }
 
         return $stored;
