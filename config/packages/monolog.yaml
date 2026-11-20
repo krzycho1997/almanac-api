@@ -1,6 +1,60 @@
 monolog:
     channels:
         - deprecation
+        - briefing
+        - identity
+
+services:
+    app.monolog.formatter.json:
+        class: Monolog\Formatter\JsonFormatter
+        arguments:
+            $includeStacktraces: true
+
+    app.monolog.formatter.redacting_json:
+        class: Monolog\Formatter\RedactingFormatter
+        arguments:
+            $formatter: '@app.monolog.formatter.json'
+            $sensitiveKeys:
+                - authorization
+                - proxy-authorization
+                - auth
+                - token
+                - access_token
+                - accesstoken
+                - refresh_token
+                - refreshtoken
+                - id_token
+                - idtoken
+                - api_key
+                - api-key
+                - apikey
+                - x-api-key
+                - x-auth-token
+                - x-access-token
+                - password
+                - passwd
+                - pwd
+                - secret
+                - app_secret
+                - client_secret
+                - clientsecret
+                - cookie
+                - set-cookie
+                - email
+                - lat
+                - lon
+                - lng
+                - latitude
+                - longitude
+                - database_url
+                - dsn
+            $patterns:
+                - '/[?&](?:api[_-]?key|access_token|refresh_token|token|lat|lon|lng|latitude|longitude)=\K[^&\s"\\#]+/i'
+                - '/\b(?:Bearer|Basic)\s+\K[A-Za-z0-9._~+\/-]{8,}=*/i'
+                - '/\beyJ[A-Za-z0-9_-]{5,}\.[A-Za-z0-9_-]{5,}\.[A-Za-z0-9_-]*/'
+                - '/:\/\/[^\s:\/@"]*+:\K[^\s@\/"]++(?=@)/'
+                - '/[\p{L}\p{N}._%+-]+@[\p{L}\p{N}-]+(?:\.[\p{L}\p{N}-]+)*\.\p{L}{2,}/u'
+            $mask: !php/const App\Shared\Logging\AllowedLogContextProcessor::MASK
 
 when@dev: &stderr_json
     monolog:
@@ -9,19 +63,25 @@ when@dev: &stderr_json
                 type: stream
                 path: php://stderr
                 level: '%env(LOG_LEVEL)%'
-                formatter: monolog.formatter.json
+                formatter: app.monolog.formatter.redacting_json
                 channels: ['!event', '!request', '!doctrine', '!deprecation']
             request:
                 type: stream
                 path: php://stderr
+                level: notice
+                formatter: app.monolog.formatter.redacting_json
+                channels: [request]
+            doctrine:
+                type: stream
+                path: php://stderr
                 level: warning
-                formatter: monolog.formatter.json
-                channels: [request, doctrine]
+                formatter: app.monolog.formatter.redacting_json
+                channels: [doctrine]
             deprecation:
                 type: stream
                 path: php://stderr
                 level: '%env(LOG_LEVEL)%'
-                formatter: monolog.formatter.json
+                formatter: app.monolog.formatter.redacting_json
                 channels: [deprecation]
 
 when@prod: *stderr_json
@@ -32,9 +92,13 @@ when@test:
             main:
                 type: test
                 level: debug
+                formatter: app.monolog.formatter.redacting_json
             request:
                 type: 'null'
-                channels: [request, doctrine]
+                channels: [request]
+            doctrine:
+                type: 'null'
+                channels: [doctrine]
             deprecation:
                 type: 'null'
                 channels: [deprecation]

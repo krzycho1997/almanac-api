@@ -1,0 +1,23 @@
+#!/bin/sh
+set -eu
+
+image=${1:?usage: bin/check-prod-image IMAGE}
+
+docker run --rm --entrypoint sh "$image" -c '
+    status=0
+    fail() { echo "check-prod-image: $1" >&2; status=1; }
+
+    [ "$(id -u)" = 82 ] || fail "runs as uid $(id -u), expected 82 (www-data)"
+    writable=$(find /srv/app \( ! -user root -o ! -group root -o -perm -o+w -o -perm -g+w \) | head -5)
+    [ -z "$writable" ] || fail "app files the runtime user could change: $writable"
+    php -r "exit(ini_get(\"expose_php\") ? 1 : 0);" || fail "expose_php is on"
+    php -r "exit(ini_get(\"opcache.validate_timestamps\") ? 1 : 0);" || fail "opcache.validate_timestamps is on"
+    ! command -v composer >/dev/null || fail "composer is in the image"
+    ! command -v install-php-extensions >/dev/null || fail "install-php-extensions is in the image"
+    php -r "exit(ini_get(\"opcache.preload\") === \"/srv/app/config/preload.php\" ? 0 : 1);" || fail "opcache.preload is not set"
+    ls var/cache/prod/*.preload.php >/dev/null 2>&1 || fail "the warmed cache has no preload file"
+    [ -f .env.local.php ] || fail "the env is not dumped to .env.local.php"
+    php bin/console about --env=prod | grep -Eq "Debug +false" || fail "the kernel is not in prod without debug"
+
+    exit "$status"
+'

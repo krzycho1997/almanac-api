@@ -7,3 +7,23 @@ services:
 
     App\:
         resource: '../src/'
+        exclude:
+            - '../src/Briefing/Location.php'
+
+    app.briefing.default_location:
+        class: App\Briefing\Location
+        public: true
+        factory: ['App\Briefing\Location', 'defaultAt']
+        arguments:
+            - '%env(float:ALMANAC_DEFAULT_LAT)%'
+            - '%env(float:ALMANAC_DEFAULT_LON)%'
+            - '%env(ALMANAC_DEFAULT_LOCATION_NAME)%'
+
+    App\Briefing\Location $defaultLocation: '@app.briefing.default_location'
+
+    App\Shared\Logging\AllowedLogContextProcessor:
+        autoconfigure: false
+        tags:
+            - { name: monolog.processor, channel: app }
+            - { name: monolog.processor, channel: briefing }
+            - { name: monolog.processor, channel: identity }

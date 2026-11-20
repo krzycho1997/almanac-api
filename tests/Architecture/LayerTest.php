@@ -13,6 +13,9 @@ use PHPat\Test\PHPat;
 
 final class LayerTest
 {
+    private const string ENTITY = 'Entity';
+    private const string REPOSITORY = 'Repository';
+
     #[TestRule]
     public function edgeOnlyTranslatesInputAndOutput(): Rule
     {
@@ -22,12 +25,12 @@ final class LayerTest
             ->shouldNot()
             ->dependOn()
             ->classes(
-                Codebase::layer('Repository'),
+                Codebase::layer(self::REPOSITORY),
                 self::doctrine(),
                 self::httpClient(),
                 Selector::classname('/^App\\\\Briefing\\\\Source\\\\.+Client$/', regex: true),
             )
-            ->because('controllers, commands, handlers, resolvers and security adapters call services, not storage or upstream clients')
+            ->because('controllers, commands, handlers, resolvers, security adapters and HTTP listeners call services, not storage or upstream clients')
             ->nonIgnorable();
     }
 
@@ -75,7 +78,7 @@ final class LayerTest
             ->classes(
                 self::doctrine(),
                 self::http(),
-                Codebase::layer('Entity', 'Repository'),
+                Codebase::layer(self::ENTITY, self::REPOSITORY),
                 Selector::inNamespace('App\Briefing\Source'),
             )
             ->because('the model and contracts carry data only; Doctrine id types in contracts are the one intended exception')
@@ -91,7 +94,7 @@ final class LayerTest
                 Selector::inNamespace('App\Tests'),
                 Selector::inNamespace('App\PHPStan'),
                 Selector::classname(Kernel::class),
-                Codebase::layer('Entity'),
+                Codebase::layer(self::ENTITY),
                 Selector::isAbstract(),
                 Selector::isInterface(),
             )
@@ -103,7 +106,7 @@ final class LayerTest
 
     private static function edge(): SelectorInterface
     {
-        return Codebase::layer('Controller', 'Command', 'MessageHandler', 'ValueResolver', 'Security');
+        return Codebase::layer('Controller', 'Command', 'MessageHandler', 'ValueResolver', 'Security', 'ErrorHandler', 'RequestId');
     }
 
     private static function doctrine(): SelectorInterface

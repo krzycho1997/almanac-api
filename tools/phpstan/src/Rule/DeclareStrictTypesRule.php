@@ -10,6 +10,7 @@ use PhpParser\Node\Stmt\Declare_;
 use PhpParser\Node\Stmt\InlineHTML;
 use PHPStan\Analyser\Scope;
 use PHPStan\Node\FileNode;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 
@@ -18,6 +19,11 @@ use PHPStan\Rules\RuleErrorBuilder;
  */
 final class DeclareStrictTypesRule implements Rule
 {
+    private const string MESSAGE = 'File must start with declare(strict_types=1).';
+    private const string IDENTIFIER = 'almanac.declareStrictTypes';
+    private const string DIRECTIVE = 'strict_types';
+    private const int ENABLED = 1;
+
     public function getNodeType(): string
     {
         return FileNode::class;
@@ -25,35 +31,55 @@ final class DeclareStrictTypesRule implements Rule
 
     public function processNode(Node $node, Scope $scope): array
     {
-        foreach ($node->getNodes() as $statement) {
+        if (self::startsWithStrictTypes($node->getNodes())) {
+            return [];
+        }
+
+        return [self::error()];
+    }
+
+    /**
+     * @param array<Node> $statements
+     */
+    private static function startsWithStrictTypes(array $statements): bool
+    {
+        foreach ($statements as $statement) {
             if ($statement instanceof InlineHTML) {
                 continue;
             }
 
-            if ($statement instanceof Declare_ && $this->declaresStrictTypes($statement)) {
-                return [];
-            }
-
-            break;
+            return $statement instanceof Declare_ && self::declaresStrictTypes($statement);
         }
 
-        return [
-            RuleErrorBuilder::message('File must start with declare(strict_types=1).')
-                ->identifier('almanac.declareStrictTypes')
-                ->line(1)
-                ->nonIgnorable()
-                ->build(),
-        ];
+        return false;
     }
 
-    private function declaresStrictTypes(Declare_ $declare): bool
+    private static function declaresStrictTypes(Declare_ $declare): bool
     {
         foreach ($declare->declares as $item) {
-            if ('strict_types' === $item->key->toLowerString()) {
-                return $item->value instanceof Int_ && 1 === $item->value->value;
+            if (self::DIRECTIVE === $item->key->toLowerString()) {
+                return self::isEnabled($item->value);
             }
         }
 
         return false;
+    }
+
+    private static function isEnabled(Node\Expr $value): bool
+    {
+        if ($value instanceof Int_) {
+            return self::ENABLED === $value->value;
+        }
+
+        return false;
+    }
+
+    private static function error(): IdentifierRuleError
+    {
+        return RuleErrorBuilder::message(self::MESSAGE)
+            ->identifier(self::IDENTIFIER)
+            ->line(1)
+            ->nonIgnorable()
+            ->build();
     }
 }

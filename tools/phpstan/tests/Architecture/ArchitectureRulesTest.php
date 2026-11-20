@@ -19,6 +19,7 @@ final class ArchitectureRulesTest extends TestCase
             'Shared/ProbeUsesModule.php' => ['phpat.sharedDependsOnNoModule'],
             'Briefing/Controller/ProbeControllerUsesDoctrine.php' => ['phpat.edgeOnlyTranslatesInputAndOutput'],
             'Bookmark/Controller/ProbeControllerUsesDoctrineBridge.php' => ['phpat.edgeOnlyTranslatesInputAndOutput'],
+            'Shared/ErrorHandler/ProbeListenerUsesDoctrine.php' => ['phpat.edgeOnlyTranslatesInputAndOutput'],
             'Briefing/ProbeServiceUsesHttp.php' => ['phpat.servicesAndExceptionsDoNotKnowHttp'],
             'Briefing/ProbeServiceUsesEdge.php' => ['phpat.servicesAndExceptionsDoNotKnowHttp'],
             'Identity/Exception/ProbeHttpException.php' => ['phpat.servicesAndExceptionsDoNotKnowHttp'],

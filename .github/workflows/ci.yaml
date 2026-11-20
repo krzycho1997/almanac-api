@@ -32,6 +32,10 @@ jobs:
         run: docker compose run --rm --no-deps -T php composer install --no-interaction --no-progress
       - name: Run fast checks
         run: docker compose run --rm --no-deps -T php composer check:fast
+      - name: Build the prod image
+        run: docker build --target prod --tag almanac-php:prod .
+      - name: Check the prod image
+        run: bin/check-prod-image almanac-php:prod
 
   tests:
     runs-on: ubuntu-24.04
@@ -45,6 +49,8 @@ jobs:
         run: docker compose up --build --wait --wait-timeout 300
       - name: Check the running app
         run: curl --fail-with-body --silent --show-error http://127.0.0.1:8080/api/health
+      - name: Check that the app logs carry the request id from nginx
+        run: bin/check-request-id-in-logs http://127.0.0.1:8080
       - name: Run all tests
         run: docker compose exec -T php composer test
       - name: Show container state and logs

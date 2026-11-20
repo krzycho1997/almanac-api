@@ -12,13 +12,17 @@
         "doctrine/doctrine-bundle": "^3.4",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.8",
+        "monolog/monolog": "^3.13",
         "symfony/clock": "8.1.*",
         "symfony/console": "8.1.*",
         "symfony/dotenv": "8.1.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "8.1.*",
         "symfony/monolog-bundle": "^4.1",
+        "symfony/property-access": "8.1.*",
+        "symfony/property-info": "8.1.*",
         "symfony/runtime": "8.1.*",
+        "symfony/serializer": "8.1.*",
         "symfony/yaml": "8.1.*"
     },
     "require-dev": {

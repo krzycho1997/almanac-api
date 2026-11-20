@@ -1,0 +1,23 @@
+#!/bin/sh
+set -eu
+
+base_url=${1:?usage: bin/check-request-id-in-logs BASE_URL}
+
+request_id=$(curl --silent --show-error --output /dev/null --dump-header - "$base_url/api/check-request-id-in-logs" \
+    | tr -d '\r' \
+    | awk -F': ' 'tolower($1) == "x-request-id" { print $2 }')
+
+if [ -z "$request_id" ]; then
+    echo "check-request-id-in-logs: nginx returned no X-Request-Id" >&2
+    exit 1
+fi
+
+for attempt in 1 2 3 4 5; do
+    if docker compose logs --no-color php | grep -Fq "\"request_id\":\"$request_id\""; then
+        exit 0
+    fi
+    sleep 1
+done
+
+echo "check-request-id-in-logs: no app log line carries request id $request_id from nginx" >&2
+exit 1

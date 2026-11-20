@@ -2,3 +2,10 @@
 
 controllers:
     resource: routing.controllers
+
+when@test:
+    test_controllers:
+        resource:
+            path: ../tests/Support/Controller/
+            namespace: App\Tests\Support\Controller
+        type: attribute

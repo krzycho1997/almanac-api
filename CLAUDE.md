@@ -27,7 +27,7 @@ Everything runs in the `php` container.
 
 ## Layers
 
-- Edge (`Controller`, `Command`, `MessageHandler`, `ValueResolver`, `Security`): input and output only, no repositories, Doctrine or upstream clients. Exception: `AccessTokenHandler`.
+- Edge (`Controller`, `Command`, `MessageHandler`, `ValueResolver`, `Security`, `ErrorHandler`, `RequestId`): input and output only, no repositories, Doctrine or upstream clients. Exception: `AccessTokenHandler`.
 - Services in the module root, `Briefing\CircuitBreaker`, `Briefing\Discovery` and every module's `Exception` know nothing about HTTP or the edge; status codes come from `framework.exceptions`, response bodies from `Mapper`.
 - Contracts depend only on contracts. `Briefing\Model` and contracts stay free of Doctrine (including `Symfony\Bridge\Doctrine`), HTTP, entities and sources; Doctrine `*IdType` classes in `Contract` are the exception.
 - Every class in `App` is `final`, except entities, abstract classes, interfaces, enums, traits and `Kernel`.
@@ -42,13 +42,17 @@ Custom PHPStan rules and loaders live in `tools/phpstan/` (`App\PHPStan`).
 - Every PHPUnit test has `// Given`, `// When`, `// Then` sections. Merge them where a split would be artificial (`// Given / When`, `// When / Then`, `// Then / When` for `expectException()`); drop `// Given` when there is nothing to prepare. phpat classes in `tests/Architecture/` are rule declarations, not PHPUnit tests, so they have no sections.
 - Write the functional test for an endpoint before the endpoint.
 - Upstream HTTP is always mocked (`MockHttpClient`); tests never hit the network, except the `live` suite.
+- The `e2e` suite sends real HTTP requests from the `php` container to nginx (`E2E_BASE_URL`, default `http://nginx`), so it needs the running stack; nginx behaviour (headers, limits) is tested there, not in CI scripts.
 - Use `ClockInterface` instead of `new \DateTimeImmutable()` in application code; functional tests freeze the clock in `FunctionalTestCase`.
 - Never delete, skip or weaken a test to make it pass. If a test looks wrong, stop and ask.
 
 ## Code
 
 - `declare(strict_types=1);` in every PHP file, including `bin/`, `public/`, `config/` and migrations.
-- No comments that explain what the code does; only facts the code cannot express.
+- No comments in code, not even for facts the code cannot express: put reasons, upgrade notes and links in the commit message, the PR description or `docs/`. Allowed: PHPDoc types for static analysis, `// Given` / `// When` / `// Then` in tests, and generated files.
+- Classes follow SOLID (one reason to change, depend on interfaces where one exists, extend by decorating or tagging rather than editing) and SLAP: a public method reads as a list of steps at one level of abstraction, and details such as header arrays, JSON decoding or loops go into named private methods.
+- Name repeated or meaningful literals with constants, and use the framework's own first (`Request::METHOD_*`, `Response::HTTP_*`, `JsonEncoder::FORMAT`, `ProblemNormalizer::TYPE`); define `private const` only where none exists. Prefer early returns to compound conditions and nested `if`/`else`, and write conditions positively: no `!` or `!==` in an `if`; invert the check (`if ($x instanceof Foo) { return …; } return …;`, `$level->includes(…)` instead of `!…->isLowerThan(…)`) or name the helper for the case it detects (`isOutsideClientErrors()`).
+- Logs: our channels (`briefing`, `identity`) accept only context keys from `App\Shared\Logging\LogContextKey` (others are masked); add a case there with the plan's log catalogue before logging a new field. Every handler formats through `app.monolog.formatter.redacting_json`. Never put coordinates, emails, tokens or keys into message templates; pass IDs (UUID), not personal data.
 - No new dependencies without asking. No API Platform, no MySQL or SQLite.
 
 ## Commits and branches

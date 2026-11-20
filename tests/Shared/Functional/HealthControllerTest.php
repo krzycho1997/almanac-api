@@ -6,13 +6,15 @@ namespace App\Tests\Shared\Functional;
 
 use App\Tests\Support\FunctionalTestCase;
 use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 final class HealthControllerTest extends FunctionalTestCase
 {
     public function testReportsThatTheApplicationIsUp(): void
     {
         // When
-        $this->client->request('GET', '/api/health');
+        $this->client->request(Request::METHOD_GET, '/api/health');
 
         // Then
         self::assertResponseIsSuccessful();
@@ -23,22 +25,22 @@ final class HealthControllerTest extends FunctionalTestCase
     public function testAnswersHeadRequests(): void
     {
         // When
-        $this->client->request('HEAD', '/api/health');
+        $this->client->request(Request::METHOD_HEAD, '/api/health');
 
         // Then
         self::assertResponseIsSuccessful();
     }
 
-    #[TestWith(['POST'])]
-    #[TestWith(['PUT'])]
-    #[TestWith(['DELETE'])]
+    #[TestWith([Request::METHOD_POST])]
+    #[TestWith([Request::METHOD_PUT])]
+    #[TestWith([Request::METHOD_DELETE])]
     public function testRejectsMethodsThatChangeState(string $method): void
     {
         // When
         $this->client->request($method, '/api/health');
 
         // Then
-        self::assertResponseStatusCodeSame(405);
-        self::assertResponseHeaderSame('Allow', 'GET');
+        self::assertResponseStatusCodeSame(Response::HTTP_METHOD_NOT_ALLOWED);
+        self::assertResponseHeaderSame('Allow', Request::METHOD_GET);
     }
 }
