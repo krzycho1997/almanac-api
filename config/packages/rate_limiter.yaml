@@ -1,0 +1,7 @@
+framework:
+    rate_limiter:
+        briefing:
+            policy: sliding_window
+            limit: 60
+            interval: '1 minute'
+            lock_factory: null
