@@ -118,4 +118,6 @@ when@test:
             public: true
 
         app.briefing.fetch_clock:
-            alias: clock
+            class: App\Tests\Support\TickingClock
+            arguments:
+                $tickSeconds: 0.001

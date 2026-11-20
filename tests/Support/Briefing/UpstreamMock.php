@@ -16,6 +16,9 @@ final readonly class UpstreamMock
     private const string RETRY_AFTER = 'Retry-After';
     private const string ERROR = 'error';
     private const string CONNECTION_REFUSED = 'Connection refused';
+    private const string MAX_DURATION_REACHED = 'Max duration was reached';
+    private const string TOTAL_TIME = 'total_time';
+    private const float MAX_DURATION_SECONDS = 3.0;
     private const string FIXTURES = __DIR__.'/../../Fixtures/upstream/';
     private const string CONTENT_TYPE = 'Content-Type';
     private const string JSON = 'application/json';
@@ -119,10 +122,20 @@ final readonly class UpstreamMock
         });
     }
 
-    public function timeout(): self
+    public function idleTimeout(): self
     {
         return $this->withLastResponse(static function (array $response): array {
             $response['body'] = [self::IDLE_TIMEOUT];
+
+            return $response;
+        });
+    }
+
+    public function stalled(): self
+    {
+        return $this->withLastResponse(static function (array $response): array {
+            $response['info'][self::ERROR] = self::MAX_DURATION_REACHED;
+            $response['info'][self::TOTAL_TIME] = self::MAX_DURATION_SECONDS;
 
             return $response;
         });

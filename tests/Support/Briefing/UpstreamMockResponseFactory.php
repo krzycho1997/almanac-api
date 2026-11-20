@@ -58,6 +58,14 @@ final class UpstreamMockResponseFactory
         return $this->served;
     }
 
+    /**
+     * @return array<string, int>
+     */
+    public function unserved(): array
+    {
+        return array_filter(array_map(\count(...), $this->pending), static fn (int $left): bool => $left > 0);
+    }
+
     private function upstreamFor(string $url): string
     {
         foreach ($this->routes as $route) {

@@ -11,6 +11,7 @@ use App\Tests\Support\FunctionalTestCase;
 use App\Tests\Support\InteractsWithTestServices;
 use Monolog\Level;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints\Date;
@@ -32,11 +33,23 @@ final class BriefingControllerTest extends FunctionalTestCase
     private const string HISTORY_DAY = '03-15';
     private const string FIRST_FORECAST_DAY = '2026-11-13';
     private const array FRESH = ['status' => 'ok', 'fetchedAt' => '2026-11-18T12:00:00Z', 'stale' => false];
+    private const string LAST_ATTEMPT = '2026-11-18T12:00:00Z';
+    private const string PICTURE = 'apod/passthrough-2024-03-15.json';
+    private const string UNPUBLISHED_DAY = '2026-11-25';
+    private const string NASA_HOST = 'api.nasa.gov';
+    private const array NOT_APPLICABLE = ['status' => 'not_applicable'];
+    private const array ALL_FRESH = ['apod' => self::FRESH, 'onThisDay' => self::FRESH, 'weather' => self::FRESH];
+    private const array LOG_SOURCES = ['apod' => 'apod', 'onThisDay' => 'on_this_day', 'weather' => 'weather'];
+    private const array EMPTY_SECTIONS = [
+        'apod' => ['apod' => null],
+        'onThisDay' => ['events' => [], 'births' => [], 'deaths' => []],
+        'weather' => ['weather' => null],
+    ];
 
     public function testBuildsTheBriefingFromThePictureOfTheDay(): void
     {
         // Given
-        self::upstream()->respondWith(self::scenario()->apod()->fixture('apod/passthrough-2024-03-15.json'));
+        self::upstream()->respondWith(self::scenario()->apod()->fixture(self::PICTURE));
 
         // When
         $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
@@ -90,7 +103,7 @@ final class BriefingControllerTest extends FunctionalTestCase
     public function testBuildsTheBriefingWithThisDayInHistory(): void
     {
         // Given
-        self::upstream()->respondWith(self::scenario()->apod()->fixture('apod/passthrough-2024-03-15.json'));
+        self::upstream()->respondWith(self::scenario()->apod()->fixture(self::PICTURE));
 
         // When
         $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
@@ -124,7 +137,7 @@ final class BriefingControllerTest extends FunctionalTestCase
     public function testBuildsTheBriefingForTheGivenPlace(string $query, float $latitude, float $longitude): void
     {
         // Given
-        self::upstream()->respondWith(self::scenario()->apod()->fixture('apod/passthrough-2024-03-15.json'));
+        self::upstream()->respondWith(self::scenario()->apod()->fixture(self::PICTURE));
 
         // When
         $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY.$query);
@@ -235,7 +248,7 @@ final class BriefingControllerTest extends FunctionalTestCase
      */
     public static function unescapedText(): iterable
     {
-        yield 'link' => ['apod/passthrough-2024-03-15.json', self::PICTURE_DAY, '"url":"https://assets.science.nasa.gov/'];
+        yield 'link' => [self::PICTURE, self::PICTURE_DAY, '"url":"https://assets.science.nasa.gov/'];
         yield 'accent' => ['apod/passthrough-video-2021-06-23.json', '2021-06-23', 'Grudić'];
     }
 
@@ -243,7 +256,7 @@ final class BriefingControllerTest extends FunctionalTestCase
     {
         // Given
         self::upstream()->respondWith(self::scenario()
-            ->apod()->fixture('apod/passthrough-2024-03-15.json')
+            ->apod()->fixture(self::PICTURE)
             ->onThisDayFrom(self::HISTORY_DAY)
             ->archiveOn('1995-06-16')
             ->apod()->fixture('apod/passthrough-first-picture-1995-06-16.json'));
@@ -257,8 +270,123 @@ final class BriefingControllerTest extends FunctionalTestCase
         self::assertCount(10, self::upstream()->served());
     }
 
+    /**
+     * @param array<string, string> $source
+     * @param array<string, mixed>  $context
+     */
+    #[DataProvider('failedSources')]
+    public function testServesTheOtherSourcesAndLogsTheFailedOneOnce(UpstreamMock $scenario, string $failed, array $source, int $requests, Level $level, string $message, array $context): void
+    {
+        // Given
+        self::upstream()->respondWith($scenario);
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        $briefing = self::json($this->client->getResponse()->getContent());
+        self::assertSame(array_replace(self::ALL_FRESH, [$failed => $source]), $briefing['sources']);
+        self::assertSame([$failed], $briefing['missing']);
+        self::assertSame(self::EMPTY_SECTIONS[$failed], array_intersect_key($briefing, self::EMPTY_SECTIONS[$failed]));
+        self::assertSame(self::othersThan([$failed]), self::attributedSources($briefing));
+        self::assertCount($requests, self::upstream()->served());
+        $records = self::recordsOf(self::BRIEFING_CHANNEL);
+        self::assertCount(1, $records);
+        self::assertSame($level, $records[0]->level);
+        self::assertSame($message, $records[0]->message);
+        self::assertEquals(['source' => self::LOG_SOURCES[$failed], 'date' => self::PICTURE_DAY] + $context, $records[0]->context);
+    }
+
+    /**
+     * @return iterable<string, array{UpstreamMock, string, array<string, string>, int, Level, string, array<string, mixed>}>
+     */
+    public static function failedSources(): iterable
+    {
+        yield 'picture: server error twice' => [self::scenario()->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE), 'apod', self::failed('unavailable'), 6, Level::Warning, 'Source apod fetch failed: unavailable', ['kind' => 'unavailable', 'httpStatus' => 503, 'durationMs' => 2]];
+        yield 'picture: stalled until max duration' => [self::scenario()->apod()->stalled(), 'apod', self::failed('unavailable'), 5, Level::Warning, 'Source apod fetch failed: unavailable', ['kind' => 'unavailable', 'errorType' => 'TransportException', 'durationMs' => 2]];
+        yield 'picture: connection refused twice' => [self::scenario()->apod()->networkError()->apod()->networkError(), 'apod', self::failed('unavailable'), 6, Level::Warning, 'Source apod fetch failed: unavailable', ['kind' => 'unavailable', 'errorType' => 'TransportException', 'durationMs' => 2]];
+        yield 'picture: rate limited' => [self::scenario()->apod()->status(Response::HTTP_TOO_MANY_REQUESTS)->retryAfter(3600), 'apod', self::failed('rate_limited'), 5, Level::Warning, 'Source apod fetch failed: rate_limited', ['kind' => 'rate_limited', 'httpStatus' => 429, 'retryAt' => new \DateTimeImmutable('2026-11-18 13:00:00 UTC'), 'durationMs' => 2]];
+        yield 'picture: refused key' => [self::scenario()->apod()->status(Response::HTTP_FORBIDDEN), 'apod', self::failed('misconfigured'), 5, Level::Error, 'Source apod fetch failed: misconfigured', ['kind' => 'misconfigured', 'httpStatus' => 403, 'durationMs' => 2]];
+        yield 'picture: rejected date' => [self::scenario()->apod()->fixture('apod/date-out-of-range.json')->status(Response::HTTP_BAD_REQUEST), 'apod', self::failed('rejected'), 5, Level::Notice, 'Source apod fetch failed: rejected', ['kind' => 'rejected', 'httpStatus' => 400, 'durationMs' => 2]];
+        yield 'picture: NASA placeholder' => [self::scenario()->apod()->fixture('apod/placeholder-2026-11-18.json'), 'apod', self::failed('invalid_payload'), 5, Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['title'], 'reason' => 'placeholder', 'durationMs' => 12]];
+        yield 'picture: another date' => [self::scenario()->apod()->fixture('apod/passthrough-first-picture-1995-06-16.json'), 'apod', self::failed('invalid_payload'), 5, Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['date'], 'reason' => 'other_date', 'durationMs' => 12]];
+        yield 'picture: title without text' => [self::scenario()->apod()->json('{"date":"2024-03-15","title":"<b> </b>","explanation":"Gas","media_type":"image"}'), 'apod', self::failed('invalid_payload'), 5, Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['title'], 'reason' => 'no_text', 'durationMs' => 12]];
+        yield 'picture: date that is not a calendar date' => [self::scenario()->apod()->json('{"date":"2024-02-30","title":"Pillars","explanation":"Gas","media_type":"image"}'), 'apod', self::failed('invalid_payload'), 5, Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['date'], 'reason' => 'invalid_value', 'durationMs' => 12]];
+        yield 'picture: body of the wrong shape' => [self::scenario()->apod(), 'apod', self::failed('invalid_payload'), 5, Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['date', 'title', 'explanation', 'mediaType'], 'reason' => 'wrong_shape', 'durationMs' => 12]];
+        yield 'history: rejected' => [self::onThisDayRejected()->apod()->fixture(self::PICTURE)->archiveOn(self::PICTURE_DAY), 'onThisDay', self::failed('rejected'), 5, Level::Notice, 'Source on_this_day fetch failed: rejected', ['kind' => 'rejected', 'httpStatus' => 404, 'durationMs' => 3]];
+        yield 'weather: stalled until max duration' => [UpstreamMock::create()->onThisDayFrom(self::HISTORY_DAY)->apod()->fixture(self::PICTURE)->archive()->stalled(), 'weather', self::failed('unavailable'), 5, Level::Warning, 'Source weather fetch failed: unavailable', ['kind' => 'unavailable', 'errorType' => 'TransportException', 'durationMs' => 6]];
+    }
+
+    public function testDoesNotRetryAStallThatUsedTheWholeTimeBudget(): void
+    {
+        // Given
+        self::upstream()->respondWith(self::scenario()->apod()->stalled()->apod()->fixture(self::PICTURE));
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
+
+        // Then
+        $briefing = self::json($this->client->getResponse()->getContent());
+        self::assertSame(array_replace(self::ALL_FRESH, ['apod' => self::failed('unavailable')]), $briefing['sources']);
+        self::assertCount(1, self::requestedHosts(self::NASA_HOST));
+        self::assertSame(['nasa' => 1], self::upstream()->unserved());
+        self::upstream()->respondWith(UpstreamMock::create());
+    }
+
+    public function testServesTheOnlySourceThatHasData(): void
+    {
+        // Given
+        self::upstream()->respondWith(self::onThisDayRejected()->apod()->stalled()->archiveOn(self::PICTURE_DAY));
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        $briefing = self::json($this->client->getResponse()->getContent());
+        self::assertSame(['apod' => self::failed('unavailable'), 'onThisDay' => self::failed('rejected'), 'weather' => self::FRESH], $briefing['sources']);
+        self::assertSame(['apod', 'onThisDay'], $briefing['missing']);
+        self::assertSame(['weather'], self::attributedSources($briefing));
+        self::assertIsArray($briefing['weather']);
+    }
+
+    public function testListsADayThePictureDoesNotCoverNextToAFailedSource(): void
+    {
+        // Given
+        self::upstream()->respondWith(UpstreamMock::create()->onThisDayFrom(self::HISTORY_DAY)->forecast()->stalled());
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::UNPUBLISHED_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        $briefing = self::json($this->client->getResponse()->getContent());
+        self::assertSame(['apod' => self::NOT_APPLICABLE, 'onThisDay' => self::FRESH, 'weather' => self::failed('unavailable')], $briefing['sources']);
+        self::assertSame(['apod', 'weather'], $briefing['missing']);
+        self::assertSame(['onThisDay'], self::attributedSources($briefing));
+    }
+
+    public function testMarksThePictureNotApplicableWithoutAskingNasa(): void
+    {
+        // Given
+        self::upstream()->respondWith(self::scenario(self::UNPUBLISHED_DAY));
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::UNPUBLISHED_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        $briefing = self::json($this->client->getResponse()->getContent());
+        self::assertSame(['apod' => self::NOT_APPLICABLE, 'onThisDay' => self::FRESH, 'weather' => self::FRESH], $briefing['sources']);
+        self::assertSame(['apod'], $briefing['missing']);
+        self::assertNull($briefing['apod']);
+        self::assertSame([], self::requestedHosts(self::NASA_HOST));
+        self::assertSame([], self::recordsOf(self::BRIEFING_CHANNEL));
+    }
+
     #[DataProvider('briefingsWithoutData')]
-    public function testAnswersBadGatewayWhenNoSourceHasData(string $date, UpstreamMock $scenario): void
+    public function testAnswersBadGatewayWhenNoSourceHasData(string $date, UpstreamMock $scenario, int $failures): void
     {
         // Given
         self::upstream()->respondWith($scenario);
@@ -269,64 +397,21 @@ final class BriefingControllerTest extends FunctionalTestCase
         // Then
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_GATEWAY);
         self::assertResponseHeaderSame(self::CONTENT_TYPE, ProblemJsonErrorRenderer::PROBLEM_JSON);
+        $problem = self::json($this->client->getResponse()->getContent());
+        self::assertSame([Response::HTTP_BAD_GATEWAY, 'Bad Gateway'], [$problem['status'], $problem['detail']]);
+        self::assertArrayNotHasKey('sources', $problem);
         self::assertSame([Level::Warning], self::loggedExceptionLevels());
+        self::assertCount($failures, self::recordsOf(self::BRIEFING_CHANNEL));
     }
 
     /**
-     * @return iterable<string, array{string, UpstreamMock}>
+     * @return iterable<string, array{string, UpstreamMock, int}>
      */
     public static function briefingsWithoutData(): iterable
     {
-        yield 'every source unavailable' => [self::PICTURE_DAY, self::onThisDayRejected()->archive()->status(Response::HTTP_BAD_REQUEST)->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)];
-        yield 'picture not published yet, history and weather unavailable' => ['2026-11-25', self::onThisDayRejected()->forecast()->status(Response::HTTP_BAD_REQUEST)];
-    }
-
-    /**
-     * @param array<string, mixed> $context
-     */
-    #[DataProvider('failedPictures')]
-    public function testLogsTheFailedSourceOnceAtItsKindsLevel(UpstreamMock $scenario, Level $level, string $message, array $context): void
-    {
-        // Given
-        self::upstream()->respondWith($scenario);
-
-        // When
-        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
-
-        // Then
-        $records = self::recordsOf(self::BRIEFING_CHANNEL);
-        self::assertCount(1, $records);
-        self::assertSame($level, $records[0]->level);
-        self::assertSame($message, $records[0]->message);
-        self::assertSame(['source' => 'apod', 'date' => self::PICTURE_DAY] + $context, $records[0]->context);
-    }
-
-    /**
-     * @return iterable<string, array{UpstreamMock, Level, string, array<string, mixed>}>
-     */
-    public static function failedPictures(): iterable
-    {
-        yield 'server error twice' => [self::scenario()->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE), Level::Warning, 'Source apod fetch failed: unavailable', ['kind' => 'unavailable', 'httpStatus' => 503, 'durationMs' => 0]];
-        yield 'refused key' => [self::scenario()->apod()->status(Response::HTTP_FORBIDDEN), Level::Error, 'Source apod fetch failed: misconfigured', ['kind' => 'misconfigured', 'httpStatus' => 403, 'durationMs' => 0]];
-        yield 'rejected date' => [self::scenario()->apod()->fixture('apod/date-out-of-range.json')->status(Response::HTTP_BAD_REQUEST), Level::Notice, 'Source apod fetch failed: rejected', ['kind' => 'rejected', 'httpStatus' => 400, 'durationMs' => 0]];
-        yield 'NASA placeholder' => [self::scenario()->apod()->fixture('apod/placeholder-2026-11-18.json'), Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['title'], 'reason' => 'placeholder', 'durationMs' => 0]];
-        yield 'picture of another date' => [self::scenario()->apod()->fixture('apod/passthrough-first-picture-1995-06-16.json'), Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['date'], 'reason' => 'other_date', 'durationMs' => 0]];
-        yield 'title without text' => [self::scenario()->apod()->json('{"date":"2024-03-15","title":"<b> </b>","explanation":"Gas","media_type":"image"}'), Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['title'], 'reason' => 'no_text', 'durationMs' => 0]];
-        yield 'date that is not a calendar date' => [self::scenario()->apod()->json('{"date":"2024-02-30","title":"Pillars","explanation":"Gas","media_type":"image"}'), Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['date'], 'reason' => 'invalid_value', 'durationMs' => 0]];
-        yield 'body of the wrong shape' => [self::scenario()->apod(), Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['date', 'title', 'explanation', 'mediaType'], 'reason' => 'wrong_shape', 'durationMs' => 0]];
-        yield 'network error twice' => [self::scenario()->apod()->networkError()->apod()->networkError(), Level::Warning, 'Source apod fetch failed: unavailable', ['kind' => 'unavailable', 'errorType' => 'TransportException', 'durationMs' => 0]];
-    }
-
-    public function testLogsNothingOnTheBriefingChannelForADayThePictureDoesNotCover(): void
-    {
-        // Given
-        self::upstream()->respondWith(self::scenario('2026-11-25'));
-
-        // When
-        $this->client->request(Request::METHOD_GET, self::BRIEFING.'2026-11-25');
-
-        // Then
-        self::assertSame([], self::recordsOf(self::BRIEFING_CHANNEL));
+        yield 'every source unavailable' => [self::PICTURE_DAY, self::onThisDayRejected()->archive()->status(Response::HTTP_BAD_REQUEST)->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE), 3];
+        yield 'picture not published yet, history and weather unavailable' => [self::UNPUBLISHED_DAY, self::onThisDayRejected()->forecast()->status(Response::HTTP_BAD_REQUEST), 2];
+        yield 'picture and weather stalled, history rejected' => [self::PICTURE_DAY, self::onThisDayRejected()->archive()->stalled()->apod()->stalled(), 3];
     }
 
     #[DataProvider('invalidDates')]
@@ -462,6 +547,54 @@ final class BriefingControllerTest extends FunctionalTestCase
         }
 
         return $scenario->forecastOn($day);
+    }
+
+    protected function tearDown(): void
+    {
+        self::assertSame([], self::upstream()->unserved(), 'Every planned upstream response must be requested.');
+        parent::tearDown();
+    }
+
+    /**
+     * @param list<string> $failed
+     *
+     * @return list<string>
+     */
+    private static function othersThan(array $failed): array
+    {
+        return array_values(array_diff(array_keys(self::ALL_FRESH), $failed));
+    }
+
+    /**
+     * @param array<mixed> $briefing
+     *
+     * @return list<mixed>
+     */
+    private static function attributedSources(array $briefing): array
+    {
+        self::assertIsArray($briefing['attributions']);
+
+        return array_values(array_map(static function (mixed $attribution): mixed {
+            self::assertIsArray($attribution);
+
+            return $attribution['source'];
+        }, $briefing['attributions']));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function requestedHosts(string $host): array
+    {
+        return array_values(array_filter(array_map(static fn (MockResponse $response): string => (string) parse_url($response->getRequestUrl(), \PHP_URL_HOST), self::upstream()->served()), static fn (string $requested): bool => $host === $requested));
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function failed(string $error): array
+    {
+        return ['status' => 'failed', 'error' => $error, 'lastAttemptAt' => self::LAST_ATTEMPT];
     }
 
     private static function onThisDayRejected(): UpstreamMock

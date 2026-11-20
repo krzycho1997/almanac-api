@@ -130,7 +130,7 @@ final class UpstreamHttpClientsTest extends KernelTestCase
     public function testDoesNotRetryABodyThatStallsAfterTheHeaders(): void
     {
         // Given
-        self::factory()->respondWith(UpstreamMock::create()->apod()->timeout()->apod());
+        self::factory()->respondWith(UpstreamMock::create()->apod()->idleTimeout()->apod());
         $response = self::client(self::NASA)->request(Request::METHOD_GET, self::PATH);
 
         try {
