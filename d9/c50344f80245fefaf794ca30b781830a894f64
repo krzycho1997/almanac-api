@@ -1,0 +1,88 @@
+tests/Briefing/Integration/UpstreamHttpClientsTest.php
+  s_c93bf0c40bb0e6::t_dcfd1dea5f4480 71
+tests/Fixtures/upstream/apod/passthrough-2024-03-15.json
+  s_c93bf0c40bb0e6::t_bbc8b06b6ad6ac 13-15
+  s_215589a03aa971::t_c11fd6cc90e6f2 1-12
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Source/Apod/ProbeUsesItsOwnInterior.php
+  s_215589a03aa971::t_273ae45809b822 1-12
+tests/Fixtures/upstream/apod/placeholder-2026-11-18.json
+  s_215589a03aa971::t_c11fd6cc90e6f2 1-9
+config/services.yaml
+  s_c93bf0c40bb0e6::t_f1f5a955811b83 42-50
+  s_215589a03aa971::t_f32ae44f7c86f5 15-16,60-61
+tools/phpstan/tests/Architecture/Fixtures/Briefing/ProbeUsesSourceContract.php
+  s_215589a03aa971::t_273ae45809b822 1-14
+tests/Fixtures/upstream/apod/date-out-of-range.json
+  s_215589a03aa971::t_c11fd6cc90e6f2 1-5
+tests/Support/Briefing/UpstreamMock.php
+  s_c93bf0c40bb0e6::t_610f96c226c9b3 72-76
+  s_215589a03aa971::t_f32ae44f7c86f5 20-22,64-71
+  s_215589a03aa971::t_fe093329329a84 54-63,77
+  s_c93bf0c40bb0e6::t_818b876d6fe357 78
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Source/Apod/ProbeClientUsesStorage.php
+  s_c93bf0c40bb0e6::t_9535627b8980c1 1-14
+src/Briefing/Source/Apod/ApodApiResponse.php
+  s_215589a03aa971::t_5823b08ae8284a 8,13,15,17,19,21,23
+tests/Fixtures/upstream/apod/passthrough-video-2021-06-23.json
+  s_c93bf0c40bb0e6::t_bbc8b06b6ad6ac 1-15
+tests/Architecture/LayerTest.php
+  s_215589a03aa971::t_273ae45809b822 88-108,127-137
+  s_c93bf0c40bb0e6::t_9535627b8980c1 109-126
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Source/Apod/ProbeClientKnowsItsWiring.php
+  s_c93bf0c40bb0e6::t_9535627b8980c1 1-15
+tests/Architecture/Codebase.php
+  s_c93bf0c40bb0e6::t_13e38bf96404a1 29,34,36-40
+  s_215589a03aa971::t_273ae45809b822 28,30-33,35,41-42
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Model/ProbeReadonlyModel.php
+  s_215589a03aa971::t_273ae45809b822 1-13
+src/Briefing/Source/Apod/ApodClient.php
+  s_215589a03aa971::t_5823b08ae8284a 1-6,8-50,52,54-55,57-58,60,68-74
+  s_c93bf0c40bb0e6::t_a8346f97a6e78d 7,51,53,56,59,61-67
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Model/ProbeModelUsesEntity.php
+  s_215589a03aa971::t_58d8944eb55a9f 9
+src/Briefing/Source/Apod/ApodSource.php
+  s_215589a03aa971::t_5823b08ae8284a 1-27
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Source/Apod/ProbeWiringSource.php
+  s_c93bf0c40bb0e6::t_9535627b8980c1 1-15
+tools/phpstan/tests/Architecture/ArchitectureRulesTest.php
+  s_215589a03aa971::t_58d8944eb55a9f 28-30
+  s_c93bf0c40bb0e6::t_9535627b8980c1 31-32
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Model/ProbeMutableModel.php
+  s_215589a03aa971::t_273ae45809b822 1-10
+tests/Fixtures/upstream/apod/passthrough-first-picture-1995-06-16.json
+  s_c93bf0c40bb0e6::t_bbc8b06b6ad6ac 1-15
+tests/Fixtures/upstream/README.md
+  s_c93bf0c40bb0e6::t_610f96c226c9b3 3,8,12-14
+  s_c93bf0c40bb0e6::t_ab2987ffce0d76 7
+  s_215589a03aa971::t_f32ae44f7c86f5 1-2,4-6,9-11,15
+tools/phpstan/tests/Architecture/Fixtures/Briefing/ProbeUsesSourceInterior.php
+  s_215589a03aa971::t_273ae45809b822 1-14
+tests/Briefing/Integration/Source/Apod/ApodClientTest.php
+  s_215589a03aa971::t_fe093329329a84 180
+  s_c93bf0c40bb0e6::t_ab2987ffce0d76 53-56,62,65,69,102-103,106,109,112,114-115,117-138,140-152,181
+  s_215589a03aa971::t_82764da5658961 1-52,57-61,63-64,66-68,70-85,87-88,104-105,107-108,110-111,113,116,153-177,182-200
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d9c50344f80245fefaf794ca30b781830a894f64",
+  "prompts": {},
+  "sessions": {
+    "s_215589a03aa971": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "18765be5-187c-4b7a-ae8b-095188731854",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    },
+    "s_c93bf0c40bb0e6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "91ce84bb-10a8-4ffa-8f70-ca9a3f703163",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}

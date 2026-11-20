@@ -1,0 +1,36 @@
+src/Briefing/BriefingAggregator.php
+  s_a463f0f3bbc4ea::t_7cb9c0c8a296e0 32,38-54
+  s_a463f0f3bbc4ea::t_42c5b35f803988 55
+src/Briefing/Source/Apod/ApodMapper.php
+  s_a463f0f3bbc4ea::t_7cb9c0c8a296e0 33,42-50
+  s_a463f0f3bbc4ea::t_6098e69dc70438 51-52
+src/Briefing/Mapper/BriefingResponseMapper.php
+  s_a463f0f3bbc4ea::t_7cb9c0c8a296e0 7,37,45-47
+  s_a463f0f3bbc4ea::t_becf4a1695cec3 48-49
+src/Briefing/Validator/BriefingDate.php
+  s_a463f0f3bbc4ea::t_7cb9c0c8a296e0 7,14,23
+src/Briefing/BriefingDay.php
+  s_a463f0f3bbc4ea::t_7cb9c0c8a296e0 1-11
+src/Briefing/ValueResolver/BriefingDateValueResolver.php
+  s_a463f0f3bbc4ea::t_7cb9c0c8a296e0 7,26
+src/Briefing/SourceFailureLog.php
+  s_a463f0f3bbc4ea::t_7cb9c0c8a296e0 36
+src/Briefing/Source/Apod/ApodClient.php
+  s_a463f0f3bbc4ea::t_7cb9c0c8a296e0 7,42,53-59,62,64-69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4061166eee76704009789a73efdcbcfb77ad1341",
+  "prompts": {},
+  "sessions": {
+    "s_a463f0f3bbc4ea": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e80e7e02-debb-4938-91ba-befdb4b4d71a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}

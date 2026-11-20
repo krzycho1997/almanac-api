@@ -1,0 +1,127 @@
+tests/Briefing/Unit/Source/PendingFetchTest.php
+  s_a463f0f3bbc4ea::t_2a2fb4d2b25072 110
+  s_c7944f803b95c0::t_ffb334e475a983 132
+  s_a463f0f3bbc4ea::t_30f477e5ccc733 8,60,109,111-114,117,125-131,133-136,152,163,167,171,174
+  s_a463f0f3bbc4ea::t_7f3fe463cf9820 11,172-173
+tests/Briefing/Integration/UpstreamResponseDecoderTest.php
+  s_a463f0f3bbc4ea::t_30f477e5ccc733 59-61,75
+  s_a463f0f3bbc4ea::t_7f3fe463cf9820 8,63,76,82,88-103
+src/Briefing/BriefingAggregator.php
+  s_c7944f803b95c0::t_5c0fb3ec01eac8 25,33-34,36-46
+tests/Briefing/Unit/Source/Apod/ApodMapperTest.php
+  s_a463f0f3bbc4ea::t_942737b5049060 164,166-167,173,178,180-181,187,191-193,202,204-205,220,222-225,227-229
+  s_a463f0f3bbc4ea::t_3559f14aa64741 230
+  s_a463f0f3bbc4ea::t_c814f3e32d4abf 149-155
+  s_a463f0f3bbc4ea::t_7f3fe463cf9820 10,165,168-169,179,182-183,203,206-207,221,226
+src/Briefing/SourceFailureLog.php
+  s_a463f0f3bbc4ea::t_fe716d7ca0fb69 41-42
+  s_c7944f803b95c0::t_5c0fb3ec01eac8 1-40,44-46
+  s_a463f0f3bbc4ea::t_6069d5eed70335 43
+src/Briefing/FailureCause.php
+  s_a463f0f3bbc4ea::t_fe716d7ca0fb69 1-16,18-25,27-31
+  s_a463f0f3bbc4ea::t_6069d5eed70335 17,26
+src/Briefing/Source/PendingFetch.php
+  s_a463f0f3bbc4ea::t_fe716d7ca0fb69 8,36,57-58
+  s_c7944f803b95c0::t_5c0fb3ec01eac8 35
+src/Briefing/Exception/InvalidUpstreamPayloadException.php
+  s_a463f0f3bbc4ea::t_fe716d7ca0fb69 15-19,21-25,55-62
+  s_a463f0f3bbc4ea::t_13c6d1fd09da89 12-13,70-74
+  s_a463f0f3bbc4ea::t_e45ac79483c8c4 68
+  s_a463f0f3bbc4ea::t_6069d5eed70335 7-8,20,26,28,33,41,49-54
+tests/Briefing/Unit/SourceFailureLogTest.php
+  s_c7944f803b95c0::t_5c0fb3ec01eac8 48
+  s_c7944f803b95c0::t_018de56d4ae084 1-6,8,10-47,49-63,65,67-83,85,97-118
+  s_a463f0f3bbc4ea::t_30f477e5ccc733 7,64,66,92-93,95
+  s_a463f0f3bbc4ea::t_7f3fe463cf9820 9,84,86-91,94,96
+src/Shared/Logging/LogContextKey.php
+  s_a463f0f3bbc4ea::t_fe716d7ca0fb69 13,17
+src/Briefing/SourceResult.php
+  s_c7944f803b95c0::t_5c0fb3ec01eac8 24,29
+  s_a463f0f3bbc4ea::t_fe716d7ca0fb69 18,40,42
+tests/Briefing/Integration/Source/Apod/ApodClientTest.php
+  s_a463f0f3bbc4ea::t_942737b5049060 7
+  s_a463f0f3bbc4ea::t_6442e21d3a4d24 91-103
+  s_a463f0f3bbc4ea::t_b2ffa5dcc3395c 181-182
+  s_a463f0f3bbc4ea::t_7f3fe463cf9820 12,155
+src/Briefing/Source/RetryAfter.php
+  s_a463f0f3bbc4ea::t_daaada9a6fd535 15,22,24-32,34,46-50,59
+tests/Briefing/Unit/Source/RetryAfterTest.php
+  s_a463f0f3bbc4ea::t_daaada9a6fd535 52-79
+  s_a463f0f3bbc4ea::t_2907974251508c 80
+tests/Briefing/Unit/FailureKindTest.php
+  s_a463f0f3bbc4ea::t_daaada9a6fd535 15,23,27-31
+tests/Briefing/Unit/Source/UpstreamRetryStrategyTest.php
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 1-8,10,11,13-16,18-24,26-28,39-40
+  s_a463f0f3bbc4ea::t_e1406613b4f5d6 9,17,25,29-38
+  s_a463f0f3bbc4ea::t_0a7f68f584041b 12
+.env.example
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 13
+config/services.yaml
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 39
+tests/Briefing/Integration/UpstreamRetryWiringTest.php
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 1-33
+.env.dev
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 5
+.env
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 21
+tests/Briefing/Integration/UpstreamHttpClientsTest.php
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 104,106-108
+src/Briefing/Source/UpstreamRetryStrategy.php
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 14-22
+  s_a463f0f3bbc4ea::t_0a7f68f584041b 9
+.env.test
+  s_a463f0f3bbc4ea::t_d0883deeb9e619 3
+src/Briefing/Source/Apod/ApodMapper.php
+  s_a463f0f3bbc4ea::t_c814f3e32d4abf 19-22,82,117-118,120
+  s_a463f0f3bbc4ea::t_6069d5eed70335 10,34,56,74
+src/Briefing/Source/UpstreamResponseDecoder.php
+  s_a463f0f3bbc4ea::t_c62f7e08756a36 11,14,22-25,58-64,77,79
+  s_a463f0f3bbc4ea::t_9edfc7c847aa73 81
+  s_a463f0f3bbc4ea::t_13c6d1fd09da89 82,85
+composer.json
+  s_a463f0f3bbc4ea::t_598e2e7f1f89b4 35
+composer.lock
+  s_a463f0f3bbc4ea::t_22b8571a7984ea 7
+tests/Briefing/Integration/BriefingResponseSchemaTest.php
+  s_a463f0f3bbc4ea::t_c1cf2dcf72573f 1-60,62-66,71-72
+  s_a463f0f3bbc4ea::t_d5abd537562436 61,67-70
+tests/Briefing/Unit/Mapper/BriefingResponseMapperTest.php
+  s_a463f0f3bbc4ea::t_a6a312abed7fa2 25,55-56,59-82,88,93-103
+  s_a463f0f3bbc4ea::t_75d04642476b6c 104
+tests/Briefing/Functional/BriefingControllerTest.php
+  s_a463f0f3bbc4ea::t_beb794a9ae11b3 135-137
+  s_a463f0f3bbc4ea::t_e2cb3197771c2a 31,237-240,242-252,254-257,259-261,267-276
+  s_a463f0f3bbc4ea::t_fa6d39de634c1f 277
+  s_a463f0f3bbc4ea::t_918d53a156f1b8 241,253,258,262-266
+tests/Support/InteractsWithLogs.php
+  s_a463f0f3bbc4ea::t_e2cb3197771c2a 53-60
+src/Briefing/PayloadDefect.php
+  s_a463f0f3bbc4ea::t_6069d5eed70335 1-16
+src/Briefing/Source/Apod/ApodClient.php
+  s_a463f0f3bbc4ea::t_6069d5eed70335 68
+  s_a463f0f3bbc4ea::t_7f3fe463cf9820 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e5b0c1624eb75fa98c31950102125f4e88393366",
+  "prompts": {},
+  "sessions": {
+    "s_a463f0f3bbc4ea": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e80e7e02-debb-4938-91ba-befdb4b4d71a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    },
+    "s_c7944f803b95c0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "40f8f051-0645-4b76-81d0-afda85be8011",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
