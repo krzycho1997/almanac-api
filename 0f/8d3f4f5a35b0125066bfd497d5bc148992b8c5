@@ -1,0 +1,14 @@
+README.md
+  h_2da2cad4b4f8df 169,180,182,184-185,218
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0f8d3f4f5a35b0125066bfd497d5bc148992b8c5",
+  "prompts": {},
+  "humans": {
+    "h_2da2cad4b4f8df": {
+      "author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
