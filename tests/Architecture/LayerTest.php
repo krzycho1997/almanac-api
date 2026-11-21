@@ -8,6 +8,10 @@ use App\Briefing\Contract\DiscoveryId;
 use App\Briefing\Discovery\DiscoveryExtractor;
 use App\Kernel;
 use App\Shared\Contract\UidIdType;
+use App\Shared\Metrics\Metric;
+use App\Shared\Metrics\MetricLabel;
+use App\Shared\Metrics\Metrics;
+use App\Shared\Metrics\MetricsExporter;
 use PHPat\Selector\Selector;
 use PHPat\Selector\SelectorInterface;
 use PHPat\Test\Attributes\TestRule;
@@ -181,6 +185,20 @@ final class LayerTest
             ->construct()
             ->classes(Selector::classname(DiscoveryId::class))
             ->because('a discovery id is the UUIDv5 of its key, so only the owner of the keys and the namespace makes one; others parse it with fromString()')
+            ->nonIgnorable();
+    }
+
+    #[TestRule]
+    public function metricsGoThroughThePort(): Rule
+    {
+        return PHPat::rule()
+            ->classes(Selector::inNamespace('App'))
+            ->excluding(Selector::inNamespace('App\Tests'), Selector::inNamespace('App\PHPStan'), Selector::inNamespace('App\Shared\Metrics'))
+            ->shouldNot()
+            ->dependOn()
+            ->classes(Selector::inNamespace('Prometheus'), Selector::inNamespace('App\Shared\Metrics'))
+            ->excluding(Selector::classname(Metrics::class), Selector::classname(Metric::class), Selector::classname(MetricLabel::class), Selector::classname(MetricsExporter::class))
+            ->because('modules record metrics through the Metrics port, so the store and the client library can change in one place')
             ->nonIgnorable();
     }
 

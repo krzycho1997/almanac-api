@@ -18,6 +18,7 @@ enum LogContextKey: string
     case From = 'from';
     case HttpStatus = 'httpStatus';
     case Kind = 'kind';
+    case Metric = 'metric';
     case OpenSeconds = 'openSeconds';
     case Operation = 'operation';
     case Outcome = 'outcome';

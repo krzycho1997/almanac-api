@@ -89,6 +89,16 @@ services:
         arguments:
             $transientFailures: '@app.briefing.transient_failure_retry_strategy'
 
+    app.metrics.storage:
+        class: Prometheus\Storage\Redis
+        lazy: Prometheus\Storage\Adapter
+        factory: ['Prometheus\Storage\Redis', 'fromExistingConnection']
+        arguments: ['@app.redis_connection']
+
+    App\Shared\Metrics\PrometheusMetrics:
+        arguments:
+            $storage: '@app.metrics.storage'
+
 when@test:
     parameters:
         app.briefing.retry_delay_ms: 0
@@ -150,6 +160,9 @@ when@test:
         App\Briefing\CircuitBreaker\CircuitBreakerStore:
             class: App\Tests\Support\Briefing\CircuitBreaker\InMemoryCircuitBreakerStore
             arguments: ['@clock']
+
+        app.metrics.storage:
+            class: Prometheus\Storage\InMemory
 
         test.identity.access_token_handler:
             alias: App\Identity\Security\AccessTokenHandler
