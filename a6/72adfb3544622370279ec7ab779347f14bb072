@@ -1,0 +1,21 @@
+docs/SPEC.md
+  s_4da5374f6e605f::t_9fd0e09607b58d 29,40
+README.md
+  s_4da5374f6e605f::t_9fd0e09607b58d 70,177,205
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a672adfb3544622370279ec7ab779347f14bb072",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
