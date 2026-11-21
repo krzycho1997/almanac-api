@@ -89,6 +89,9 @@ services:
         arguments:
             $transientFailures: '@app.briefing.transient_failure_retry_strategy'
 
+    app.metrics.clock:
+        class: Symfony\Component\Clock\NativeClock
+
     app.metrics.storage:
         class: Prometheus\Storage\Redis
         lazy: Prometheus\Storage\Adapter
