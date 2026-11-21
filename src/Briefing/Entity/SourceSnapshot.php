@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Briefing\Entity;
 
 use App\Briefing\FailureKind;
+use App\Briefing\Repository\SourceSnapshotRepository;
 use App\Briefing\SnapshotScope;
 use App\Briefing\SourceName;
 use App\Briefing\SourceStatus;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(readOnly: true)]
+#[ORM\Entity(repositoryClass: SourceSnapshotRepository::class, readOnly: true)]
 #[ORM\Table(name: 'briefing_source_snapshot')]
 class SourceSnapshot
 {

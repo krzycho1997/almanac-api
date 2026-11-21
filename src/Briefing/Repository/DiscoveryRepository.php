@@ -5,12 +5,18 @@ declare(strict_types=1);
 namespace App\Briefing\Repository;
 
 use App\Briefing\BriefingDay;
+use App\Briefing\Contract\DiscoveryId;
 use App\Briefing\Discovery\DiscoveryRecord;
 use App\Briefing\Entity\Discovery;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\Persistence\ManagerRegistry;
 
-final readonly class DiscoveryRepository
+/**
+ * @extends ServiceEntityRepository<Discovery>
+ */
+final class DiscoveryRepository extends ServiceEntityRepository
 {
     private const string UPSERT = <<<'SQL'
         INSERT INTO briefing_discovery (id, key, type, date, title, data, created_at)
@@ -22,9 +28,19 @@ final readonly class DiscoveryRepository
 
     private const array UPSERT_TYPES = ['records' => Types::JSONB, 'createdAt' => Types::DATETIMETZ_IMMUTABLE];
 
-    public function __construct(
-        private Connection $connection,
-    ) {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Discovery::class);
+    }
+
+    /**
+     * @param non-empty-list<DiscoveryId> $ids
+     *
+     * @return list<Discovery>
+     */
+    public function findByIds(array $ids): array
+    {
+        return $this->findBy(['id' => $ids]);
     }
 
     /**
@@ -36,7 +52,12 @@ final readonly class DiscoveryRepository
             return 0;
         }
 
-        return (int) $this->connection->executeStatement(self::UPSERT, ['records' => self::rows($records), 'createdAt' => $createdAt], self::UPSERT_TYPES);
+        return (int) $this->connection()->executeStatement(self::UPSERT, ['records' => self::rows($records), 'createdAt' => $createdAt], self::UPSERT_TYPES);
+    }
+
+    private function connection(): Connection
+    {
+        return $this->getEntityManager()->getConnection();
     }
 
     /**

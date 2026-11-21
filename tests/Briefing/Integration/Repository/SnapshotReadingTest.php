@@ -16,7 +16,7 @@ use App\Briefing\SourceResult;
 use App\Tests\Support\Briefing\SourcePayloads;
 use App\Tests\Support\ExposingKernel;
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Monolog\Handler\TestHandler;
 use Monolog\Level;
 use Monolog\Logger;
@@ -33,7 +33,7 @@ final class SnapshotReadingTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->container = ExposingKernel::booted('test', [SourceSnapshotRepository::class, Connection::class, EntityManagerInterface::class, SourcePayloadCodec::class]);
+        $this->container = ExposingKernel::booted('test', [SourceSnapshotRepository::class, Connection::class, ManagerRegistry::class, SourcePayloadCodec::class]);
     }
 
     public function testFindsNothingForScopesNeverStored(): void
@@ -109,7 +109,7 @@ final class SnapshotReadingTest extends TestCase
         // Given
         $this->storeRaw('ok', null, self::UNREADABLE);
         $logs = new TestHandler();
-        $repository = new SourceSnapshotRepository($this->entityManager(), $this->codec(), new Logger('briefing', [$logs]));
+        $repository = new SourceSnapshotRepository($this->registry(), $this->codec(), new Logger('briefing', [$logs]));
 
         // When
         $repository->findForScopes([self::apod()]);
@@ -217,12 +217,12 @@ final class SnapshotReadingTest extends TestCase
         return $repository;
     }
 
-    private function entityManager(): EntityManagerInterface
+    private function registry(): ManagerRegistry
     {
-        $entityManager = $this->service(EntityManagerInterface::class);
-        self::assertInstanceOf(EntityManagerInterface::class, $entityManager);
+        $registry = $this->service(ManagerRegistry::class);
+        self::assertInstanceOf(ManagerRegistry::class, $registry);
 
-        return $entityManager;
+        return $registry;
     }
 
     private function codec(): SourcePayloadCodec

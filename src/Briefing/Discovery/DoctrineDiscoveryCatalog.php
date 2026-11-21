@@ -8,12 +8,12 @@ use App\Briefing\Contract\DiscoveryCatalog;
 use App\Briefing\Contract\DiscoveryId;
 use App\Briefing\Contract\DiscoveryView;
 use App\Briefing\Entity\Discovery;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Briefing\Repository\DiscoveryRepository;
 
 final readonly class DoctrineDiscoveryCatalog implements DiscoveryCatalog
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        private DiscoveryRepository $discoveries,
     ) {
     }
 
@@ -28,7 +28,7 @@ final readonly class DoctrineDiscoveryCatalog implements DiscoveryCatalog
             return [];
         }
 
-        return self::viewsById($this->entityManager->getRepository(Discovery::class)->findBy(['id' => array_values($ids)]));
+        return self::viewsById($this->discoveries->findByIds(array_values($ids)));
     }
 
     /**

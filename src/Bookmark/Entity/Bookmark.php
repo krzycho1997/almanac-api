@@ -6,6 +6,7 @@ namespace App\Bookmark\Entity;
 
 use App\Bookmark\BookmarkId;
 use App\Bookmark\Doctrine\BookmarkIdType;
+use App\Bookmark\Repository\BookmarkRepository;
 use App\Briefing\Contract\DiscoveryId;
 use App\Briefing\Contract\DiscoveryIdType;
 use App\Identity\Contract\UserId;
@@ -13,7 +14,7 @@ use App\Identity\Contract\UserIdType;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: BookmarkRepository::class)]
 #[ORM\Table(name: 'bookmark')]
 #[ORM\UniqueConstraint(name: 'bookmark_user_discovery_unique', columns: ['user_id', 'discovery_id'])]
 #[ORM\Index(name: 'bookmark_user_created_idx', columns: ['user_id', 'created_at', 'id'])]
