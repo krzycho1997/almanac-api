@@ -20,6 +20,7 @@ docker run --rm --entrypoint sh -e RUNTIME_SETTINGS="$runtime_settings" "$image"
     [ -f .env.local.php ] || fail "the env is not dumped to .env.local.php"
     php -r "\$env = require \".env.local.php\"; foreach (explode(\" \", getenv(\"RUNTIME_SETTINGS\")) as \$name) { if (\"\" === (\$env[\$name] ?? \"\")) { continue; } exit(1); }" || fail "the dumped env has a default for a runtime setting"
     php bin/console about --env=prod | grep -Eq "Debug +false" || fail "the kernel is not in prod without debug"
+    php -r "require \"vendor/autoload.php\"; (new Symfony\Component\Dotenv\Dotenv())->bootEnv(\".env\"); \$kernel = new App\Kernel(\"prod\", false); \$kernel->boot(); \$pool = \$kernel->getContainer()->get(\"cache.system\"); exit(\$pool->save(\$pool->getItem(\"check-prod-image\")->set(true)) ? 0 : 1);" || fail "the system cache cannot save in the image"
 
     exit "$status"
 '

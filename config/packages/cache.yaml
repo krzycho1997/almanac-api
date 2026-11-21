@@ -8,3 +8,8 @@ when@test:
     framework:
         cache:
             app: cache.adapter.array
+
+when@prod:
+    framework:
+        cache:
+            system: cache.adapter.apcu

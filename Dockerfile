@@ -45,8 +45,8 @@ RUN composer dump-autoload --no-dev --classmap-authoritative \
 FROM runtime AS prod
 
 ENV APP_ENV=prod APP_DEBUG=0
-RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
-    && printf 'expose_php = Off\nopcache.validate_timestamps = 0\nopcache.preload = /srv/app/config/preload.php\nopcache.preload_user = www-data\n' > "$PHP_INI_DIR/conf.d/zz-prod.ini"
+RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+COPY docker/php/conf.d/prod.ini $PHP_INI_DIR/conf.d/zz-prod.ini
 
 COPY --from=prod-builder /srv/app /srv/app
 
