@@ -6,7 +6,7 @@ monolog:
 
 services:
     app.monolog.formatter.json:
-        class: Monolog\Formatter\JsonFormatter
+        class: App\Shared\Logging\ClientErrorJsonFormatter
         arguments:
             $includeStacktraces: true
 
@@ -56,35 +56,43 @@ services:
                 - '/[\p{L}\p{N}._%+-]+@[\p{L}\p{N}-]+(?:\.[\p{L}\p{N}-]+)*\.\p{L}{2,}/u'
             $mask: !php/const App\Shared\Logging\AllowedLogContextProcessor::MASK
 
-when@dev: &stderr_json
+when@dev:
     monolog:
         handlers:
-            main:
+            main: &main_handler
                 type: stream
                 path: php://stderr
                 level: '%env(LOG_LEVEL)%'
                 formatter: app.monolog.formatter.redacting_json
                 channels: ['!event', '!request', '!doctrine', '!deprecation']
-            request:
+            request: &request_handler
                 type: stream
                 path: php://stderr
                 level: notice
                 formatter: app.monolog.formatter.redacting_json
                 channels: [request]
-            doctrine:
+            doctrine: &doctrine_handler
                 type: stream
                 path: php://stderr
                 level: warning
                 formatter: app.monolog.formatter.redacting_json
                 channels: [doctrine]
-            deprecation:
+            deprecation: &deprecation_handler
                 type: stream
                 path: php://stderr
                 level: '%env(LOG_LEVEL)%'
                 formatter: app.monolog.formatter.redacting_json
                 channels: [deprecation]
 
-when@prod: *stderr_json
+when@prod:
+    monolog:
+        handlers:
+            main:
+                <<: *main_handler
+                channels: ['!event', '!request', '!doctrine', '!deprecation', '!http_client']
+            request: *request_handler
+            doctrine: *doctrine_handler
+            deprecation: *deprecation_handler
 
 when@test:
     monolog:

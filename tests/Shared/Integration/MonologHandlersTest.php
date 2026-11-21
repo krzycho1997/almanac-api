@@ -18,6 +18,7 @@ final class MonologHandlersTest extends TestCase
     private const string HANDLER_PREFIX = 'monolog.handler.';
     private const string HANDLER_TAG = 'monolog.handler';
     private const string REQUEST_LOGGER = 'monolog.logger.request';
+    private const string HTTP_CLIENT_LOGGER = 'monolog.logger.http_client';
     private const string REDACTING_FORMATTER = 'app.monolog.formatter.redacting_json';
     private const string SET_FORMATTER = 'setFormatter';
     private const string PUSH_HANDLER = 'pushHandler';
@@ -62,6 +63,34 @@ final class MonologHandlersTest extends TestCase
 
         // Then
         self::assertSame([LogLevel::NOTICE], array_values($levels));
+    }
+
+    /**
+     * @param list<string> $expectedLevels
+     */
+    #[DataProvider('httpClientLevels')]
+    public function testLogsTheHttpClientChannelOnlyInDev(string $environment, array $expectedLevels): void
+    {
+        // Given
+        $container = InspectedContainer::of($environment);
+
+        // When
+        $levels = array_map(
+            static fn (Definition $handler): string => self::levelOf($container, $handler),
+            self::writingHandlers($container, self::handlerIdsOf($container, self::HTTP_CLIENT_LOGGER)),
+        );
+
+        // Then
+        self::assertSame($expectedLevels, array_values($levels));
+    }
+
+    /**
+     * @return iterable<string, array{string, list<string>}>
+     */
+    public static function httpClientLevels(): iterable
+    {
+        yield 'dev' => ['dev', [LogLevel::INFO]];
+        yield 'prod' => ['prod', []];
     }
 
     /**
