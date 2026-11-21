@@ -1,0 +1,38 @@
+docs/SPEC.md
+  s_4da5374f6e605f::t_42e07fcf33618d 27-31,33
+  s_4da5374f6e605f::t_c3f504b93e19ad 39
+  s_4da5374f6e605f::t_e6b62dd0b44ef1 32
+tools/phpstan/tests/Rule/ProviderLiteralRuleTest.php
+  s_4da5374f6e605f::t_be8a3012d46665 42
+  s_4da5374f6e605f::t_90e58b0f09cd93 29,41,43,67-74
+tools/phpstan/tests/Rule/Fixtures/ProviderLiteral/src/Briefing/Discovery/ProbeBuildsAddresses.php
+  s_4da5374f6e605f::t_90e58b0f09cd93 1-27
+tools/phpstan/src/Rule/ProviderLiteralRule.php
+  s_4da5374f6e605f::t_90e58b0f09cd93 8-10,22,36-40,45,51,57,59-66,68-71,77-92,96,98-99,131,133
+  s_4da5374f6e605f::t_449ed098e2b69c 18
+tools/phpstan/tests/Rule/Fixtures/ProviderLiteral/src/Shared/ProbeAllowedLiterals.php
+  s_4da5374f6e605f::t_90e58b0f09cd93 12
+src/Briefing/Discovery/PersonIdentity.php
+  s_4da5374f6e605f::t_e3c5ac0647a69f 12
+tests/Briefing/Unit/Source/OnThisDay/WikipediaPersonIdentityTest.php
+  s_4da5374f6e605f::t_e3c5ac0647a69f 37
+tests/Briefing/Unit/DependencyInjection/ProviderClientsConfigTest.php
+  s_4da5374f6e605f::t_8994f287a97442 15,22,28-50,53,56,63,67-68,71-73,79,82-99,106-113,115,128-136
+  s_4da5374f6e605f::t_6981cdd5e99d8f 14,69-70,114,116-127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4d5289f22e2818a6b484ea79f0b1ecf060f5650e",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
