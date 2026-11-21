@@ -14,6 +14,8 @@ use App\Briefing\Source\WebAddress;
 
 final readonly class ApodMapper
 {
+    private const string IMAGE = 'image';
+    private const string VIDEO = 'video';
     private const string DATE_FORMAT = 'Y-m-d';
     private const string MIDNIGHT_DATE_FORMAT = '!'.self::DATE_FORMAT;
     private const string DATE_TIMEZONE = 'UTC';
@@ -98,7 +100,11 @@ final readonly class ApodMapper
 
     private static function mediaType(string $mediaType): MediaType
     {
-        return MediaType::tryFrom($mediaType) ?? MediaType::Other;
+        return match ($mediaType) {
+            self::IMAGE => MediaType::Image,
+            self::VIDEO => MediaType::Video,
+            default => MediaType::Other,
+        };
     }
 
     private static function mediaUrl(?string $url): ?string
