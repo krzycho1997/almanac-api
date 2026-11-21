@@ -80,7 +80,7 @@ class AccessToken
 
     private static function toWholeSeconds(\DateTimeImmutable $moment): \DateTimeImmutable
     {
-        return $moment->setTimestamp($moment->getTimestamp());
+        return $moment->setMicrosecond(0);
     }
 
     public function isExpired(\DateTimeImmutable $now): bool
