@@ -11,7 +11,7 @@ use Prometheus\Storage\Adapter;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
 
-final class PrometheusMetrics implements Metrics, MetricsExporter
+final class PrometheusMetrics implements Metrics
 {
     private const string NAMESPACE = 'almanac';
     private const string UNAVAILABLE = 'Metrics store unavailable, dropping metrics for a while';
@@ -40,6 +40,16 @@ final class PrometheusMetrics implements Metrics, MetricsExporter
         $values = self::valuesOf($metric, $labels);
 
         $this->attempt($metric, fn () => $this->registry->getOrRegisterHistogram(self::NAMESPACE, $metric->value, $metric->help(), $metric->labelNames(), $metric->buckets())->observe($seconds, $values));
+    }
+
+    /**
+     * @param array<string, string> $labels
+     */
+    public function gauge(Metric $metric, float $value, array $labels): void
+    {
+        $values = self::valuesOf($metric, $labels);
+
+        $this->attempt($metric, fn () => $this->registry->getOrRegisterGauge(self::NAMESPACE, $metric->value, $metric->help(), $metric->labelNames())->set($value, $values));
     }
 
     public function render(): string

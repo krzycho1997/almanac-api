@@ -13,6 +13,7 @@ enum Metric: string
     case UpstreamFetchDuration = 'upstream_fetch_duration_seconds';
     case BriefingSourceStatus = 'briefing_source_status_total';
     case CircuitTransitions = 'circuit_transitions_total';
+    case MessengerFailedMessages = 'messenger_failed_messages';
 
     private const array HTTP_BUCKETS = [0.025, 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 10, 30];
     private const array UPSTREAM_BUCKETS = [0.1, 0.25, 0.5, 1, 1.5, 2, 3, 3.5];
@@ -27,6 +28,7 @@ enum Metric: string
             self::UpstreamFetchDuration => 'Time of an upstream fetch, retries included, by source',
             self::BriefingSourceStatus => 'Sources served in briefings, by source and status',
             self::CircuitTransitions => 'Circuit breaker transitions, by source and new state',
+            self::MessengerFailedMessages => 'Messages waiting in the failed transport, read at scrape time',
         };
     }
 
@@ -43,6 +45,7 @@ enum Metric: string
             self::UpstreamFetchDuration => [MetricLabel::Source],
             self::BriefingSourceStatus => [MetricLabel::Source, MetricLabel::Status],
             self::CircuitTransitions => [MetricLabel::Source, MetricLabel::To],
+            self::MessengerFailedMessages => [],
         };
     }
 

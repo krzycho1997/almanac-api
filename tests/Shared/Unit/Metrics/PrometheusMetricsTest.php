@@ -105,7 +105,7 @@ final class PrometheusMetricsTest extends TestCase
 
         yield 'a lazy connection that cannot connect' => [new InvalidArgumentException('Redis connection failed: Connection refused'), $observe];
         yield 'a command that fails' => [new \RedisException('read error on connection'), $observe];
-        yield 'a store that is down' => [new StorageException('Redis is down'), $observe];
+        yield 'a gauge on a store that is down' => [new StorageException('Redis is down'), static fn (PrometheusMetrics $metrics) => $metrics->gauge(Metric::MessengerFailedMessages, 3, [])];
     }
 
     public function testTriesTheStoreAgainAfterAPause(): void

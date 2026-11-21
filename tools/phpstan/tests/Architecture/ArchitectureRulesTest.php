@@ -43,6 +43,7 @@ final class ArchitectureRulesTest extends TestCase
             'Briefing/Discovery/ProbeMintsWithoutTheExtractor.php' => ['phpat.onlyTheExtractorMintsDiscoveryIds'],
             'Briefing/ProbeUsesPrometheus.php' => ['phpat.metricsGoThroughThePort'],
             'Briefing/ProbeUsesMetricsAdapter.php' => ['phpat.metricsGoThroughThePort'],
+            'Briefing/ProbeUsesScrapedMetrics.php' => ['phpat.metricsGoThroughThePort'],
         ];
 
         // When
