@@ -61,7 +61,7 @@ final readonly class BriefingAggregator
         $entries = $this->entriesAfterSaving($settled, $scopes, $stored, $decisions, $date, $now);
         $this->recordFailures($settled, $entries, $date);
 
-        return new BriefingResult($date, $location, array_values($entries));
+        return new BriefingResult($date, $location, array_values($entries), self::resultsOf($settled));
     }
 
     /**
@@ -129,7 +129,17 @@ final readonly class BriefingAggregator
             return $stored;
         }
 
-        return array_replace($stored, $this->refresher->saveAndReread(array_map(static fn (SettledFetch $fetch): SourceResult => $fetch->result, $settled), $scopes, $date, $now));
+        return array_replace($stored, $this->refresher->saveAndReread(self::resultsOf($settled), $scopes, $date, $now));
+    }
+
+    /**
+     * @param list<SettledFetch> $settled
+     *
+     * @return list<SourceResult>
+     */
+    private static function resultsOf(array $settled): array
+    {
+        return array_map(static fn (SettledFetch $fetch): SourceResult => $fetch->result, $settled);
     }
 
     /**

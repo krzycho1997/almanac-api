@@ -276,6 +276,20 @@ final class BriefingAggregatorTest extends KernelTestCase
         self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, SourcePayloads::onThisDayFeed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
     }
 
+    public function testTellsTheFailuresOfThisRunFromThoseOfAnEarlierOne(): void
+    {
+        // Given
+        $clock = new MockClock(self::NOW);
+        $first = self::aggregator([new StubSource(SourceName::Apod, static fn (): PendingFetch => self::pendingFetch(SourceName::Apod)), new StubSource(SourceName::OnThisDay, static fn (): PendingFetch => self::failingFetch()), new StubSource(SourceName::Weather, static fn (): PendingFetch => self::pendingFetch(SourceName::Weather))], $clock)->briefingFor(self::day(), self::warsaw());
+
+        // When
+        $second = self::aggregator([new StubSource(SourceName::OnThisDay, self::unrequested())], $clock)->briefingFor(self::day(), self::warsaw());
+
+        // Then
+        self::assertSame([[SourceName::OnThisDay], []], [array_map(static fn (SourceResult $failure): SourceName => $failure->source, $first->failures()), $second->failures()]);
+        self::assertSame([true, true], [$first->hasProblems(), $second->hasProblems()]);
+    }
+
     public function testKeepsTheFirstFailureWhenTheSourceIsNotAskedAgain(): void
     {
         // Given

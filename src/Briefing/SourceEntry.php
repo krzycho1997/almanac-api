@@ -48,6 +48,18 @@ final readonly class SourceEntry
 
     /**
      * @phpstan-assert-if-true !null $this->lastFailure
+     */
+    public function isMissingAfterFailure(): bool
+    {
+        if ($this->hasData()) {
+            return false;
+        }
+
+        return $this->hasFailed();
+    }
+
+    /**
+     * @phpstan-assert-if-true !null $this->lastFailure
      * @phpstan-assert-if-true !null $this->lastAttemptAt
      */
     public function hasFailed(): bool

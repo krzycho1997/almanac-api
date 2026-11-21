@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Briefing\Source;
 
+use App\Briefing\Elapsed;
 use App\Briefing\Exception\UpstreamStreamException;
 use App\Briefing\FailureCause;
 use App\Briefing\FailureKind;
@@ -25,8 +26,6 @@ final readonly class ConcurrentFetcher
     private const string STREAM_FAILED = 'Streaming upstream responses failed: {errorType}';
     private const float TICK_SECONDS = 0.1;
     private const float NO_TIME_LEFT = 0.0;
-    private const int MILLISECONDS_PER_SECOND = 1000;
-    private const string SECONDS_WITH_MICROSECONDS = 'U.u';
 
     public function __construct(
         private HttpClientInterface $upstream,
@@ -159,12 +158,12 @@ final readonly class ConcurrentFetcher
         if ($settledAt instanceof \DateTimeImmutable) {
             $progress->cancelUnfinished($fetch);
 
-            return new SettledFetch($fetch->pending->resolve($fetch->source), self::millisecondsBetween($startedAt, $settledAt));
+            return new SettledFetch($fetch->pending->resolve($fetch->source), Elapsed::millisecondsBetween($startedAt, $settledAt));
         }
 
         return new SettledFetch(
             SourceResult::failed($fetch->source, FailureKind::Unavailable, cause: $streamFailure ?? FailureCause::deadlineExceeded()),
-            self::millisecondsBetween($startedAt, $this->clock->now()),
+            Elapsed::millisecondsBetween($startedAt, $this->clock->now()),
         );
     }
 
@@ -202,21 +201,11 @@ final readonly class ConcurrentFetcher
 
     private function deadlineFrom(\DateTimeImmutable $startedAt): \DateTimeImmutable
     {
-        return $startedAt->modify(\sprintf('+%d milliseconds', (int) round($this->deadlineSeconds * self::MILLISECONDS_PER_SECOND)));
+        return $startedAt->modify(\sprintf('+%d milliseconds', (int) round($this->deadlineSeconds * Elapsed::MILLISECONDS_PER_SECOND)));
     }
 
     private function secondsUntil(\DateTimeImmutable $deadline): float
     {
-        return self::seconds($deadline) - self::seconds($this->clock->now());
-    }
-
-    private static function millisecondsBetween(\DateTimeImmutable $from, \DateTimeImmutable $to): int
-    {
-        return (int) round((self::seconds($to) - self::seconds($from)) * self::MILLISECONDS_PER_SECOND);
-    }
-
-    private static function seconds(\DateTimeImmutable $moment): float
-    {
-        return (float) $moment->format(self::SECONDS_WITH_MICROSECONDS);
+        return Elapsed::secondsBetween($this->clock->now(), $deadline);
     }
 }

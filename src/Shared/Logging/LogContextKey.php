@@ -21,6 +21,7 @@ enum LogContextKey: string
     case OpenSeconds = 'openSeconds';
     case Operation = 'operation';
     case Outcome = 'outcome';
+    case Problems = 'problems';
     case Reason = 'reason';
     case RetryAt = 'retryAt';
     case RevokedCount = 'revokedCount';
