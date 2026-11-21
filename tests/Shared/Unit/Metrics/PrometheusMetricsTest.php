@@ -48,7 +48,7 @@ final class PrometheusMetricsTest extends TestCase
         $text = $metrics->render();
         self::assertStringContainsString("almanac_upstream_fetch_duration_seconds_bucket{source=\"weather\",le=\"1\"} 0\n", $text);
         self::assertStringContainsString("almanac_upstream_fetch_duration_seconds_bucket{source=\"weather\",le=\"1.5\"} 1\n", $text);
-        self::assertStringContainsString("almanac_upstream_fetch_duration_seconds_bucket{source=\"weather\",le=\"3.5\"} 1\n", $text);
+        self::assertStringContainsString("almanac_upstream_fetch_duration_seconds_bucket{source=\"weather\",le=\"8.5\"} 1\n", $text);
     }
 
     public function testRefusesLabelsThatTheMetricDoesNotDefine(): void

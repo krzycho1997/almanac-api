@@ -74,7 +74,7 @@ curl -s http://127.0.0.1:8080/api/briefings/2024-03-15
 curl -s 'http://127.0.0.1:8080/api/briefings/2024-03-15?lat=48.86&lon=2.35'
 ```
 
-In the answer, `sources` has the status of each source (`ok`, `failed` or `not_applicable`, with `stale: true` when old data is served after a failed refresh), and `missing` lists the sources without data. Wikipedia sometimes takes longer than the 3-second budget; On This Day is then `failed` with `error: unavailable` and is fetched again 10 minutes later. That is the intended behaviour, not a bug.
+In the answer, `sources` has the status of each source (`ok`, `failed` or `not_applicable`, with `stale: true` when old data is served after a failed refresh), and `missing` lists the sources without data. Wikipedia is slow for a day its CDN has not cached yet (up to about 5.5 s for one list), so it gets 8 seconds; if it takes longer still, On This Day is `failed` with `error: unavailable` and is fetched again 10 minutes later. That is the intended behaviour, not a bug.
 
 Health and the API document:
 
@@ -177,7 +177,7 @@ If I had to cut, the release pipeline and the monitoring profile go first, then 
 
 ## Decisions and trade-offs
 
-- **Sources.** Each source has its own client that maps the answer into our internal model; raw payloads are never proxied. On This Day is three calls (`selected`, `births`, `deaths`) instead of `/all/`: for 15 March `/all/` is 1.4 MB, a third of it events and holidays we never show. The calls run in parallel, 3 seconds each and 3.5 seconds in all; a network error or a 500, 502, 503 or 504 is retried once; a 429, or any answer with `Retry-After`, never is.
+- **Sources.** Each source has its own client that maps the answer into our internal model; raw payloads are never proxied. On This Day is three calls (`selected`, `births`, `deaths`) instead of `/all/`: for 15 March `/all/` is 1.4 MB, a third of it events and holidays we never show. The calls run in parallel, 3 seconds each (8 for Wikipedia, whose uncached answers take up to about 5.5 s) and 8.5 seconds in all; a network error or a 500, 502, 503 or 504 is retried once (for Wikipedia only if the first attempt failed fast enough to leave time before the deadline); a 429, or any answer with `Retry-After`, never is.
 - **Modules.** `Briefing`, `Identity` and `Bookmark` talk only through `Contract` namespaces, checked by phpat. The cost is no foreign keys between modules: a bookmark keeps the user and discovery ids as plain `uuid` columns.
 - **Snapshots.** One row per source and scope, the internal model as JSONB. A stored past day never calls upstream again, even when its weather was a forecast (`kind: forecast`); APOD and On This Day are final once fetched, and weather for today and later is refreshed after an hour. A failure waits 10 minutes, and the last good data is served meanwhile as `stale`, or the source is listed in `missing`.
 - **Location.** APOD and On This Day are one row per day for everyone; weather one per day and 0.01° cell (about 1 km). A coarser grid would store less but describe another place: Open-Meteo fits its data to the elevation of the exact point, and 0.1° put Tromsø 690 m higher, in polar day, on a night the sun set at 00:22. The monitoring profile counts the upstream calls that new places cause.

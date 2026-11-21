@@ -55,7 +55,7 @@ final class UpstreamHttpClientsTest extends KernelTestCase
     }
 
     #[DataProvider('clientNames')]
-    public function testLimitsTimeAndFollowsNoRedirects(string $client, UpstreamMock $scenario): void
+    public function testLimitsTimeAndFollowsNoRedirects(string $client, UpstreamMock $scenario, float $maxDuration): void
     {
         // Given
         self::factory()->respondWith($scenario);
@@ -66,20 +66,20 @@ final class UpstreamHttpClientsTest extends KernelTestCase
         // Then
         $options = self::onlyServedRequest()->getRequestOptions();
         self::assertSame((float) \ini_get('default_socket_timeout'), $options['timeout']);
-        self::assertSame(3.0, $options['max_duration']);
+        self::assertSame($maxDuration, $options['max_duration']);
         self::assertSame(0, $options['max_redirects']);
         self::assertSame(1.0, $options['max_connect_duration']);
     }
 
     /**
-     * @return iterable<string, array{string, UpstreamMock}>
+     * @return iterable<string, array{string, UpstreamMock, float}>
      */
     public static function clientNames(): iterable
     {
-        yield 'NASA' => [self::NASA, UpstreamMock::create()->apod()];
-        yield 'Wikipedia' => [self::WIKIPEDIA, UpstreamMock::create()->onThisDay()];
-        yield 'Open-Meteo forecast' => [self::OPEN_METEO, UpstreamMock::create()->forecast()];
-        yield 'Open-Meteo archive' => [self::OPEN_METEO_ARCHIVE, UpstreamMock::create()->archive()];
+        yield 'NASA' => [self::NASA, UpstreamMock::create()->apod(), 3.0];
+        yield 'Wikipedia, whose uncached answers take up to about 5.5 s' => [self::WIKIPEDIA, UpstreamMock::create()->onThisDay(), 8.0];
+        yield 'Open-Meteo forecast' => [self::OPEN_METEO, UpstreamMock::create()->forecast(), 3.0];
+        yield 'Open-Meteo archive' => [self::OPEN_METEO_ARCHIVE, UpstreamMock::create()->archive(), 3.0];
     }
 
     #[DataProvider('retries')]

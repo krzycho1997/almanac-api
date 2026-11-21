@@ -175,7 +175,7 @@
     {
       "id": 4,
       "type": "timeseries",
-      "title": "Upstream fetch time p95 against the 3.5 s deadline",
+      "title": "Upstream fetch time p95 against the limits (3 s, Wikipedia 8 s, 8.5 s in all)",
       "description": "",
       "datasource": {
         "type": "prometheus",
@@ -209,8 +209,12 @@
                 "value": null
               },
               {
+                "color": "orange",
+                "value": 3
+              },
+              {
                 "color": "red",
-                "value": 3.5
+                "value": 8.5
               }
             ]
           }
@@ -242,7 +246,7 @@
       "id": 5,
       "type": "timeseries",
       "title": "Briefing response time p95 and p99 against the SLO",
-      "description": "SLO: 95% under 1 s, 99% under 4 s.",
+      "description": "SLO: 95% under 1 s, 99% under 9 s.",
       "datasource": {
         "type": "prometheus",
         "uid": "prometheus"
@@ -280,7 +284,7 @@
               },
               {
                 "color": "red",
-                "value": 4
+                "value": 9
               }
             ]
           }
