@@ -34,6 +34,14 @@ final readonly class SourceResult
         return $this->payload instanceof SourcePayload;
     }
 
+    /**
+     * @phpstan-assert-if-true !null $this->failure
+     */
+    public function hasFailed(): bool
+    {
+        return $this->failure instanceof SourceFailure;
+    }
+
     public static function failed(SourceName $source, FailureKind $kind, ?int $httpStatus = null, ?\DateTimeImmutable $retryAt = null, ?FailureCause $cause = null): self
     {
         return new self($source, SourceStatus::Failed, null, new SourceFailure($kind, $httpStatus, $retryAt, $cause));

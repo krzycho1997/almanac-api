@@ -7,13 +7,32 @@ namespace App\Briefing;
 final readonly class BriefingResult
 {
     /**
-     * @param list<SourceEntry> $entries
+     * @param list<SourceEntry>  $entries
+     * @param list<SourceResult> $results
      */
     public function __construct(
         public \DateTimeImmutable $date,
         public Location $location,
         private array $entries,
+        private array $results,
     ) {
+    }
+
+    /**
+     * @return list<SourceResult>
+     */
+    public function failures(): array
+    {
+        return array_values(array_filter($this->results, static fn (SourceResult $result): bool => $result->hasFailed()));
+    }
+
+    public function hasProblems(): bool
+    {
+        if ([] === $this->failures()) {
+            return array_any($this->entries, static fn (SourceEntry $entry): bool => $entry->isMissingAfterFailure());
+        }
+
+        return true;
     }
 
     public function hasAnyData(): bool

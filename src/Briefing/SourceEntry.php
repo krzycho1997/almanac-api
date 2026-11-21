@@ -46,6 +46,15 @@ final readonly class SourceEntry
         return $this->payload instanceof SourcePayload;
     }
 
+    public function isMissingAfterFailure(): bool
+    {
+        if ($this->hasData()) {
+            return false;
+        }
+
+        return $this->hasFailed();
+    }
+
     /**
      * @phpstan-assert-if-true !null $this->lastFailure
      * @phpstan-assert-if-true !null $this->lastAttemptAt

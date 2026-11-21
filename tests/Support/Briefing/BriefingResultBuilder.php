@@ -70,6 +70,7 @@ final readonly class BriefingResultBuilder
             new \DateTimeImmutable(self::DATE, new \DateTimeZone(self::TIMEZONE)),
             Location::fromCoordinates(self::LATITUDE, self::LONGITUDE),
             array_values(array_map(static fn (\Closure $entry): SourceEntry => $entry($attemptedAt), $this->entries)),
+            [],
         );
     }
 
