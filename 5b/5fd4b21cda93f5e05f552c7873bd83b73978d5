@@ -1,0 +1,35 @@
+src/Briefing/Repository/SourceSnapshotRepository.php
+  s_4da5374f6e605f::t_bbf3bb60064417 20
+  s_4da5374f6e605f::t_5593a2a9a25885 24,28-30,32,79-81,83,164,213
+src/Bookmark/Entity/Bookmark.php
+  s_4da5374f6e605f::t_5593a2a9a25885 9,17
+src/Briefing/Entity/SourceSnapshot.php
+  s_4da5374f6e605f::t_5593a2a9a25885 15
+  s_4da5374f6e605f::t_bbf3bb60064417 8
+src/Briefing/Discovery/DoctrineDiscoveryCatalog.php
+  s_4da5374f6e605f::t_5593a2a9a25885 11,16,31
+src/Briefing/Entity/Discovery.php
+  s_4da5374f6e605f::t_5593a2a9a25885 10,14
+tests/Briefing/Integration/Repository/SnapshotReadingTest.php
+  s_4da5374f6e605f::t_bbf3bb60064417 225
+  s_4da5374f6e605f::t_fdda9c09c33245 19,36,112,220,222-223
+src/Briefing/Repository/DiscoveryRepository.php
+  s_4da5374f6e605f::t_5593a2a9a25885 11,13,15-18,30-42,54
+  s_4da5374f6e605f::t_bbf3bb60064417 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5b5fd4b21cda93f5e05f552c7873bd83b73978d5",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
