@@ -1,0 +1,20 @@
+tests/Briefing/Integration/Discovery/StoredDiscoveryKeysTest.php
+  s_4da5374f6e605f::t_fb1aa1eea822c5 58,71-74
+  s_4da5374f6e605f::t_c607b29b6fba67 1-57,59-70,75-102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "394b4b8c3e5060df2345f2e06500864e05424242",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
