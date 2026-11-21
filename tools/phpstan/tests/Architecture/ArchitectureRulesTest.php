@@ -36,6 +36,8 @@ final class ArchitectureRulesTest extends TestCase
             'Shared/ProbeNotFinal.php' => ['phpat.classesAreFinal'],
             'Identity/Entity/ProbeEntityUsesServiceAndHttp.php' => ['phpat.entitiesStayBelowServices', 'phpat.entitiesStayBelowServices'],
             'Identity/Entity/ProbeEntityUsesMapper.php' => ['phpat.entitiesStayBelowServices'],
+            'Bookmark/ProbeMintsDiscoveryId.php' => ['phpat.onlyTheExtractorMintsDiscoveryIds'],
+            'Briefing/Discovery/ProbeMintsWithoutTheExtractor.php' => ['phpat.onlyTheExtractorMintsDiscoveryIds'],
         ];
 
         // When

@@ -289,8 +289,13 @@ components:
     Apod:
       type: object
       additionalProperties: false
-      required: [title, explanation, mediaType, url, hdUrl, credit]
+      required: [discoveryId, title, explanation, mediaType, url, hdUrl, credit]
       properties:
+        discoveryId:
+          type: string
+          format: uuid
+          description: Stable id of this item; the same item gets the same id in every briefing.
+          example: 2ed6657d-e927-568b-95e1-2665a8aea6a2
         title:
           type: string
         explanation:
@@ -312,8 +317,13 @@ components:
     Event:
       type: object
       additionalProperties: false
-      required: [year, text, pages]
+      required: [discoveryId, year, text, pages]
       properties:
+        discoveryId:
+          type: string
+          format: uuid
+          description: Stable id of this item; the same item gets the same id in every briefing.
+          example: 2ed6657d-e927-568b-95e1-2665a8aea6a2
         year:
           type: integer
           description: Negative for years BC.
@@ -327,8 +337,13 @@ components:
     Person:
       type: object
       additionalProperties: false
-      required: [year, name, description, url, thumbnail]
+      required: [discoveryId, year, name, description, url, thumbnail]
       properties:
+        discoveryId:
+          type: string
+          format: uuid
+          description: Stable id of this item; the same item gets the same id in every briefing.
+          example: 2ed6657d-e927-568b-95e1-2665a8aea6a2
         year:
           type: integer
           description: Negative for years BC.

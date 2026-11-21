@@ -64,6 +64,7 @@ final class BriefingControllerTest extends FunctionalTestCase
         self::assertSame([], $briefing['missing']);
         self::assertSame(
             [
+                'discoveryId' => 'c05f9b6a-9262-5859-b45d-743a62e1bc6e',
                 'title' => 'Portrait of NGC 1055',
                 'explanation' => self::apodExplanation($briefing),
                 'mediaType' => 'image',
@@ -110,12 +111,13 @@ final class BriefingControllerTest extends FunctionalTestCase
 
         // Then
         self::assertResponseIsSuccessful();
-        /** @var array{events: list<array{year: int, text: string, pages: list<array{title: string, url: string, thumbnail: ?string}>}>, births: list<array{year: int, name: string, description: ?string, url: string, thumbnail: ?string}>, deaths: list<array{year: int, name: string, description: ?string, url: string, thumbnail: ?string}>} $history */
+        /** @var array{events: list<array{discoveryId: string, year: int, text: string, pages: list<array{title: string, url: string, thumbnail: ?string}>}>, births: list<array{discoveryId: string, year: int, name: string, description: ?string, url: string, thumbnail: ?string}>, deaths: list<array{discoveryId: string, year: int, name: string, description: ?string, url: string, thumbnail: ?string}>} $history */
         $history = self::json($this->client->getResponse()->getContent());
         self::assertSame([20, 20, 20], [\count($history['events']), \count($history['births']), \count($history['deaths'])]);
         self::assertSame([1990, 'Farzad Bazoft', 'https://en.wikipedia.org/wiki/Farzad_Bazoft'], [$history['events'][0]['year'], $history['events'][0]['pages'][0]['title'], $history['events'][0]['pages'][0]['url']]);
         self::assertSame([2005, 'Rodri Mendoza', 'Spanish footballer', 'https://en.wikipedia.org/wiki/Rodri_Mendoza'], [$history['births'][0]['year'], $history['births'][0]['name'], $history['births'][0]['description'], $history['births'][0]['url']]);
-        self::assertSame([-44, 'Julius Caesar'], [$history['deaths'][19]['year'], $history['deaths'][19]['name']]);
+        self::assertSame([-44, 'Julius Caesar', '30ad2d96-39f2-514a-806e-58f2041d1ce6'], [$history['deaths'][19]['year'], $history['deaths'][19]['name'], $history['deaths'][19]['discoveryId']]);
+        self::assertSame('e9b46a81-debf-5313-adf4-562da5ece32d', $history['events'][0]['discoveryId']);
     }
 
     public function testBuildsTheBriefingForAPictureWithoutMediaOrCredit(): void
