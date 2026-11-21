@@ -29,7 +29,7 @@ These are phpat rules in `tests/Architecture/`. They run inside PHPStan and cann
 1. The date must be `Y-m-d` and a real calendar day (else 400), from 1995-06-16 to today + 15 days in `APP_TIMEZONE` (else 422). `lat` and `lon` are validated as plain decimal strings, both or neither, and rounded to two decimals (about 1 km). Weather is stored per day and that cell. A coarser grid was tried and dropped: Open-Meteo fits its answer to the elevation of the exact point, so snapping Tromsø from 69.65° to 69.7° moved it about 690 m up and turned a sunset at 00:22 into polar day.
 2. Each source says whether it covers the date: APOD from 1995-06-16 by New York's publication day; Open-Meteo from 1940-01-01 to today + 14 days, through the archive for days six or more days ago and the forecast API for the rest. Otherwise the source is `not_applicable`, which is computed per request and never stored.
 3. The aggregator reads the stored snapshots, asks the refresh policy what to fetch, and asks each source's circuit for permission.
-4. Permitted sources are fetched concurrently in one HttpClient `stream()` (curl). The stream is called on one scoped client, `app.briefing.upstream_stream`, an alias of `nasa.client`: every scoped client retries on top of the same transport, so one `RetryableHttpClient` can stream the responses of all of them, and `ConcurrentFetcherWiringTest` checks that in dev and prod. Each client has a 3-second `max_duration`, one retry on network errors and 500, 502, 503 or 504, no retry on 429 or with `Retry-After`, and no redirects. The whole fetch ends after 3.5 seconds.
+4. Permitted sources are fetched concurrently in one HttpClient `stream()` (curl). The stream is called on one scoped client, `app.briefing.upstream_stream`, an alias of `nasa.client`: every scoped client retries on top of the same transport, so one `RetryableHttpClient` can stream the responses of all of them, and `ConcurrentFetcherWiringTest` checks that in dev and prod. Each client has a 3-second `max_duration` (Wikipedia 8 seconds), one retry on network errors and 500, 502, 503 or 504, no retry on 429 or with `Retry-After`, and no redirects. The whole fetch ends after 8.5 seconds. Wikipedia gets more because its CDN answers a day it has not cached slowly: twelve uncached On This Day lists measured on 2026-11-21 took 1.6 to 5.4 seconds, median about 2.4, and with 3 seconds new dates often came back `unavailable`. After a fast 5xx Wikipedia is still retried; after a timeout or a slow failure the retry starts too late and the deadline cuts it off. The other sources retry within the deadline as before.
 5. Results are mapped into the internal model, discoveries are extracted, and snapshots and discoveries are saved in one transaction.
 6. The response is built from storage: 200 if any source has data, otherwise 502.
 
@@ -110,7 +110,7 @@ The metrics answer questions that lead to a decision; a metric with no such ques
 | How fast do we use the providers' limits? | When to move from `DEMO_KEY` to an own NASA key, and which `--delay` to give prefetch. |
 | How often do we serve `stale` or `missing`? | Whether the 10-minute pause and the breaker thresholds fit. |
 | Does the breaker open again and again, or not at all? | The 60 s and 15 min openings; how reliable a provider is. |
-| How long does each source take against the 3.5 s deadline? | Whether `max_duration: 3` and the 3.5 s deadline fit. |
+| How long does each source take against its limit and the 8.5 s deadline? | Whether `max_duration` (3 s, Wikipedia 8 s) and the 8.5 s deadline fit. |
 
 **Catalogue.** Prefix `almanac_`, the unit in the name, `_total` for counters. Every label has a fixed, short list of values, well under 300 series in all.
 
@@ -125,7 +125,7 @@ The metrics answer questions that lead to a decision; a metric with no such ques
 | `circuit_transitions_total` | counter | `source`, `to` (`open`, `half_open`, `closed`) | `CircuitLog`, next to the log line |
 | `messenger_failed_messages` | gauge | none | read from the `failed` transport at scrape time |
 
-Upstream buckets are `0.1, 0.25, 0.5, 1, 1.5, 2, 3, 3.5` seconds: 1 s is the connect limit, 3 s `max_duration`, 3.5 s the deadline, so a fetch above 3.5 s means the deadline did not work. HTTP buckets run from 25 ms to 30 s, with 1 s and 4 s for the SLO and 30 s for `request_terminate_timeout`. There are no summaries, because they cannot be added up across processes.
+Upstream buckets are `0.1, 0.25, 0.5, 1, 1.5, 2, 3, 5, 8, 8.5` seconds: 1 s is the connect limit, 3 s `max_duration`, 5 s splits Wikipedia's uncached answers, 8 s its `max_duration` and 8.5 s the deadline, so a fetch above 8.5 s means the deadline did not work. HTTP buckets run from 25 ms to 30 s, with 1 s and 9 s for the SLO and 30 s for `request_terminate_timeout`, which is still well above the deadline. There are no summaries, because they cannot be added up across processes.
 
 **No unbounded labels.** Dates, coordinates, `scope_key`, user and token ids, IP addresses, request ids, bookmark ids, raw paths, the upstream HTTP status and exception messages never become labels: each would add a series per value, and coordinates and addresses are personal data the logs already mask. Those details are in the JSON logs. An e2e test sends requests with dates, coordinates, UUIDs and a request id, then checks that every label on `/metrics` is a catalogue name with a bounded value.
 
@@ -135,7 +135,7 @@ Upstream buckets are `0.1, 0.25, 0.5, 1, 1.5, 2, 3, 3.5` seconds: 1 s is the con
 
 **SLOs, over 28 days.**
 - Availability of briefings: responses other than 5xx among all except 4xx, target 99.5% (an error budget of about 3.4 hours). The three providers have no SLA, and stale data and partial 200s hide outages, so 99.9% would be fiction.
-- Response time: 95% under 1 s, the stored path, and 99% under 4 s, which shows whether the 3.5 s deadline really cuts the wait.
+- Response time: 95% under 1 s, the stored path, and 99% under 9 s, which shows whether the 8.5 s deadline really cuts the wait; only a day not yet stored can take that long, and prefetch keeps those out of the user's way.
 - Completeness: `ok` and `stale` among `ok`, `stale` and `missing`, target 99%. It is the only SLI that sees one source failing behind a 200.
 
 **Alerts** (`docker/prometheus/alerts.yml`, each with `promtool` tests for when it fires and when it stays quiet):
