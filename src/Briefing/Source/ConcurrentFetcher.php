@@ -113,7 +113,7 @@ final readonly class ConcurrentFetcher
     {
         try {
             return $step();
-        } catch (TransportExceptionInterface|\TypeError $failure) {
+        } catch (TransportExceptionInterface $failure) {
             throw UpstreamStreamException::brokenBy($failure);
         }
     }

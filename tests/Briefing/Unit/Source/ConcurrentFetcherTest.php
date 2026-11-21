@@ -18,6 +18,7 @@ use Monolog\Handler\TestHandler;
 use Monolog\Level;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpClient\Chunk\DataChunk;
@@ -290,9 +291,19 @@ final class ConcurrentFetcherTest extends TestCase
     public static function streamFailures(): iterable
     {
         yield 'responses of several clients' => [new TransportException('Cannot stream AsyncResponse objects with many clients.'), 'TransportException', false];
-        yield 'response of a client without retries' => [new \TypeError('RetryableHttpClient::stream() expects AsyncResponse objects.'), 'TypeError', false];
         yield 'responses of several clients while streaming' => [new TransportException('Cannot stream AsyncResponse objects with many clients.'), 'TransportException', true];
-        yield 'response of a client without retries while streaming' => [new \TypeError('RetryableHttpClient::stream() expects AsyncResponse objects.'), 'TypeError', true];
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testLetsATypeErrorFromTheStreamPropagate(bool $whileStreaming): void
+    {
+        // Given
+        self::breakStream($this->upstream, new \TypeError('RetryableHttpClient::stream() expects AsyncResponse objects.'), $whileStreaming);
+
+        // Then / When
+        $this->expectException(\TypeError::class);
+        $this->fetcher()->settleAll([self::fetch(SourceName::Apod, self::response())]);
     }
 
     public function testLetsATypeErrorOutsideTheStreamPropagate(): void
