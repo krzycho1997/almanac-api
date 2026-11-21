@@ -31,6 +31,7 @@ use App\Tests\Support\Briefing\JournalingSource;
 use App\Tests\Support\Briefing\SourcePayloads;
 use App\Tests\Support\Briefing\StubSource;
 use App\Tests\Support\InteractsWithTestServices;
+use App\Tests\Support\Metrics\RecordingMetrics;
 use Doctrine\DBAL\Connection;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
@@ -442,7 +443,7 @@ final class BriefingAggregatorTest extends KernelTestCase
 
     private static function breaker(MockClock $clock): CircuitBreaker
     {
-        return new CircuitBreaker(new InMemoryCircuitBreakerStore($clock), $clock, new CircuitLog(new NullLogger()));
+        return new CircuitBreaker(new InMemoryCircuitBreakerStore($clock), $clock, new CircuitLog(new NullLogger(), new RecordingMetrics()));
     }
 
     /**
