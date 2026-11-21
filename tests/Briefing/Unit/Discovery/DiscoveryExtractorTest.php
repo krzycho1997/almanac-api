@@ -16,6 +16,7 @@ use App\Briefing\Model\MediaType;
 use App\Briefing\Model\NotablePerson;
 use App\Briefing\Model\OnThisDayFeed;
 use App\Briefing\Model\PageRef;
+use App\Briefing\Source\OnThisDay\WikipediaPersonIdentity;
 use App\Tests\Support\Briefing\FakePayload;
 use App\Tests\Support\Briefing\SourcePayloads;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -31,7 +32,7 @@ final class DiscoveryExtractorTest extends TestCase
         $picture = new ApodPicture(new \DateTimeImmutable(self::IDES), 'Portrait of NGC 1055', 'A galaxy.', MediaType::Image, null, null, null, self::attribution());
 
         // When
-        $id = new DiscoveryExtractor()->apodId($picture);
+        $id = new DiscoveryExtractor(new WikipediaPersonIdentity())->apodId($picture);
 
         // Then
         self::assertSame('c05f9b6a-9262-5859-b45d-743a62e1bc6e', $id->toRfc4122());
@@ -41,7 +42,7 @@ final class DiscoveryExtractorTest extends TestCase
     public function testKeysAnEventByItsYearDayAndText(HistoricalEvent $event, string $expected): void
     {
         // When
-        $id = new DiscoveryExtractor()->eventId($event, new \DateTimeImmutable(self::IDES));
+        $id = new DiscoveryExtractor(new WikipediaPersonIdentity())->eventId($event, new \DateTimeImmutable(self::IDES));
 
         // Then
         self::assertSame($expected, $id->toRfc4122());
@@ -60,7 +61,7 @@ final class DiscoveryExtractorTest extends TestCase
     public function testKeysAPersonByTheMostStableNameThereIs(NotablePerson $person, string $expected): void
     {
         // When
-        $id = new DiscoveryExtractor()->personId($person);
+        $id = new DiscoveryExtractor(new WikipediaPersonIdentity())->personId($person);
 
         // Then
         self::assertSame($expected, $id->toRfc4122());
@@ -80,7 +81,7 @@ final class DiscoveryExtractorTest extends TestCase
     public function testKeepsAPersonsIdWhenTheirPageMoves(): void
     {
         // Given
-        $extractor = new DiscoveryExtractor();
+        $extractor = new DiscoveryExtractor(new WikipediaPersonIdentity());
 
         // When
         $before = $extractor->personId(new NotablePerson(-100, 'Julius Caesar', null, 'https://en.wikipedia.org/wiki/Julius_Caesar', null, 'Q1048'));
@@ -93,7 +94,7 @@ final class DiscoveryExtractorTest extends TestCase
     public function testTreatsComposedAndDecomposedTextAsTheSameEvent(): void
     {
         // Given
-        $extractor = new DiscoveryExtractor();
+        $extractor = new DiscoveryExtractor(new WikipediaPersonIdentity());
         $day = new \DateTimeImmutable(self::IDES);
 
         // When
@@ -107,7 +108,7 @@ final class DiscoveryExtractorTest extends TestCase
     public function testTreatsAnEncodedAndAPlainPageTitleAsTheSamePerson(): void
     {
         // Given
-        $extractor = new DiscoveryExtractor();
+        $extractor = new DiscoveryExtractor(new WikipediaPersonIdentity());
 
         // When
         $encoded = $extractor->personId(new NotablePerson(1906, 'Kurt Gödel', null, 'https://en.wikipedia.org/wiki/Kurt_G%C3%B6del', null));
@@ -121,7 +122,7 @@ final class DiscoveryExtractorTest extends TestCase
     public function testReadsTheSamePageTitleFromEveryFormOfItsAddress(string $address, string $sameAs): void
     {
         // Given
-        $extractor = new DiscoveryExtractor();
+        $extractor = new DiscoveryExtractor(new WikipediaPersonIdentity());
 
         // When
         $first = $extractor->personId(new NotablePerson(1906, 'Someone', null, $address, null));
@@ -146,7 +147,7 @@ final class DiscoveryExtractorTest extends TestCase
     public function testTellsDifferentPageTitlesApart(string $address, string $other): void
     {
         // Given
-        $extractor = new DiscoveryExtractor();
+        $extractor = new DiscoveryExtractor(new WikipediaPersonIdentity());
 
         // When
         $first = $extractor->personId(new NotablePerson(1906, 'Someone', null, $address, null));
@@ -169,7 +170,7 @@ final class DiscoveryExtractorTest extends TestCase
     public function testKeysAPersonWhoseWikidataItemIsTooLongByTheirPage(): void
     {
         // When
-        $id = new DiscoveryExtractor()->personId(new NotablePerson(1950, 'John Smith', null, 'https://en.wikipedia.org/wiki/John_Smith_(footballer)', null, 'Q'.str_repeat('1', Discovery::LONGEST_KEY)));
+        $id = new DiscoveryExtractor(new WikipediaPersonIdentity())->personId(new NotablePerson(1950, 'John Smith', null, 'https://en.wikipedia.org/wiki/John_Smith_(footballer)', null, 'Q'.str_repeat('1', Discovery::LONGEST_KEY)));
 
         // Then
         self::assertSame('fa271102-bc32-56f2-b685-1b0b4ce8dcc5', $id->toRfc4122());
@@ -179,7 +180,7 @@ final class DiscoveryExtractorTest extends TestCase
     public function testKeysAPersonWithoutAReadablePageTitleAsUnlinked(string $address): void
     {
         // When
-        $id = new DiscoveryExtractor()->personId(new NotablePerson(1970, 'Jan Kowalski', null, $address, null));
+        $id = new DiscoveryExtractor(new WikipediaPersonIdentity())->personId(new NotablePerson(1970, 'Jan Kowalski', null, $address, null));
 
         // Then
         self::assertSame('6c6ef5d2-9e6c-51e5-9787-da2bbd22e4f8', $id->toRfc4122());
@@ -203,7 +204,7 @@ final class DiscoveryExtractorTest extends TestCase
     public function testTreatsComposedAndDecomposedNamesOfAnUnlinkedPersonAlike(): void
     {
         // Given
-        $extractor = new DiscoveryExtractor();
+        $extractor = new DiscoveryExtractor(new WikipediaPersonIdentity());
 
         // When
         $composed = $extractor->personId(new NotablePerson(1906, " G\u{00F6}del ", null, null, null));
@@ -224,7 +225,7 @@ final class DiscoveryExtractorTest extends TestCase
         );
 
         // When
-        $records = new DiscoveryExtractor()->extract($feed, new \DateTimeImmutable(self::IDES));
+        $records = new DiscoveryExtractor(new WikipediaPersonIdentity())->extract($feed, new \DateTimeImmutable(self::IDES));
 
         // Then
         self::assertEquals([
@@ -240,7 +241,7 @@ final class DiscoveryExtractorTest extends TestCase
         $picture = new ApodPicture(new \DateTimeImmutable(self::IDES), 'Portrait of NGC 1055', 'A galaxy.', MediaType::Image, 'https://apod.nasa.gov/a.jpg', null, null, self::attribution());
 
         // When
-        $records = new DiscoveryExtractor()->extract($picture, new \DateTimeImmutable(self::IDES));
+        $records = new DiscoveryExtractor(new WikipediaPersonIdentity())->extract($picture, new \DateTimeImmutable(self::IDES));
 
         // Then
         self::assertEquals([new DiscoveryRecord(DiscoveryId::fromString('c05f9b6a-9262-5859-b45d-743a62e1bc6e'), 'apod:2024-03-15', DiscoveryType::Apod, new \DateTimeImmutable(self::IDES), 'Portrait of NGC 1055', 'A galaxy.', 'https://apod.nasa.gov/a.jpg')], $records);
@@ -253,7 +254,7 @@ final class DiscoveryExtractorTest extends TestCase
         $feed = new OnThisDayFeed([new HistoricalEvent($year, 'Something happens.', [])], [], [], self::attribution());
 
         // When
-        $records = new DiscoveryExtractor()->extract($feed, new \DateTimeImmutable($day));
+        $records = new DiscoveryExtractor(new WikipediaPersonIdentity())->extract($feed, new \DateTimeImmutable($day));
 
         // Then
         self::assertNull($records[0]->date);
@@ -275,7 +276,7 @@ final class DiscoveryExtractorTest extends TestCase
         $feed = new OnThisDayFeed([new HistoricalEvent(1904, 'Something happens.', [])], [], [], self::attribution());
 
         // When
-        $records = new DiscoveryExtractor()->extract($feed, new \DateTimeImmutable('2024-02-29'));
+        $records = new DiscoveryExtractor(new WikipediaPersonIdentity())->extract($feed, new \DateTimeImmutable('2024-02-29'));
 
         // Then
         self::assertSame('1904-02-29', $records[0]->date?->format('Y-m-d'));
@@ -284,7 +285,7 @@ final class DiscoveryExtractorTest extends TestCase
     public function testFindsNothingToDiscoverInTheWeather(): void
     {
         // When
-        $records = new DiscoveryExtractor()->extract(SourcePayloads::dailyWeather(), new \DateTimeImmutable(self::IDES));
+        $records = new DiscoveryExtractor(new WikipediaPersonIdentity())->extract(SourcePayloads::dailyWeather(), new \DateTimeImmutable(self::IDES));
 
         // Then
         self::assertSame([], $records);
@@ -294,7 +295,7 @@ final class DiscoveryExtractorTest extends TestCase
     {
         // Then / When
         $this->expectException(\LogicException::class);
-        new DiscoveryExtractor()->extract(new FakePayload([]), new \DateTimeImmutable(self::IDES));
+        new DiscoveryExtractor(new WikipediaPersonIdentity())->extract(new FakePayload([]), new \DateTimeImmutable(self::IDES));
     }
 
     private static function attribution(): Attribution

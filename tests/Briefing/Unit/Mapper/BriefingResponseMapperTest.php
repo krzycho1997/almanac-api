@@ -34,6 +34,7 @@ use App\Briefing\Model\NotablePerson;
 use App\Briefing\Model\OnThisDayFeed;
 use App\Briefing\Model\PageRef;
 use App\Briefing\Model\WeatherKind;
+use App\Briefing\Source\OnThisDay\WikipediaPersonIdentity;
 use App\Briefing\SourceName;
 use App\Tests\Support\Briefing\BriefingResultBuilder;
 use App\Tests\Support\Briefing\SourcePayloads;
@@ -62,7 +63,7 @@ final class BriefingResponseMapperTest extends TestCase
         $ok = new SourceOkDto(new \DateTimeImmutable(self::CHECKED_AT), false);
 
         // When
-        $response = new BriefingResponseMapper(new DiscoveryExtractor())->create($briefing);
+        $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create($briefing);
 
         // Then
         self::assertEquals(
@@ -93,7 +94,7 @@ final class BriefingResponseMapperTest extends TestCase
         $briefing = BriefingResultBuilder::create()->ok(SourceName::Apod, SourcePayloads::apodPicture($mediaType))->build();
 
         // When
-        $response = new BriefingResponseMapper(new DiscoveryExtractor())->create($briefing);
+        $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create($briefing);
 
         // Then
         self::assertSame($expectedMediaType, $response->apod?->mediaType);
@@ -116,7 +117,7 @@ final class BriefingResponseMapperTest extends TestCase
         $briefing = BriefingResultBuilder::create()->failed(SourceName::Apod, $kind)->attemptedAt(self::CHECKED_AT)->build();
 
         // When
-        $response = new BriefingResponseMapper(new DiscoveryExtractor())->create($briefing);
+        $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create($briefing);
 
         // Then
         self::assertEquals(new SourceFailedDto($expectedError, new \DateTimeImmutable(self::CHECKED_AT)), $response->sources->apod);
@@ -143,7 +144,7 @@ final class BriefingResponseMapperTest extends TestCase
         $briefing = BriefingResultBuilder::create()->stale(SourceName::Weather, SourcePayloads::dailyWeather(), '2026-11-18T09:00:00Z', FailureKind::Unavailable)->attemptedAt(self::CHECKED_AT)->build();
 
         // When
-        $response = new BriefingResponseMapper(new DiscoveryExtractor())->create($briefing);
+        $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create($briefing);
 
         // Then
         self::assertEquals(new SourceStaleDto(new \DateTimeImmutable('2026-11-18T09:00:00Z'), SourceError::Unavailable, new \DateTimeImmutable(self::CHECKED_AT)), $response->sources->weather);
@@ -157,7 +158,7 @@ final class BriefingResponseMapperTest extends TestCase
         $briefing = BriefingResultBuilder::create()->stale(SourceName::Weather, SourcePayloads::dailyWeather(), '2026-11-18T09:00:00Z', FailureKind::CircuitOpen)->attemptedAt(self::CHECKED_AT)->build();
 
         // When
-        $response = new BriefingResponseMapper(new DiscoveryExtractor())->create($briefing);
+        $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create($briefing);
 
         // Then
         self::assertEquals(new SourceStaleDto(new \DateTimeImmutable('2026-11-18T09:00:00Z'), SourceError::Unavailable, new \DateTimeImmutable(self::CHECKED_AT)), $response->sources->weather);
@@ -170,7 +171,7 @@ final class BriefingResponseMapperTest extends TestCase
         $briefing = BriefingResultBuilder::create()->notApplicable(SourceName::Apod)->build();
 
         // When
-        $response = new BriefingResponseMapper(new DiscoveryExtractor())->create($briefing);
+        $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create($briefing);
 
         // Then
         self::assertEquals(new SourceNotApplicableDto(), $response->sources->apod);
@@ -184,7 +185,7 @@ final class BriefingResponseMapperTest extends TestCase
         $briefing = BriefingResultBuilder::create()->ok(SourceName::Weather, SourcePayloads::dailyWeather($kind))->build();
 
         // When
-        $response = new BriefingResponseMapper(new DiscoveryExtractor())->create($briefing);
+        $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create($briefing);
 
         // Then
         self::assertSame($expected, $response->weather?->kind);
@@ -218,7 +219,7 @@ final class BriefingResponseMapperTest extends TestCase
         $briefing = BriefingResultBuilder::create()->ok(SourceName::Weather, SourcePayloads::dailyWeather(weatherCode: $code))->build();
 
         // When
-        $response = new BriefingResponseMapper(new DiscoveryExtractor())->create($briefing);
+        $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create($briefing);
 
         // Then
         self::assertSame($expected, $response->weather?->description);
@@ -230,7 +231,7 @@ final class BriefingResponseMapperTest extends TestCase
         $briefing = BriefingResultBuilder::create()->failed(SourceName::Weather, FailureKind::Rejected)->build();
 
         // When
-        $response = new BriefingResponseMapper(new DiscoveryExtractor())->create($briefing);
+        $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create($briefing);
 
         // Then
         self::assertNull($response->weather);
@@ -245,7 +246,7 @@ final class BriefingResponseMapperTest extends TestCase
         $briefing = BriefingResultBuilder::create()->failed(SourceName::OnThisDay, FailureKind::Unavailable)->build();
 
         // When
-        $response = new BriefingResponseMapper(new DiscoveryExtractor())->create($briefing);
+        $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create($briefing);
 
         // Then
         self::assertEquals(new SourceFailedDto(SourceError::Unavailable, new \DateTimeImmutable(BriefingResultBuilder::ATTEMPTED_AT)), $response->sources->onThisDay);
@@ -260,7 +261,7 @@ final class BriefingResponseMapperTest extends TestCase
         $briefing = BriefingResultBuilder::create()->failed(SourceName::Weather, FailureKind::Unavailable)->notApplicable(SourceName::Apod)->build();
 
         // When
-        $response = new BriefingResponseMapper(new DiscoveryExtractor())->create($briefing);
+        $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create($briefing);
 
         // Then
         self::assertSame([SourceKey::Apod, SourceKey::Weather], $response->missing);
