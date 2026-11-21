@@ -1,0 +1,45 @@
+src/Briefing/Dto/Input/PrefetchInput.php
+  s_4da5374f6e605f::t_105dafdbe5c5ee 56
+  s_4da5374f6e605f::t_12436a552ab085 63-65
+tests/Briefing/Functional/PrefetchCommandTest.php
+  s_4da5374f6e605f::t_105dafdbe5c5ee 17-19,193-198,200-203,205-215
+  s_4da5374f6e605f::t_e6548839aa7a4a 216
+  s_4da5374f6e605f::t_72970088301968 7,199,204
+tests/Briefing/Integration/PrefetcherTest.php
+  s_4da5374f6e605f::t_105dafdbe5c5ee 12,26-28,192-233
+  s_4da5374f6e605f::t_563e8558ed3be3 234
+src/Briefing/Command/PrefetchCommand.php
+  s_4da5374f6e605f::t_ae878695f2bc3d 43-47,53-60
+  s_4da5374f6e605f::t_72970088301968 29
+src/Briefing/Prefetcher.php
+  s_4da5374f6e605f::t_ade7173b4dbf79 7,12-13,20,26,30-37,73-88
+config/packages/messenger.yaml
+  s_4da5374f6e605f::t_b7f7ffe8941f87 17-19
+  s_4da5374f6e605f::t_57656954bf3462 20,26
+tests/Shared/Integration/Messenger/MessengerTransportsTest.php
+  s_4da5374f6e605f::t_d2d267fd311f45 41-42,45-49,59,61-67
+  s_4da5374f6e605f::t_72970088301968 12,35-40,43-44,60
+compose.yaml
+  s_4da5374f6e605f::t_b7f7ffe8941f87 1-10,28,42
+docker/php/entrypoint.sh
+  s_4da5374f6e605f::t_b7f7ffe8941f87 92
+  s_4da5374f6e605f::t_9e07048d1f30c3 91
+bin/check-prod-image
+  s_4da5374f6e605f::t_b7f7ffe8941f87 35,50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4e42468891d7ef9cac7424d1866b278e4791d989",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}

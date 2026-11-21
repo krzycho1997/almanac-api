@@ -1,0 +1,41 @@
+.env
+  s_4da5374f6e605f::t_aeef921718acbb 27
+config/packages/messenger.yaml
+  s_4da5374f6e605f::t_aeef921718acbb 1-2,4-5,23
+  s_4da5374f6e605f::t_bcd80548ca86f5 3,6-18,24-27
+migrations/Version20261121120000.php
+  s_4da5374f6e605f::t_5443b2a0bd9802 1-38
+.env.example
+  s_4da5374f6e605f::t_bcd80548ca86f5 19
+composer.json
+  s_4da5374f6e605f::t_aeef921718acbb 26,31
+tests/Shared/Integration/Messenger/MessengerTransportsTest.php
+  s_4da5374f6e605f::t_05cc19dbdd83aa 1-11,13-34,50-58,68-75
+composer.lock
+  s_4da5374f6e605f::t_c9967760d90245 7,2371-2449,3508-3600
+symfony.lock
+  s_4da5374f6e605f::t_c0c7aa6169265f 128-139
+docker/php/entrypoint.sh
+  s_4da5374f6e605f::t_8674f99aa77c3c 49-79,90,93-95
+  s_4da5374f6e605f::t_3f1120d7512a10 96-97
+Dockerfile
+  s_4da5374f6e605f::t_8674f99aa77c3c 7
+compose.yaml
+  s_4da5374f6e605f::t_8674f99aa77c3c 41,43-48,49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "edf52b7a19025763f7100bf968c817a25e38e519",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
