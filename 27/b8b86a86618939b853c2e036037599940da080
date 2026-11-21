@@ -1,0 +1,28 @@
+tests/Briefing/Integration/CircuitBreaker/RedisCircuitBreakerStoreTest.php
+  s_4da5374f6e605f::t_ec7e814c5b4df2 144
+  s_4da5374f6e605f::t_6575dfcac9d224 106-122
+tests/Support/Briefing/CircuitBreaker/InMemoryCircuitBreakerStore.php
+  s_4da5374f6e605f::t_d114c465e7104c 73-81,129-139
+tests/Support/Briefing/CircuitBreaker/CircuitBreakerStoreContract.php
+  s_4da5374f6e605f::t_ec7e814c5b4df2 141,155,168,194,196,199,205-230,244-245,327-333
+  s_4da5374f6e605f::t_b214da7bb3d8b6 334
+src/Briefing/CircuitBreaker/RedisCircuitBreakerStore.php
+  s_4da5374f6e605f::t_6575dfcac9d224 64,69,122,188,221-229,232
+  s_4da5374f6e605f::t_d114c465e7104c 47-63,107-112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "27b8b86a86618939b853c2e036037599940da080",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
