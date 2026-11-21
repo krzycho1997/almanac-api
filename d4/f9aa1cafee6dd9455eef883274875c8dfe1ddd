@@ -1,0 +1,20 @@
+tests/EndToEnd/NginxCompressionTest.php
+  s_79485d0750c5ec::t_0b9f0ebd87ca6e 16,23,37-44
+  s_79485d0750c5ec::t_65dc3880d4b222 45-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d4f9aa1cafee6dd9455eef883274875c8dfe1ddd",
+  "prompts": {},
+  "sessions": {
+    "s_79485d0750c5ec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a02bf82-600a-499e-b66e-8863bae65409",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
