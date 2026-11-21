@@ -158,18 +158,36 @@ Git hooks, once per clone: `git config core.hooksPath .githooks`. `commit-msg` c
 
 CI (`.github/workflows/ci.yaml`) runs `check:fast`, the Redocly lint, a build and check of the prod image, a clean `docker compose up --wait` with all tests, `promtool` checks and alert tests for the monitoring profile, the same stack under Podman with `bin/smoke-test`, a check of the commit subjects, gitleaks on the history and hadolint. A tag such as `v1.0.0` (matching `v[0-9]+.[0-9]+.[0-9]+`) runs `release.yaml`, which publishes the prod image to GHCR with an SBOM.
 
+## Core and bonus
+
+The brief asks for three sources normalised into one format, stored data, a briefing that survives a failing source, users with bookmarks, Docker (and Podman), tests and this README. That core is the sources, the snapshot table with its refresh rule, the briefing and bookmark endpoints, the console user command and the test suite.
+
+Everything else goes beyond the brief, and each piece can go on its own:
+
+| Bonus | What it adds | Cost of removing it |
+|---|---|---|
+| Circuit breaker in Redis (Lua) | stops calling a provider that is down or out of quota, across dates and processes | each date and place still waits 10 minutes after a failure, but a provider that is down or out of quota is called again for every new date or cell, and `Retry-After` is ignored |
+| Async prefetch (Messenger) | warms many dates in the background | prefetch stays synchronous |
+| phpat architecture rules | module boundaries and layers checked in PHPStan | boundaries kept by review only |
+| OpenAPI validation in every functional test | the contract cannot drift | the document can go stale |
+| Monitoring profile (Prometheus, Grafana) | metrics, SLOs, five alerts | nothing at runtime; it is off by default |
+| Release pipeline (SBOM, Trivy, Grype) | a scanned image on GHCR | images built by hand |
+
+If I had to cut, the release pipeline and the monitoring profile go first, then phpat; the breaker is the last bonus I would drop.
+
 ## Decisions and trade-offs
 
-- **Sources.** APOD, On This Day and Open-Meteo, each behind its own client that maps the upstream answer into an internal model; the API never proxies raw payloads. Page Summary was left out because On This Day already carries page summaries. The three calls run concurrently with a 3-second budget each and a 3.5-second deadline for the whole fetch. A network error or a 500, 502, 503 or 504 is retried once; a 429 or an answer with `Retry-After` never is.
-- **Modules.** A modular monolith: `Briefing`, `Identity`, `Bookmark` and a small `Shared`. Modules talk only through `Contract` namespaces. Rules written with phpat run inside PHPStan, cannot be ignored, and also fix the layers (edge, services, model). The cost: no foreign keys or Doctrine relations between modules. A bookmark stores user and discovery ids as plain `uuid` columns, and the contract checks the discovery before the insert.
-- **Snapshots and refresh.** One row per source and scope in `briefing_source_snapshot`, with the internal model as JSONB. A past date with stored data never calls upstream again, even when the stored weather was a forecast (the answer says `kind: forecast`). APOD and On This Day are final once fetched; weather for today and later is refreshed after an hour. A failed fetch is retried after 10 minutes. Until then the last good data is served with `stale: true`, or the source is listed in `missing`.
-- **Location and storage.** APOD and On This Day depend only on the date, so every user shares one snapshot per day. Weather is stored per day and place, with the coordinates rounded to 0.01° (about 1 km): one key per day and cell, so a day gains as many weather rows as there are distinct cells asked for, and the default place costs one. A coarser grid would store less but answer for the wrong place, because Open-Meteo fits its data to the elevation of the exact point: at 69.7° instead of Tromsø's 69.65° it reports a point 690 m higher and polar day on 17 May 2024, when the sun really set at 00:22. With the monitoring profile, `almanac_upstream_fetches_total{source="weather"}` and the `fetch` decisions for today and later show how many calls new places cause.
-- **Native upserts.** The ORM maps every entity, all reads and the schema. Three writes use `INSERT … ON CONFLICT` on the Doctrine connection: snapshots, discoveries and the bookmark insert. The API and the worker write the same rows at once, and neither the ORM nor DBAL has an atomic upsert. Guards in the `WHERE` clause stop an older result from overwriting a newer one. A duplicate bookmark is a clean 409.
-- **Circuit breaker.** One circuit per source, kept in Redis and shared by `php` and `worker`. Three outages, each within 30 minutes of the last and with no success in between, open it for 60 seconds (a 400, a misconfigured key or an invalid payload neither counts nor resets the count); a 429 opens it until `Retry-After`. One trial call closes it again. If Redis is down, it fails open: calls go through, with one warning per request or queued message.
-- **Messenger.** `--async` queues one message per date on the Doctrine transport. Upstream failures are stored as snapshots, not as failed messages. A date that is only waiting (pause, `Retry-After`, open circuit) is redelivered at that moment.
-- **OpenAPI.** Written by hand. Every request and response in every functional test is validated against it, and a test checks that routes and paths match both ways. An undocumented status or field fails the build.
-- **Rate limit.** A sliding window of 60 requests a minute per client network (IPv4 address or IPv6 /64), shared by all dates.
-- **Logs.** One-line JSON on stderr. Our channels accept only listed context keys, and the app's redacting JSON formatter masks tokens, keys, emails and coordinates on every handler. User ids in logs are UUIDs, never emails.
+- **Sources.** Each source has its own client that maps the answer into our internal model; raw payloads are never proxied. On This Day is three calls (`selected`, `births`, `deaths`) instead of `/all/`: for 15 March `/all/` is 1.4 MB, a third of it events and holidays we never show. The calls run in parallel, 3 seconds each and 3.5 seconds in all; a network error or a 500, 502, 503 or 504 is retried once; a 429, or any answer with `Retry-After`, never is.
+- **Modules.** `Briefing`, `Identity` and `Bookmark` talk only through `Contract` namespaces, checked by phpat. The cost is no foreign keys between modules: a bookmark keeps the user and discovery ids as plain `uuid` columns.
+- **Snapshots.** One row per source and scope, the internal model as JSONB. A stored past day never calls upstream again, even when its weather was a forecast (`kind: forecast`); APOD and On This Day are final once fetched, and weather for today and later is refreshed after an hour. A failure waits 10 minutes, and the last good data is served meanwhile as `stale`, or the source is listed in `missing`.
+- **Location.** APOD and On This Day are one row per day for everyone; weather one per day and 0.01° cell (about 1 km). A coarser grid would store less but describe another place: Open-Meteo fits its data to the elevation of the exact point, and 0.1° put Tromsø 690 m higher, in polar day, on a night the sun set at 00:22. The monitoring profile counts the upstream calls that new places cause.
+- **Native upserts.** Doctrine maps everything, but three writes use `INSERT … ON CONFLICT`, because the API and the worker write the same rows at once and neither ORM nor DBAL has an atomic upsert. A `WHERE` guard keeps newer data, and a duplicate bookmark is a clean 409.
+- **Circuit breaker.** Three outages within 30 minutes of each other, with no success between, open a source for 60 seconds; a 429 until `Retry-After`. A 400 or an invalid payload neither counts nor resets the count, and one trial call closes the circuit. It fails open when Redis is down.
+- **Errors.** Problem Details with `about:blank` and the status name, and a `detail` that says what to change. OpenAPI is written by hand and every functional test is validated against it.
+- **Rate limit.** 60 briefings a minute per client network (IPv4 address or IPv6 /64).
+- **Logs.** One-line JSON; listed context keys only; tokens, keys, emails and coordinates masked.
+
+The reasoning behind each part is in [docs/SPEC.md](docs/SPEC.md).
 
 ## Schema
 
@@ -197,13 +215,13 @@ Tokens are 32 random bytes; only their sha256 is stored. They expire (30 days by
 
 ## With more time
 
-- Wikipedia Page Summary as a fourth source, if a briefing should carry more than On This Day's summaries: a new `Source/` directory, and a case in `SourceName`, with no change to the schema.
+- Wikipedia Page Summary as a fourth source, if a briefing should carry more than On This Day's summaries. It touches about a dozen places: a `Source/` directory (client, response DTO, mapper, definition), a payload model, cases in `SourceName`, `SourceKey` and `SourcePayloadCodec`, the briefing's response DTOs and mappers, `SnapshotScope` if the source is not dated, the discovery extractor if its items can be bookmarked, `openapi.yaml`, and fixtures with tests. The schema does not change, and the breaker, health check and metrics pick the source up from `SourceName`.
 - A lock per scope, so parallel first requests call upstream once (it needs `symfony/lock`), and `Cache-Control` derived from the refresh policy, so clients can cache final days.
 - A separate circuit for each Open-Meteo address, because an archive outage now also stops forecasts, and a manual reset command instead of restarting Redis.
 - A one-off fetch of observed weather for a past day that has only a forecast. Stored past days must not call upstream again, so this needs an agreed exception to that rule.
 - Clean-up of old weather rows for coordinates other than the default place (a forecast stays forever once its day has passed), and one call budget for Open-Meteo shared by the API and the worker for places not yet stored, so many new places and a prefetch cannot use up its daily limit together.
 - Short-lived tokens with refresh, or an OIDC provider through Symfony's `access_token` handlers, because a 30-day Bearer token is a long-lived secret.
-- Redis and PostgreSQL probes in `/api/health`, metrics per source, and the request id passed into Messenger messages, so an outage shows up before users report it and a queued date can be traced to its command.
+- Redis and PostgreSQL probes in `/api/health` and the request id passed into Messenger messages, so an outage shows up before users report it and a queued date can be traced to its command.
 - A stable event key (year and linked pages instead of a text hash), because an edit on Wikipedia now creates a new discovery and old bookmarks keep pointing at the old text.
 - A PostgreSQL schema per module with its own database user, so the boundaries hold in the database too; it is the step before splitting `Briefing` into a service behind `DiscoveryCatalog`.
 
