@@ -48,6 +48,16 @@ final class DiscoveryRepositoryTest extends KernelTestCase
         self::assertEquals(['url' => 'https://apod.nasa.gov/a.jpg', 'summary' => 'A galaxy.'], $discovery->data);
     }
 
+    public function testStoresTheFirstOfTwoRecordsWithOneKeyInABatch(): void
+    {
+        // When
+        $inserted = $this->repository()->upsertDiscoveries([self::apod(), self::apod('Renamed')], new \DateTimeImmutable(self::TEN));
+
+        // Then
+        self::assertSame(1, $inserted);
+        self::assertSame(['Portrait of NGC 1055'], array_map(static fn (Discovery $discovery): string => $discovery->title, $this->stored()));
+    }
+
     public function testSkipsADiscoveryWhoseIdAnotherWriteJustStored(): void
     {
         // Given
