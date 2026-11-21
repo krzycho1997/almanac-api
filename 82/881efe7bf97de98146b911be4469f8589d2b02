@@ -1,0 +1,39 @@
+tests/Briefing/Unit/CircuitBreaker/InMemoryCircuitBreakerStoreTest.php
+  s_4da5374f6e605f::t_b1b8aa51c83707 1-7,9-15,17-32,36,38-39
+  s_4da5374f6e605f::t_a70e34773743d2 8,37
+  s_4da5374f6e605f::t_b26c23e393650d 16,33-35
+tests/Support/Briefing/CircuitBreaker/InMemoryCircuitBreakerStore.php
+  s_4da5374f6e605f::t_b1b8aa51c83707 1-60,62-100
+  s_4da5374f6e605f::t_87df666c7b42f9 61
+tests/Briefing/Integration/CircuitBreaker/RedisCircuitBreakerStoreTest.php
+  s_4da5374f6e605f::t_b1b8aa51c83707 1-8,10-20,22-45,49,52-93,94,96-125
+  s_4da5374f6e605f::t_a70e34773743d2 9,50-51
+  s_4da5374f6e605f::t_6b424e926ff8bb 21,46-48
+  s_4da5374f6e605f::t_cd65ce40e263a6 95
+tests/Support/Briefing/CircuitBreaker/CircuitBreakerStoreContract.php
+  s_4da5374f6e605f::t_b1b8aa51c83707 1-175,189-223
+  s_4da5374f6e605f::t_87df666c7b42f9 176-188
+src/Briefing/CircuitBreaker/RedisCircuitBreakerStore.php
+  s_4da5374f6e605f::t_3d7dbbde5be48a 1-49,51-65,67-111,113-119,121-122,135-168
+  s_4da5374f6e605f::t_c8f845189af1cb 124-128,130-133
+  s_4da5374f6e605f::t_9872d2befc2abe 50,112,120,123,129,134
+  s_4da5374f6e605f::t_87df666c7b42f9 66
+src/Briefing/CircuitBreaker/CircuitBreakerStore.php
+  s_4da5374f6e605f::t_3d7dbbde5be48a 1-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "82881efe7bf97de98146b911be4469f8589d2b02",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}

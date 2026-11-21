@@ -1,0 +1,53 @@
+tests/Briefing/Integration/CircuitBreaker/RedisCircuitBreakerStoreTest.php
+  s_4da5374f6e605f::t_e49d82af2e2b53 73-87
+src/Briefing/CircuitBreaker/CircuitLog.php
+  s_4da5374f6e605f::t_de170066378418 19,26,28,44,48
+  s_4da5374f6e605f::t_e49d82af2e2b53 1-18,20-25,27,29-43,45-47,49-54
+src/Briefing/CircuitBreaker/CircuitBreakerStore.php
+  s_4da5374f6e605f::t_e49d82af2e2b53 15
+  s_4da5374f6e605f::t_447a504a370fcc 19
+tests/Briefing/Integration/BriefingAggregatorTest.php
+  s_4da5374f6e605f::t_e49d82af2e2b53 9,436
+tests/Support/Briefing/CircuitBreaker/CircuitBreakerStoreContract.php
+  s_4da5374f6e605f::t_94a23b6bfee0e1 265,267-297
+  s_4da5374f6e605f::t_e49d82af2e2b53 8,17,221-264
+  s_4da5374f6e605f::t_e45715dcd68465 266
+tests/Briefing/Unit/CircuitBreaker/CircuitBreakerTest.php
+  s_4da5374f6e605f::t_619e08aa94bc43 371-388
+  s_4da5374f6e605f::t_e49d82af2e2b53 8,17-20,31-33,38,45-46,294-319,327-339,341-366,369-370,389-425,433-449
+  s_4da5374f6e605f::t_de170066378418 34,320-326,340,367-368
+  s_4da5374f6e605f::t_8ed86f69973308 450
+tests/Support/Briefing/CircuitBreaker/InMemoryCircuitBreakerStore.php
+  s_4da5374f6e605f::t_447a504a370fcc 60-61,63-65,69,83,85,87-88
+  s_4da5374f6e605f::t_e49d82af2e2b53 58,68
+  s_4da5374f6e605f::t_7013a0907441fc 62,111-118
+  s_4da5374f6e605f::t_846f566bf9b45c 119
+tests/Briefing/Functional/BriefingControllerTest.php
+  s_4da5374f6e605f::t_e49d82af2e2b53 8,17,19-21,37,511-522,524-540,542-561,792-811
+  s_4da5374f6e605f::t_de170066378418 523,541
+  s_4da5374f6e605f::t_6ecb6a5226a061 812
+src/Briefing/CircuitBreaker/CircuitBreaker.php
+  s_4da5374f6e605f::t_447a504a370fcc 110,121-123
+  s_4da5374f6e605f::t_e49d82af2e2b53 7,22-24,29,61,67,74-75,82,85,91-93,96,99,101-104,108,113,116,124-130,160-163
+  s_4da5374f6e605f::t_c96ebb0cd44467 164
+src/Briefing/CircuitBreaker/RedisCircuitBreakerStore.php
+  s_4da5374f6e605f::t_447a504a370fcc 37-51,80-86,94,96,130,132-134,136
+  s_4da5374f6e605f::t_e49d82af2e2b53 78,131,135
+  s_4da5374f6e605f::t_d4e925a9ab51e2 137-138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4d86ca96ca1a297cc6b8d8353ac317a4bfd4ee1f",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
