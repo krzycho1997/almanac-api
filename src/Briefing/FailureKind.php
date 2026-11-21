@@ -25,4 +25,12 @@ enum FailureKind: string
             self::Misconfigured, self::InvalidPayload => LogLevel::ERROR,
         };
     }
+
+    public function countsAsOutage(): bool
+    {
+        return match ($this) {
+            self::Unavailable, self::RateLimited => true,
+            self::Rejected, self::Misconfigured, self::InvalidPayload => false,
+        };
+    }
 }
