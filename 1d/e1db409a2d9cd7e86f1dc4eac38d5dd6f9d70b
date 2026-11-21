@@ -1,0 +1,37 @@
+tests/Shared/Functional/LogLeakTest.php
+  s_79485d0750c5ec::t_1f6f949828d0d7 26-33,53,60-69,73,75-84,90-99,104-110,115,123-124,138,141-148,150-155,157-160,163
+  s_79485d0750c5ec::t_6789008e3e40c2 1-11,13-25,34-42,49-52,54-59,70-72,74,85-89,100-103,111-114,116-122,125-135,164-165
+  s_79485d0750c5ec::t_ccc9b52d0b7c50 12,43-48,136-137,139-140,149,156,161-162
+tests/Architecture/LayerTest.php
+  s_79485d0750c5ec::t_4366fb692bda69 78
+tests/Bookmark/Integration/BookmarkConstraintTest.php
+  s_79485d0750c5ec::t_8b2c35ef5dddc2 1-51
+src/Bookmark/PageRequest.php
+  s_79485d0750c5ec::t_10e4d7f19a90a8 21,25,39-47
+  s_79485d0750c5ec::t_16ed96d256b513 48
+src/Bookmark/Exception/AlreadyBookmarkedException.php
+  s_79485d0750c5ec::t_10e4d7f19a90a8 11
+src/Bookmark/BookmarkService.php
+  s_79485d0750c5ec::t_10e4d7f19a90a8 36
+src/Bookmark/Repository/BookmarkRepository.php
+  s_79485d0750c5ec::t_10e4d7f19a90a8 36,48,57,67,80-91
+  s_79485d0750c5ec::t_e66cfaf8152f7a 92
+tests/Bookmark/Functional/ListBookmarksTest.php
+  s_79485d0750c5ec::t_f4b1e1c3f11158 112-113,116,120-129
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1de1db409a2d9cd7e86f1dc4eac38d5dd6f9d70b",
+  "prompts": {},
+  "sessions": {
+    "s_79485d0750c5ec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a02bf82-600a-499e-b66e-8863bae65409",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
