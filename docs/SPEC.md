@@ -26,7 +26,7 @@ These are phpat rules in `tests/Architecture/`. They run inside PHPStan and cann
 
 ## Briefing flow
 
-1. The date must be `Y-m-d` and a real calendar day (else 400), from 1995-06-16 to today + 15 days in `APP_TIMEZONE` (else 422). `lat` and `lon` are validated as plain decimal strings, both or neither, and rounded to two decimals (about 1 km).
+1. The date must be `Y-m-d` and a real calendar day (else 400), from 1995-06-16 to today + 15 days in `APP_TIMEZONE` (else 422). `lat` and `lon` are validated as plain decimal strings, both or neither, and rounded to two decimals (about 1 km). Weather is stored per day and that cell. A coarser grid was tried and dropped: Open-Meteo fits its answer to the elevation of the exact point, so snapping Tromsø from 69.65° to 69.7° moved it about 690 m up and turned a sunset at 00:22 into polar day.
 2. Each source says whether it covers the date: APOD from 1995-06-16 by New York's publication day; Open-Meteo from 1940-01-01 to today + 14 days, through the archive for days six or more days ago and the forecast API for the rest. Otherwise the source is `not_applicable`, which is computed per request and never stored.
 3. The aggregator reads the stored snapshots, asks the refresh policy what to fetch, and asks each source's circuit for permission.
 4. Permitted sources are fetched concurrently in one HttpClient `stream()` (curl). Each client has a 3-second `max_duration`, one retry on network errors and 500, 502, 503 or 504, no retry on 429 or with `Retry-After`, and no redirects. The whole fetch ends after 3.5 seconds.
