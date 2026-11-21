@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Briefing\Controller;
 
 use App\Briefing\BriefingAggregator;
+use App\Briefing\BriefingMetrics;
 use App\Briefing\Dto\Request\BriefingQuery;
 use App\Briefing\Dto\Response\BriefingResponse;
 use App\Briefing\Exception\NoSourceDataException;
@@ -29,6 +30,7 @@ final readonly class BriefingController
         private BriefingResponseMapper $mapper,
         #[Target('defaultLocation')]
         private Location $defaultLocation,
+        private BriefingMetrics $metrics,
     ) {
     }
 
@@ -42,6 +44,7 @@ final readonly class BriefingController
         BriefingQuery $query = new BriefingQuery(),
     ): BriefingResponse {
         $briefing = $this->aggregator->briefingFor($date, $query->locationOr($this->defaultLocation));
+        $this->metrics->served($briefing);
 
         if ($briefing->hasAnyData()) {
             return $this->mapper->create($briefing);

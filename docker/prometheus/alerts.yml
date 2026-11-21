@@ -1,0 +1,64 @@
+groups:
+  - name: almanac
+    rules:
+      - alert: AlmanacDown
+        expr: up{job="almanac"} == 0
+        for: 2m
+        labels:
+          severity: page
+        annotations:
+          summary: Prometheus cannot scrape nginx:9100, so nginx or php-fpm is down
+
+      - alert: BriefingErrorBudgetBurningFast
+        expr: |
+          (
+            sum(rate(almanac_http_requests_total{route="briefing_show",code=~"5.."}[1h]))
+              / sum(rate(almanac_http_requests_total{route="briefing_show",code!~"4.."}[1h]))
+          ) > (14.4 * 0.005)
+          and
+          (
+            sum(rate(almanac_http_requests_total{route="briefing_show",code=~"5.."}[5m]))
+              / sum(rate(almanac_http_requests_total{route="briefing_show",code!~"4.."}[5m]))
+          ) > (14.4 * 0.005)
+          and
+          sum(increase(almanac_http_requests_total{route="briefing_show",code!~"4.."}[1h])) >= 20
+        labels:
+          severity: page
+        annotations:
+          summary: Briefings fail fast enough to spend the 28-day error budget in two days
+
+      - alert: UpstreamMisconfiguredOrChanged
+        expr: |
+          sum by (source, result) (
+            almanac_upstream_fetches_total{result=~"misconfigured|invalid_payload"}
+              - (
+                (almanac_upstream_fetches_total{result=~"misconfigured|invalid_payload"} offset 15m) * 1
+                  or almanac_upstream_fetches_total{result=~"misconfigured|invalid_payload"} * 0
+              )
+          ) > 0
+        labels:
+          severity: ticket
+        annotations:
+          summary: '{{ $labels.source }} answered {{ $labels.result }}: check the key, the User-Agent or a changed format'
+
+      - alert: CircuitOpensRepeatedly
+        expr: |
+          sum by (source) (
+            almanac_circuit_transitions_total{to="open"}
+              - (
+                (almanac_circuit_transitions_total{to="open"} offset 1h) * 1
+                  or almanac_circuit_transitions_total{to="open"} * 0
+              )
+          ) >= 3
+        labels:
+          severity: ticket
+        annotations:
+          summary: The {{ $labels.source }} circuit opened at least three times in an hour
+
+      - alert: PrefetchMessagesFailed
+        expr: almanac_messenger_failed_messages > 0
+        for: 15m
+        labels:
+          severity: ticket
+        annotations:
+          summary: '{{ $value }} prefetch messages ran out of retries and wait in the failed transport'

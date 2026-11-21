@@ -19,6 +19,7 @@
         "monolog/monolog": "^3.13",
         "phpdocumentor/type-resolver": "^2.1",
         "phpstan/phpdoc-parser": "^2.4",
+        "promphp/prometheus_client_php": "^2.15",
         "psr/clock": "^1.0",
         "symfony/clock": "8.1.*",
         "symfony/console": "8.1.*",

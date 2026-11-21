@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Briefing\Integration;
 
 use App\Briefing\BriefingAggregator;
+use App\Briefing\BriefingMetrics;
 use App\Briefing\CircuitBreaker\CircuitBreaker;
 use App\Briefing\CircuitBreaker\CircuitLog;
 use App\Briefing\CircuitBreaker\CircuitPermit;
@@ -30,6 +31,7 @@ use App\Tests\Support\Briefing\JournalingSource;
 use App\Tests\Support\Briefing\SourcePayloads;
 use App\Tests\Support\Briefing\StubSource;
 use App\Tests\Support\InteractsWithTestServices;
+use App\Tests\Support\Metrics\RecordingMetrics;
 use Doctrine\DBAL\Connection;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
@@ -431,7 +433,7 @@ final class BriefingAggregatorTest extends KernelTestCase
      */
     private static function aggregator(array $sources, MockClock $clock, LoggerInterface $logger = new NullLogger(), ?CircuitBreaker $breaker = null): BriefingAggregator
     {
-        return new BriefingAggregator($sources, new ConcurrentFetcher(new MockHttpClient(), $clock, new NullLogger(), 3.5), $clock, new SourceFailureLog($logger), self::testService(SnapshotRefresher::class), new RefreshPolicy(), $breaker ?? self::breaker($clock));
+        return new BriefingAggregator($sources, new ConcurrentFetcher(new MockHttpClient(), $clock, new NullLogger(), 3.5), $clock, new SourceFailureLog($logger), self::testService(SnapshotRefresher::class), new RefreshPolicy(), $breaker ?? self::breaker($clock), self::testService(BriefingMetrics::class));
     }
 
     private static function refuseEveryWriteOfSnapshots(): void
@@ -441,7 +443,7 @@ final class BriefingAggregatorTest extends KernelTestCase
 
     private static function breaker(MockClock $clock): CircuitBreaker
     {
-        return new CircuitBreaker(new InMemoryCircuitBreakerStore($clock), $clock, new CircuitLog(new NullLogger()));
+        return new CircuitBreaker(new InMemoryCircuitBreakerStore($clock), $clock, new CircuitLog(new NullLogger(), new RecordingMetrics()));
     }
 
     /**

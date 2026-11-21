@@ -41,6 +41,9 @@ final class ArchitectureRulesTest extends TestCase
             'Identity/Entity/ProbeEntityUsesMapper.php' => ['phpat.entitiesStayBelowServices'],
             'Bookmark/ProbeMintsDiscoveryId.php' => ['phpat.onlyTheExtractorMintsDiscoveryIds'],
             'Briefing/Discovery/ProbeMintsWithoutTheExtractor.php' => ['phpat.onlyTheExtractorMintsDiscoveryIds'],
+            'Briefing/ProbeUsesPrometheus.php' => ['phpat.metricsGoThroughThePort'],
+            'Briefing/ProbeUsesMetricsAdapter.php' => ['phpat.metricsGoThroughThePort'],
+            'Briefing/ProbeUsesScrapedMetrics.php' => ['phpat.metricsGoThroughThePort'],
         ];
 
         // When

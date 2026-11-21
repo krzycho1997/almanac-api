@@ -20,4 +20,14 @@ final class BriefingDay
 
         return null;
     }
+
+    public static function isBefore(\DateTimeImmutable $date, \DateTimeImmutable $day): bool
+    {
+        return $date->format(self::FORMAT) < $day->format(self::FORMAT);
+    }
+
+    public static function isSame(\DateTimeImmutable $date, \DateTimeImmutable $day): bool
+    {
+        return $date->format(self::FORMAT) === $day->format(self::FORMAT);
+    }
 }

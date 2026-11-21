@@ -36,7 +36,7 @@ final class RedisServerTest extends TestCase
         self::assertSame('', $config['save']);
         self::assertSame('no', $config['appendonly']);
         self::assertSame((string) self::MAX_MEMORY_BYTES, $config['maxmemory']);
-        self::assertSame('allkeys-lru', $config['maxmemory-policy']);
+        self::assertSame('volatile-lru', $config['maxmemory-policy']);
     }
 
     public function testReusesConnectionsAcrossRequests(): void

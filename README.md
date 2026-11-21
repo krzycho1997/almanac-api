@@ -31,7 +31,7 @@ The first start builds the image, runs `composer install`, waits for PostgreSQL 
 | `php` | php-fpm with the app; runs the migrations on start |
 | `worker` | `messenger:consume async`, the same image; waits for the migrations, never runs them |
 | `database` | PostgreSQL 18 |
-| `redis` | Redis 8: circuit breaker state, rate-limit counters, `cache.app`; no persistence |
+| `redis` | Redis 8: circuit breaker state, rate-limit counters, `cache.app` and the metrics; no persistence, and only keys with a TTL are evicted |
 
 `compose.yaml` uses full image names and SELinux volume labels, so it also runs with `podman compose`. CI starts it from a clean checkout with rootless Podman 5 (5.7 at the time of writing) and podman-compose 1.6 on Ubuntu 26.04 and runs `bin/smoke-test` (health, a briefing, a new user's token, and a bookmark created, listed and deleted). Podman 4.x, as on Ubuntu 24.04, ships an aardvark-dns that loses DNS between containers at random ([containers/aardvark-dns#389](https://github.com/containers/aardvark-dns/issues/389)), so use Podman 5.
 
@@ -126,6 +126,16 @@ docker compose exec php bin/console messenger:failed:show
 
 A date whose source is down, rate limited or behind an open circuit goes back to the queue and is retried when that source can be called again, for up to a day. Messages that fail because of a bug or the database are retried 3 times and then moved to the `failed` queue.
 
+## Monitoring (optional)
+
+A bonus beyond the brief, off by default:
+
+```sh
+docker compose --profile monitoring up -d
+```
+
+Grafana opens at http://127.0.0.1:3000 with one dashboard and no login (viewer only), and Prometheus at http://127.0.0.1:9090 with five alerts. The app serves its metrics on `nginx:9100/metrics`, inside the compose network only; the public port answers 404. The metrics, their labels, the SLOs and the alerts are described in [docs/SPEC.md](docs/SPEC.md#metrics).
+
 ## Checks and tests
 
 Everything runs in the `php` container, against PostgreSQL. The `e2e` suite sends real requests to nginx, so the stack must be running.
@@ -146,7 +156,7 @@ bin/smoke-test http://127.0.0.1:8080                               # on the host
 
 Git hooks, once per clone: `git config core.hooksPath .githooks`. `commit-msg` checks the Conventional Commits format and length; `pre-push` runs `check:fast` in the container (Docker only).
 
-CI (`.github/workflows/ci.yaml`) runs `check:fast`, the Redocly lint, a build and check of the prod image, a clean `docker compose up --wait` with all tests, the same stack under Podman with `bin/smoke-test`, a check of the commit subjects, gitleaks on the history and hadolint. A tag such as `v1.0.0` (matching `v[0-9]+.[0-9]+.[0-9]+`) runs `release.yaml`, which publishes the prod image to GHCR with an SBOM.
+CI (`.github/workflows/ci.yaml`) runs `check:fast`, the Redocly lint, a build and check of the prod image, a clean `docker compose up --wait` with all tests, `promtool` checks and alert tests for the monitoring profile, the same stack under Podman with `bin/smoke-test`, a check of the commit subjects, gitleaks on the history and hadolint. A tag such as `v1.0.0` (matching `v[0-9]+.[0-9]+.[0-9]+`) runs `release.yaml`, which publishes the prod image to GHCR with an SBOM.
 
 ## Decisions and trade-offs
 

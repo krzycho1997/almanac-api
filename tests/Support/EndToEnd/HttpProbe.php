@@ -26,6 +26,13 @@ final readonly class HttpProbe
         throw new \LogicException(self::BASE_URL_VARIABLE.' is not set.');
     }
 
+    public static function fromEnvironmentOnPort(int $port): self
+    {
+        $baseUrl = self::fromEnvironment()->baseUrl;
+
+        return new self(\sprintf('%s://%s:%d', (string) parse_url($baseUrl, \PHP_URL_SCHEME), (string) parse_url($baseUrl, \PHP_URL_HOST), $port));
+    }
+
     /**
      * @param array<string, string> $headers
      */

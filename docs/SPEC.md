@@ -100,6 +100,57 @@ Every error from the app is `application/problem+json` from Symfony's `ProblemNo
 - Our channels accept only the context keys in `LogContextKey`. Monolog's `RedactingFormatter` on every handler masks tokens, keys, emails and coordinates. The NASA key travels in a header, and the security identifier is the user's UUID.
 - `LogLeakTest` replays the listed scenarios at prod log levels and finds no coordinates, email or token. It is a regression check for those paths, not a proof.
 
+## Metrics
+
+The metrics answer questions that lead to a decision; a metric with no such question is left out.
+
+| Question | Decision |
+|---|---|
+| How many upstream calls do snapshots save, per source, for past days and for today and later? | Whether the weather `refreshAfter` (1 h) fits and whether prefetch pays off. Past days should be 100% from storage. |
+| How fast do we use the providers' limits? | When to move from `DEMO_KEY` to an own NASA key, and which `--delay` to give prefetch. |
+| How often do we serve `stale` or `missing`? | Whether the 10-minute pause and the breaker thresholds fit. |
+| Does the breaker open again and again, or not at all? | The 60 s and 15 min openings; how reliable a provider is. |
+| How long does each source take against the 3.5 s deadline? | Whether `max_duration: 3` and the 3.5 s deadline fit. |
+
+**Catalogue.** Prefix `almanac_`, the unit in the name, `_total` for counters. Every label has a fixed, short list of values, well under 300 series in all.
+
+| Metric | Type | Labels | Recorded in |
+|---|---|---|---|
+| `http_requests_total` | counter | `route` (or `unmatched`), `method`, `code` (unknown ones as `other`) | a `kernel.terminate` listener, after the response is sent |
+| `http_request_duration_seconds` | histogram | `route` | the same listener, from `REQUEST_TIME_FLOAT` |
+| `snapshot_decisions_total` | counter | `source`, `decision` (`final`, `fresh`, `wait`, `fetch`), `day` (`past`, `today`, `future`) | the aggregator, for each refresh decision |
+| `upstream_fetches_total` | counter | `source`, `result` (`ok` or the failure kind) | the aggregator, for each settled fetch |
+| `upstream_fetch_duration_seconds` | histogram | `source` | the same place, retries included |
+| `briefing_source_status_total` | counter | `source`, `status` (`ok`, `stale`, `missing`, `not_applicable`) | the briefing controller, also before a 502 |
+| `circuit_transitions_total` | counter | `source`, `to` (`open`, `half_open`, `closed`) | `CircuitLog`, next to the log line |
+| `messenger_failed_messages` | gauge | none | read from the `failed` transport at scrape time |
+
+Upstream buckets are `0.1, 0.25, 0.5, 1, 1.5, 2, 3, 3.5` seconds: 1 s is the connect limit, 3 s `max_duration`, 3.5 s the deadline, so a fetch above 3.5 s means the deadline did not work. HTTP buckets run from 25 ms to 30 s, with 1 s and 4 s for the SLO and 30 s for `request_terminate_timeout`. There are no summaries, because they cannot be added up across processes.
+
+**No unbounded labels.** Dates, coordinates, `scope_key`, user and token ids, IP addresses, request ids, bookmark ids, raw paths, the upstream HTTP status and exception messages never become labels: each would add a series per value, and coordinates and addresses are personal data the logs already mask. Those details are in the JSON logs. An e2e test sends requests with dates, coordinates, UUIDs and a request id, then checks that every label on `/metrics` is a catalogue name with a bounded value.
+
+**Storage and failures.** Modules record through the `App\Shared\Metrics\Metrics` port (`increment`, `observe`); a phpat rule keeps `promphp/prometheus_client_php` and its adapter inside `Shared\Metrics`. The values live in Redis, which `php` and the worker share; APCu would not be shared, because the worker runs in its own container. The store uses the app's connection and database under the library's `PROMETHEUS_` prefix: a second persistent connection that selected another database came back from phpredis's pool to the app on a later request, and the breaker then wrote into the metrics database. Any failure of the store drops the write and logs one warning; metrics then rest for 30 seconds, which under php-fpm means the rest of the request and in the worker half a minute, as the breaker does. Redis evicts only keys with a TTL (`volatile-lru`), so a full Redis drops cache entries and rate-limit windows, never an open circuit or a metric.
+
+**`/metrics`** is served by a second nginx server on port 9100, which compose does not publish and which allows only private networks. It passes the FastCGI parameter `ALMANAC_METRICS_SCRAPE`, which no HTTP header can set; without it the controller answers 404, and the public port answers 404 before reaching PHP. The route is not part of the public API, so `openapi.yaml` leaves it out.
+
+**SLOs, over 28 days.**
+- Availability of briefings: responses other than 5xx among all except 4xx, target 99.5% (an error budget of about 3.4 hours). The three providers have no SLA, and stale data and partial 200s hide outages, so 99.9% would be fiction.
+- Response time: 95% under 1 s, the stored path, and 99% under 4 s, which shows whether the 3.5 s deadline really cuts the wait.
+- Completeness: `ok` and `stale` among `ok`, `stale` and `missing`, target 99%. It is the only SLI that sees one source failing behind a 200.
+
+**Alerts** (`docker/prometheus/alerts.yml`, each with `promtool` tests for when it fires and when it stays quiet):
+1. The scrape of `nginx:9100` fails for 2 minutes: nginx or php-fpm is down, and then the app counts nothing, so no other alert could fire.
+2. The briefing error budget burns 14.4 times too fast in both the last hour and the last 5 minutes, with at least 20 requests an hour that are not 4xx.
+3. Any `misconfigured` or `invalid_payload` answer within 15 minutes: a bad key or User-Agent, or a changed format.
+4. A circuit opens at least three times in an hour.
+5. Failed prefetch messages wait for 15 minutes.
+
+The library creates a series at its first count, with no zero before it, and Redis restarts with none. So the counter alerts compare with the value 15 minutes or an hour ago, or with 0 when the series did not exist then, instead of `increase()`, which would miss the first event. Status codes outside the known list are labelled by class (`5xx`), so they still count as errors. Prometheus keeps 30 days, which covers the 28-day SLO window. Refresh decisions and fetches include prefetch, which runs the same aggregator; the served status counts only briefing responses.
+
+There is no alert on an open circuit: without traffic a circuit stays half-open until the next request, so it would ring all night.
+
+**Not chosen:** a Prometheus bundle (a second dependency with its own names), the OpenTelemetry SDK (about ten packages, a PECL extension and a collector; the way forward once there is tracing), statsd (an exporter container).
+
 ## Code quality and security
 
 - PHPStan level 9 with strict and deprecation rules, phpat, and a rule that requires `declare(strict_types=1)`. PHP-CS-Fixer with the Symfony rule sets.

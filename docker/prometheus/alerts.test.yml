@@ -1,0 +1,151 @@
+rule_files:
+  - alerts.yml
+
+evaluation_interval: 1m
+
+tests:
+  - name: the app is down for two minutes
+    interval: 1m
+    input_series:
+      - series: 'up{job="almanac",instance="nginx:9100"}'
+        values: '1 0 0 0'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: AlmanacDown
+        exp_alerts: []
+      - eval_time: 3m
+        alertname: AlmanacDown
+        exp_alerts:
+          - exp_labels:
+              severity: page
+              job: almanac
+              instance: 'nginx:9100'
+            exp_annotations:
+              summary: Prometheus cannot scrape nginx:9100, so nginx or php-fpm is down
+
+  - name: fast burn needs failures in both windows and enough traffic
+    interval: 1m
+    input_series:
+      - series: 'almanac_http_requests_total{route="briefing_show",method="GET",code="200"}'
+        values: '0+1x60'
+      - series: 'almanac_http_requests_total{route="briefing_show",method="GET",code="502"}'
+        values: '0+1x60'
+    alert_rule_test:
+      - eval_time: 60m
+        alertname: BriefingErrorBudgetBurningFast
+        exp_alerts:
+          - exp_labels:
+              severity: page
+            exp_annotations:
+              summary: Briefings fail fast enough to spend the 28-day error budget in two days
+
+  - name: fast burn stays quiet once the last five minutes recovered
+    interval: 1m
+    input_series:
+      - series: 'almanac_http_requests_total{route="briefing_show",method="GET",code="200"}'
+        values: '0+1x60'
+      - series: 'almanac_http_requests_total{route="briefing_show",method="GET",code="502"}'
+        values: '0+1x50 50x10'
+    alert_rule_test:
+      - eval_time: 60m
+        alertname: BriefingErrorBudgetBurningFast
+        exp_alerts: []
+
+  - name: fast burn does not count client errors toward the traffic floor
+    interval: 1m
+    input_series:
+      - series: 'almanac_http_requests_total{route="briefing_show",method="GET",code="422"}'
+        values: '0+1x60'
+      - series: 'almanac_http_requests_total{route="briefing_show",method="GET",code="502"}'
+        values: '0+0.1x60'
+    alert_rule_test:
+      - eval_time: 60m
+        alertname: BriefingErrorBudgetBurningFast
+        exp_alerts: []
+
+  - name: the first misconfigured answer of a new series raises a ticket
+    interval: 1m
+    input_series:
+      - series: 'almanac_upstream_fetches_total{source="apod",result="misconfigured"}'
+        values: '_ _ 1 1'
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: UpstreamMisconfiguredOrChanged
+        exp_alerts:
+          - exp_labels:
+              severity: ticket
+              source: apod
+              result: misconfigured
+            exp_annotations:
+              summary: 'apod answered misconfigured: check the key, the User-Agent or a changed format'
+
+  - name: an invalid payload raises a ticket and is forgotten after fifteen minutes
+    interval: 1m
+    input_series:
+      - series: 'almanac_upstream_fetches_total{source="weather",result="invalid_payload"}'
+        values: '1 2 2x20'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: UpstreamMisconfiguredOrChanged
+        exp_alerts:
+          - exp_labels:
+              severity: ticket
+              source: weather
+              result: invalid_payload
+            exp_annotations:
+              summary: 'weather answered invalid_payload: check the key, the User-Agent or a changed format'
+      - eval_time: 20m
+        alertname: UpstreamMisconfiguredOrChanged
+        exp_alerts: []
+
+  - name: three openings in an hour, counted from a new series
+    interval: 10m
+    input_series:
+      - series: 'almanac_circuit_transitions_total{source="weather",to="open"}'
+        values: '_ 1 2 3'
+    alert_rule_test:
+      - eval_time: 30m
+        alertname: CircuitOpensRepeatedly
+        exp_alerts:
+          - exp_labels:
+              severity: ticket
+              source: weather
+            exp_annotations:
+              summary: The weather circuit opened at least three times in an hour
+
+  - name: two openings in an hour stay quiet
+    interval: 10m
+    input_series:
+      - series: 'almanac_circuit_transitions_total{source="apod",to="open"}'
+        values: '_ 1 2 2'
+    alert_rule_test:
+      - eval_time: 30m
+        alertname: CircuitOpensRepeatedly
+        exp_alerts: []
+
+  - name: failed messages for fifteen minutes
+    interval: 1m
+    input_series:
+      - series: 'almanac_messenger_failed_messages'
+        values: '2x20'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: PrefetchMessagesFailed
+        exp_alerts: []
+      - eval_time: 16m
+        alertname: PrefetchMessagesFailed
+        exp_alerts:
+          - exp_labels:
+              severity: ticket
+            exp_annotations:
+              summary: '2 prefetch messages ran out of retries and wait in the failed transport'
+
+  - name: failed messages handled within fifteen minutes stay quiet
+    interval: 1m
+    input_series:
+      - series: 'almanac_messenger_failed_messages'
+        values: '2x10 0x10'
+    alert_rule_test:
+      - eval_time: 20m
+        alertname: PrefetchMessagesFailed
+        exp_alerts: []

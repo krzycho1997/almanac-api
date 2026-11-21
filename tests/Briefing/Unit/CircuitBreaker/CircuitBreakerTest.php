@@ -12,8 +12,10 @@ use App\Briefing\FailureKind;
 use App\Briefing\Model\SourcePayload;
 use App\Briefing\SourceName;
 use App\Briefing\SourceResult;
+use App\Shared\Metrics\Metric;
 use App\Tests\Support\Briefing\CircuitBreaker\InMemoryCircuitBreakerStore;
 use App\Tests\Support\Briefing\FakePayload;
+use App\Tests\Support\Metrics\RecordingMetrics;
 use Monolog\Handler\TestHandler;
 use Monolog\Level;
 use Monolog\Logger;
@@ -36,6 +38,7 @@ final class CircuitBreakerTest extends TestCase
     private MockClock $clock;
     private InMemoryCircuitBreakerStore $store;
     private TestHandler $log;
+    private RecordingMetrics $metrics;
     private CircuitBreaker $breaker;
 
     protected function setUp(): void
@@ -43,7 +46,8 @@ final class CircuitBreakerTest extends TestCase
         $this->clock = new MockClock(self::NOW);
         $this->store = new InMemoryCircuitBreakerStore($this->clock);
         $this->log = new TestHandler();
-        $this->breaker = new CircuitBreaker($this->store, $this->clock, new CircuitLog(new Logger(self::CHANNEL, [$this->log])));
+        $this->metrics = new RecordingMetrics();
+        $this->breaker = new CircuitBreaker($this->store, $this->clock, new CircuitLog(new Logger(self::CHANNEL, [$this->log]), $this->metrics));
     }
 
     /**
@@ -390,6 +394,24 @@ final class CircuitBreakerTest extends TestCase
         yield 'a rejection closes it' => [FailureKind::Rejected->value, null, [[Level::Info, self::CLOSED, ['source' => 'apod']]]];
         yield 'an outage reopens it' => [FailureKind::Unavailable->value, null, [self::opened(['source' => 'apod', 'kind' => 'unavailable', 'openSeconds' => 60, 'trial' => true])]];
         yield 'a 429 reopens it until Retry-After' => [FailureKind::RateLimited->value, '+2 hours', [self::opened(['source' => 'apod', 'kind' => 'rate_limited', 'openSeconds' => 7200, 'trial' => true])]];
+    }
+
+    public function testCountsEveryTransitionOfACircuitThatOpensAndCloses(): void
+    {
+        // Given
+        $this->recordCalls(3, FailureKind::Unavailable);
+        $this->clock->modify(self::NOW.' +61 seconds');
+        $permit = $this->breaker->tryAcquire(self::SOURCE);
+
+        // When
+        $this->breaker->record(self::resultOf(self::OK, null), $permit);
+
+        // Then
+        self::assertSame([
+            [Metric::CircuitTransitions, ['source' => 'apod', 'to' => 'open']],
+            [Metric::CircuitTransitions, ['source' => 'apod', 'to' => 'half_open']],
+            [Metric::CircuitTransitions, ['source' => 'apod', 'to' => 'closed']],
+        ], $this->metrics->increments);
     }
 
     public function testLogsTheClosingOnceWhenTwoTrialsSucceed(): void
