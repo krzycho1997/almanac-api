@@ -29,7 +29,6 @@ final readonly class OnThisDayMapper
     private const string EMPTY = '';
     private const string COMMA = ',';
     private const string DISAMBIGUATION = '/\s*\([^()]*\)$/u';
-    private const string COMPARABLE = 'NFD; [:Nonspacing Mark:] Remove; Lower(); NFC';
     private const string NAME_ENDS = '/^(?:$|[\s,(])/u';
     private const string WIKIDATA_ID = '/^Q[1-9][0-9]*$/D';
 
@@ -166,7 +165,9 @@ final readonly class OnThisDayMapper
      */
     private static function pageAbout(string $text, array $pages): ?OnThisDayPage
     {
-        $named = array_values(array_filter($pages, static fn (OnThisDayPage $page): bool => self::namesThePage($text, $page)));
+        $comparableText = ComparableText::of($text);
+        $comparableName = ComparableText::of(self::nameIn($text));
+        $named = array_values(array_filter($pages, static fn (OnThisDayPage $page): bool => self::namesThePage($comparableText, $comparableName, $page)));
         usort($named, static fn (OnThisDayPage $first, OnThisDayPage $second): int => self::nameLength($second) <=> self::nameLength($first));
 
         return $named[0] ?? null;
@@ -177,15 +178,15 @@ final readonly class OnThisDayMapper
         return mb_strlen(self::withoutDisambiguation($page->title));
     }
 
-    private static function namesThePage(string $text, OnThisDayPage $page): bool
+    private static function namesThePage(string $comparableText, string $comparableName, OnThisDayPage $page): bool
     {
-        $title = self::comparable(self::withoutDisambiguation($page->title));
+        $title = ComparableText::of(self::withoutDisambiguation($page->title));
 
-        if (self::startsWithName(self::comparable($text), $title)) {
+        if (self::startsWithName($comparableText, $title)) {
             return true;
         }
 
-        return self::startsWithName($title, self::comparable(self::nameIn($text)));
+        return self::startsWithName($title, $comparableName);
     }
 
     private static function startsWithName(string $text, string $name): bool
@@ -264,11 +265,6 @@ final readonly class OnThisDayMapper
     private static function withoutDisambiguation(string $title): string
     {
         return PlainText::tidy((string) preg_replace(self::DISAMBIGUATION, self::EMPTY, $title));
-    }
-
-    private static function comparable(string $text): string
-    {
-        return (string) transliterator_transliterate(self::COMPARABLE, $text);
     }
 
     /**
