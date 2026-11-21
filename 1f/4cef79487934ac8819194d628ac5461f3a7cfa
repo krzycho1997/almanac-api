@@ -1,0 +1,61 @@
+src/Briefing/Exception/DateNotReadyException.php
+  s_4da5374f6e605f::t_d6a7eecb92bf7a 22-44
+  s_4da5374f6e605f::t_0f90ec4406d44f 7-9,11
+src/Briefing/MessageHandler/MarkCodeFailuresListener.php
+  s_4da5374f6e605f::t_d6a7eecb92bf7a 1-24
+src/Briefing/MessageHandler/CodeFailureStamp.php
+  s_4da5374f6e605f::t_d6a7eecb92bf7a 1-11
+tests/Briefing/Integration/Messenger/CodeFailureRetriesTest.php
+  s_4da5374f6e605f::t_a4731147fdbe8c 7,17
+src/Briefing/SourceEntry.php
+  s_4da5374f6e605f::t_02f9bda44309d3 60-68
+tests/Support/Briefing/CircuitBreaker/BrokenCircuitBreakerStore.php
+  s_4da5374f6e605f::t_9e07048d1f30c3 1-42
+tests/Briefing/Unit/BriefingResultTest.php
+  s_4da5374f6e605f::t_58f692958c945a 119-155
+tests/Briefing/Unit/MessageHandler/PrefetchRetryStrategyTest.php
+  s_4da5374f6e605f::t_add15332b7b8ea 21,30,57,79,81,95,97-100,102-107,109-126
+  s_4da5374f6e605f::t_bdb53345229de6 7-9,18
+src/Briefing/MessageHandler/PrefetchRetryStrategy.php
+  s_4da5374f6e605f::t_d6a7eecb92bf7a 21,28-29,35,39,44,46-47,50-57,65,71,73,76,78,80-81,84
+  s_4da5374f6e605f::t_02f9bda44309d3 22
+  s_4da5374f6e605f::t_48f4db4fa160cc 8,15,18-19
+src/Briefing/SourceResult.php
+  s_4da5374f6e605f::t_02f9bda44309d3 50-58
+src/Briefing/RefreshPolicy.php
+  s_4da5374f6e605f::t_02f9bda44309d3 9
+config/services.yaml
+  s_4da5374f6e605f::t_add15332b7b8ea 95
+  s_4da5374f6e605f::t_02f9bda44309d3 6
+tests/Briefing/Unit/Message/PrefetchDateMessageTest.php
+  s_4da5374f6e605f::t_72970088301968 37-45
+src/Briefing/MessageHandler/PrefetchDateHandler.php
+  s_4da5374f6e605f::t_02f9bda44309d3 34,36-37
+  s_4da5374f6e605f::t_a4731147fdbe8c 8
+  s_4da5374f6e605f::t_9e07048d1f30c3 9,21,33,38-46
+tests/Briefing/Integration/MessageHandler/PrefetchDateHandlerTest.php
+  s_4da5374f6e605f::t_112fe86a836b98 35
+  s_4da5374f6e605f::t_9e07048d1f30c3 16,142-143,154-163
+  s_4da5374f6e605f::t_a2c03afce5dd87 10,59,67,70,77-108,165,180-189
+  s_4da5374f6e605f::t_7635b54f04865a 109,164,166,190
+src/Briefing/BriefingResult.php
+  s_4da5374f6e605f::t_02f9bda44309d3 47-61,146-154
+tests/Briefing/Unit/MessageHandler/MarkCodeFailuresListenerTest.php
+  s_4da5374f6e605f::t_31b4e5f0b6c31b 1-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1f4cef79487934ac8819194d628ac5461f3a7cfa",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
