@@ -35,6 +35,10 @@ jobs:
         run: docker compose run --rm --no-deps -T php composer check:fast
       - name: Lint the OpenAPI description
         run: docker compose run --rm --no-deps redocly lint docs/openapi.yaml
+      - name: Check the Prometheus configuration and test the alerts
+        run: |
+          docker compose --profile monitoring run --rm --no-deps --entrypoint promtool prometheus check config /etc/prometheus/prometheus.yml
+          docker compose --profile monitoring run --rm --no-deps --entrypoint promtool prometheus test rules /etc/prometheus/alerts.test.yml
       - name: Build the prod image
         run: docker build --target prod --tag almanac-php:prod .
       - name: Check the prod image

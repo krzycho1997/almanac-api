@@ -84,5 +84,42 @@ services:
       timeout: 3s
       retries: 30
 
+  prometheus:
+    security_opt:
+      - no-new-privileges:true
+    profiles: [monitoring]
+    image: docker.io/prom/prometheus:v3.15.1@sha256:fa3302279710be2f21a8301ec17a8b4f2301fd829bd113839b3b6b02b6f191a2
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus", "--storage.tsdb.retention.time=30d"]
+    depends_on:
+      - nginx
+    ports:
+      - "127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./docker/prometheus:/etc/prometheus:ro,z
+      - prometheus_data:/prometheus
+
+  grafana:
+    security_opt:
+      - no-new-privileges:true
+    profiles: [monitoring]
+    image: docker.io/grafana/grafana:13.2.6@sha256:b21409d7951ddcfd63a4b49083e4ef2cc35bc1437d071813bf82bfb238b00bca
+    depends_on:
+      - prometheus
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_NEWS_NEWS_FEED_ENABLED: "false"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/almanac.json
+    ports:
+      - "127.0.0.1:${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro,z
+      - ./docker/grafana/dashboards:/var/lib/grafana/dashboards:ro,z
+
 volumes:
   database_data:
+  prometheus_data:
