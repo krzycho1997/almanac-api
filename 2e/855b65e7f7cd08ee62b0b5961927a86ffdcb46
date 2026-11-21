@@ -1,0 +1,42 @@
+tests/Briefing/Integration/Discovery/DiscoveryCatalogTest.php
+  s_4da5374f6e605f::t_9ab50b60bdad9e 1-11,13-14,17,19-26,28-34,36-88,111-113,115-124,133-147
+  s_4da5374f6e605f::t_641f6dd410f014 15,35,91-92,94-95,97-101,125-132
+  s_4da5374f6e605f::t_64bd5142c61d29 18
+  s_4da5374f6e605f::t_c3d8a8aac2d6b5 12,16,27,89-90,93,96,102-110,114
+src/Briefing/Contract/DiscoveryView.php
+  s_4da5374f6e605f::t_09b7a3b218a7e6 1-18
+src/Briefing/Discovery/DoctrineDiscoveryCatalog.php
+  s_4da5374f6e605f::t_09b7a3b218a7e6 1-14,15-30,32-34,36,38,40,48-51,53-68
+  s_4da5374f6e605f::t_c3d8a8aac2d6b5 31,35,37,39,41-47,52
+src/Briefing/Contract/DiscoveryCatalog.php
+  s_4da5374f6e605f::t_09b7a3b218a7e6 1-11,13-15
+  s_4da5374f6e605f::t_641f6dd410f014 12
+tests/Briefing/Unit/Discovery/DiscoveryExtractorTest.php
+  s_4da5374f6e605f::t_9ac0bd107f8279 141,194
+  s_4da5374f6e605f::t_dd103c6c855fcb 11,169-177,200
+tests/Briefing/Integration/SnapshotRefresherTest.php
+  s_4da5374f6e605f::t_dd103c6c855fcb 30,118-119,122-123,125-126
+  s_4da5374f6e605f::t_ea518c4aff0d99 128-129
+src/Briefing/Discovery/DiscoveryExtractor.php
+  s_4da5374f6e605f::t_dd103c6c855fcb 10,88,129-135,190-191,194-199
+src/Briefing/Repository/DiscoveryRepository.php
+  s_4da5374f6e605f::t_dd103c6c855fcb 9,17,55
+src/Briefing/Entity/Discovery.php
+  s_4da5374f6e605f::t_dd103c6c855fcb 18-21,28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2e855b65e7f7cd08ee62b0b5961927a86ffdcb46",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
