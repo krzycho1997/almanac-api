@@ -6,6 +6,7 @@ namespace App\Tests\Briefing\Integration;
 
 use App\Briefing\BriefingAggregator;
 use App\Briefing\CircuitBreaker\CircuitBreaker;
+use App\Briefing\CircuitBreaker\CircuitLog;
 use App\Briefing\CircuitBreaker\CircuitPermit;
 use App\Briefing\CircuitBreaker\CircuitState;
 use App\Briefing\FailureKind;
@@ -432,7 +433,7 @@ final class BriefingAggregatorTest extends KernelTestCase
 
     private static function breaker(MockClock $clock): CircuitBreaker
     {
-        return new CircuitBreaker(new InMemoryCircuitBreakerStore($clock), $clock);
+        return new CircuitBreaker(new InMemoryCircuitBreakerStore($clock), $clock, new CircuitLog(new NullLogger()));
     }
 
     /**

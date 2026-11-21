@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Briefing\CircuitBreaker;
 
+use App\Briefing\Elapsed;
 use App\Briefing\FailureKind;
 use App\Briefing\SourceFailure;
 use App\Briefing\SourceName;
@@ -18,10 +19,14 @@ final readonly class CircuitBreaker
     private const string SHORTEST_RATE_LIMIT_OPENING = 'PT60S';
     private const string TRIAL_LEASE = 'PT30S';
     private const string FAILURE_WINDOW = 'PT30M';
+    private const ?int NOT_COUNTED = null;
+    private const bool AFTER_CALL = false;
+    private const bool AFTER_TRIAL = true;
 
     public function __construct(
         private CircuitBreakerStore $store,
         private ClockInterface $clock,
+        private CircuitLog $log,
     ) {
     }
 
@@ -53,74 +58,76 @@ final readonly class CircuitBreaker
     public function record(SourceResult $result, CircuitPermit $permit): void
     {
         if (CircuitPermit::Call === $permit) {
-            $this->afterCall($result->source->value, self::outageOf($result));
+            $this->afterCall($result->source, self::outageOf($result));
 
             return;
         }
 
         if (CircuitPermit::Trial === $permit) {
-            $this->afterTrial($result->source->value, self::outageOf($result));
+            $this->afterTrial($result->source, self::outageOf($result));
         }
     }
 
     private function trialFor(SourceName $source): CircuitPermit
     {
         if ($this->store->claimTrial($source->value, $this->after(self::TRIAL_LEASE))) {
+            $this->log->halfOpened($source);
+
             return CircuitPermit::Trial;
         }
 
         return CircuitPermit::Refused;
     }
 
-    private function afterCall(string $circuit, ?SourceFailure $outage): void
+    private function afterCall(SourceName $source, ?SourceFailure $outage): void
     {
         if (null === $outage) {
-            $this->store->forgetFailures($circuit);
+            $this->store->forgetFailures($source->value);
 
             return;
         }
 
-        if ($this->opensAfter($circuit, $outage)) {
-            $this->openAtLeastUntil($circuit, $this->openUntil($outage));
-        }
-    }
-
-    private function opensAfter(string $circuit, SourceFailure $outage): bool
-    {
         if (FailureKind::RateLimited === $outage->kind) {
-            return true;
+            $this->openAtLeast($source, $outage, self::NOT_COUNTED);
+
+            return;
         }
 
-        return self::OUTAGES_TO_OPEN <= $this->store->recordFailure($circuit, $this->after(self::FAILURE_WINDOW));
+        $this->countOutage($source, $outage);
     }
 
-    private function openAtLeastUntil(string $circuit, \DateTimeImmutable $until): void
+    private function countOutage(SourceName $source, SourceFailure $outage): void
     {
-        if ($this->openingEndsBefore($circuit, $until)) {
-            $this->store->open($circuit, $until);
+        $failures = $this->store->recordFailure($source->value, $this->after(self::FAILURE_WINDOW));
+
+        if (self::OUTAGES_TO_OPEN <= $failures) {
+            $this->openAtLeast($source, $outage, $failures);
         }
     }
 
-    private function openingEndsBefore(string $circuit, \DateTimeImmutable $until): bool
+    private function openAtLeast(SourceName $source, SourceFailure $outage, ?int $failures): void
     {
-        $current = $this->store->openUntil($circuit);
-
-        if (null === $current) {
-            return true;
-        }
-
-        return $current < $until;
+        $this->open($source, $outage, $this->openUntil($outage), $failures, self::AFTER_CALL);
     }
 
-    private function afterTrial(string $circuit, ?SourceFailure $outage): void
+    private function afterTrial(SourceName $source, ?SourceFailure $outage): void
     {
         if ($outage instanceof SourceFailure) {
-            $this->store->open($circuit, $this->openUntil($outage));
+            $this->open($source, $outage, $this->openUntil($outage), self::NOT_COUNTED, self::AFTER_TRIAL);
 
             return;
         }
 
-        $this->store->close($circuit);
+        if ($this->store->close($source->value)) {
+            $this->log->closed($source);
+        }
+    }
+
+    private function open(SourceName $source, SourceFailure $outage, \DateTimeImmutable $until, ?int $failures, bool $trial): void
+    {
+        if ($this->store->open($source->value, $until)) {
+            $this->log->opened($source, $outage->kind, $failures, $this->secondsUntil($until), $trial);
+        }
     }
 
     private static function outageOf(SourceResult $result): ?SourceFailure
@@ -148,6 +155,11 @@ final readonly class CircuitBreaker
         }
 
         return max($retryAt, $this->after(self::SHORTEST_RATE_LIMIT_OPENING));
+    }
+
+    private function secondsUntil(\DateTimeImmutable $until): int
+    {
+        return (int) ceil(Elapsed::secondsBetween($this->clock->now(), $until));
     }
 
     private function after(string $interval): \DateTimeImmutable

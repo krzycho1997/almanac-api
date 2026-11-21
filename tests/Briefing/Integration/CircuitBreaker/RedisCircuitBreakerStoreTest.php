@@ -70,6 +70,21 @@ final class RedisCircuitBreakerStoreTest extends CircuitBreakerStoreContract
         self::assertSame('openUntil', $log->getRecords()[0]->context['operation'] ?? null);
     }
 
+    public function testReportsNoOpeningWhileRedisIsDown(): void
+    {
+        // Given
+        $log = new TestHandler();
+        $store = new RedisCircuitBreakerStore(self::connectionTo(self::REFUSING_REDIS), $this->clock, new Logger(self::CHANNEL, [$log]));
+
+        // When
+        $opened = $store->open(self::CIRCUIT, $this->clock->now()->modify('+1 minute'));
+
+        // Then
+        self::assertFalse($opened);
+        self::assertCount(1, $log->getRecords());
+        self::assertSame('open', $log->getRecords()[0]->context['operation'] ?? null);
+    }
+
     public function testFailsOpenWhenRedisAnswersWithAnError(): void
     {
         // Given
@@ -86,6 +101,23 @@ final class RedisCircuitBreakerStoreTest extends CircuitBreakerStoreContract
         self::assertTrue($claimed);
         self::assertCount(1, $log->getRecords());
         self::assertSame(0, $this->redis->exists('briefing:cb:{apod}:trial'));
+    }
+
+    public function testAsksRedisAgainThirtySecondsAfterAFailure(): void
+    {
+        // Given
+        $log = new TestHandler();
+        $store = new RedisCircuitBreakerStore(self::connectionTo(self::REFUSING_REDIS), $this->clock, new Logger(self::CHANNEL, [$log]));
+        $store->openUntil(self::CIRCUIT);
+        $this->clock->sleep(29.9);
+        $store->openUntil(self::CIRCUIT);
+
+        // When
+        $this->clock->sleep(0.1);
+        $store->openUntil(self::CIRCUIT);
+
+        // Then
+        self::assertCount(2, $log->getRecords());
     }
 
     public function testAsksRedisAgainAfterReset(): void
@@ -109,7 +141,7 @@ final class RedisCircuitBreakerStoreTest extends CircuitBreakerStoreContract
         $store = $this->store();
 
         // When
-        $store->open(self::CIRCUIT, $this->clock->now()->modify('+1 minute'));
+        $store->open(self::CIRCUIT, $this->clock->now()->modify('-1 minute'));
         $store->recordFailure(self::CIRCUIT, $this->clock->now()->modify('+10 minutes'));
         $store->claimTrial(self::CIRCUIT, $this->clock->now()->modify('+30 seconds'));
 

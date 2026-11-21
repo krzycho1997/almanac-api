@@ -22,10 +22,7 @@ final class RedisCircuitBreakerStore implements CircuitBreakerStore, ResetInterf
     private const string FAILURES = 'failures';
     private const string OPEN_UNTIL = 'open_until';
     private const string TRIAL = 'trial';
-    private const string CLAIMED = '1';
     private const string INSTANT = 'U.u';
-    private const string NOT_EXISTING = 'nx';
-    private const string EXPIRES_IN = 'px';
     private const int ONE_KEY = 1;
     private const int FIRST_FAILURE = 1;
     private const int NOTHING_LEFT = 0;
@@ -34,8 +31,42 @@ final class RedisCircuitBreakerStore implements CircuitBreakerStore, ResetInterf
         redis.call('PEXPIRE', KEYS[1], ARGV[1])
         return count
         LUA;
+    private const string OPEN_AT_LEAST_UNTIL = <<<'LUA'
+        local previous = tonumber(redis.call('GET', KEYS[1]))
+        local untilAt = tonumber(ARGV[1])
+        if previous and previous >= untilAt then
+            return 0
+        end
+        redis.call('SET', KEYS[1], ARGV[1])
+        redis.call('DEL', KEYS[2], KEYS[3])
+        if previous and previous > tonumber(ARGV[2]) then
+            return 0
+        end
+        return 1
+        LUA;
+    private const string CLAIM_HALF_OPEN_TRIAL = <<<'LUA'
+        local openUntil = tonumber(redis.call('GET', KEYS[1]))
+        if not openUntil or openUntil > tonumber(ARGV[1]) then
+            return 0
+        end
+        if tonumber(ARGV[2]) <= 0 then
+            if redis.call('EXISTS', KEYS[2]) == 0 then
+                return 1
+            end
+            return 0
+        end
+        if redis.call('SET', KEYS[2], '1', 'NX', 'PX', ARGV[2]) then
+            return 1
+        end
+        return 0
+        LUA;
+    private const int TWO_KEYS = 2;
+    private const string REST_AFTER_FAILURE = 'PT30S';
+    private const int THREE_KEYS = 3;
+    private const int STARTED = 1;
+    private const int ONE_DELETED = 1;
 
-    private bool $unavailable = false;
+    private ?\DateTimeImmutable $unavailableUntil = null;
 
     public function __construct(
         #[Autowire(service: 'app.redis_connection')]
@@ -60,25 +91,35 @@ final class RedisCircuitBreakerStore implements CircuitBreakerStore, ResetInterf
         $this->attempt(__FUNCTION__, fn (): mixed => $this->redis->del(self::key($circuit, self::FAILURES)), null);
     }
 
-    public function open(string $circuit, \DateTimeImmutable $until): void
+    public function open(string $circuit, \DateTimeImmutable $until): bool
     {
-        $this->attempt(__FUNCTION__, fn (): mixed => $this->redis->set(self::key($circuit, self::OPEN_UNTIL), $until->format(self::INSTANT)), null);
-        $this->attempt(__FUNCTION__, fn (): mixed => $this->redis->del(self::key($circuit, self::FAILURES), self::key($circuit, self::TRIAL)), null);
+        return $this->attempt(__FUNCTION__, fn (): bool => self::STARTED === $this->redis->eval(self::OPEN_AT_LEAST_UNTIL, [
+            self::key($circuit, self::OPEN_UNTIL),
+            self::key($circuit, self::FAILURES),
+            self::key($circuit, self::TRIAL),
+            $until->format(self::INSTANT),
+            $this->clock->now()->format(self::INSTANT),
+        ], self::THREE_KEYS), false);
     }
 
     public function claimTrial(string $circuit, \DateTimeImmutable $leaseUntil): bool
     {
-        return $this->attempt(__FUNCTION__, fn (): bool => $this->lease(self::key($circuit, self::TRIAL), $leaseUntil), true);
+        return $this->attempt(__FUNCTION__, fn (): bool => self::STARTED === $this->redis->eval(self::CLAIM_HALF_OPEN_TRIAL, [
+            self::key($circuit, self::OPEN_UNTIL),
+            self::key($circuit, self::TRIAL),
+            $this->clock->now()->format(self::INSTANT),
+            $this->millisecondsUntil($leaseUntil),
+        ], self::TWO_KEYS), true);
     }
 
-    public function close(string $circuit): void
+    public function close(string $circuit): bool
     {
-        $this->attempt(__FUNCTION__, fn (): mixed => $this->redis->del(self::key($circuit, self::FAILURES), self::key($circuit, self::OPEN_UNTIL), self::key($circuit, self::TRIAL)), null);
+        return $this->attempt(__FUNCTION__, fn (): bool => $this->closed($circuit), false);
     }
 
     public function reset(): void
     {
-        $this->unavailable = false;
+        $this->unavailableUntil = null;
     }
 
     private function countUntil(string $key, \DateTimeImmutable $forgetAt): int
@@ -96,15 +137,12 @@ final class RedisCircuitBreakerStore implements CircuitBreakerStore, ResetInterf
         return self::FIRST_FAILURE;
     }
 
-    private function lease(string $key, \DateTimeImmutable $leaseUntil): bool
+    private function closed(string $circuit): bool
     {
-        $milliseconds = $this->millisecondsUntil($leaseUntil);
+        $wasOpen = self::ONE_DELETED === $this->redis->del(self::key($circuit, self::OPEN_UNTIL));
+        $this->redis->del(self::key($circuit, self::FAILURES), self::key($circuit, self::TRIAL));
 
-        if (self::NOTHING_LEFT < $milliseconds) {
-            return true === $this->redis->set($key, self::CLAIMED, [self::NOT_EXISTING, self::EXPIRES_IN => $milliseconds]);
-        }
-
-        return 0 === $this->redis->exists($key);
+        return $wasOpen;
     }
 
     private function millisecondsUntil(\DateTimeImmutable $moment): int
@@ -147,7 +185,7 @@ final class RedisCircuitBreakerStore implements CircuitBreakerStore, ResetInterf
      */
     private function attempt(string $name, \Closure $operation, mixed $fallback): mixed
     {
-        if ($this->unavailable) {
+        if ($this->isResting()) {
             return $fallback;
         }
 
@@ -180,9 +218,18 @@ final class RedisCircuitBreakerStore implements CircuitBreakerStore, ResetInterf
         throw new \RedisException($error);
     }
 
+    private function isResting(): bool
+    {
+        if (null === $this->unavailableUntil) {
+            return false;
+        }
+
+        return $this->clock->now() < $this->unavailableUntil;
+    }
+
     private function failOpen(string $operation, \Throwable $exception): void
     {
-        $this->unavailable = true;
+        $this->unavailableUntil = $this->clock->now()->add(new \DateInterval(self::REST_AFTER_FAILURE));
         $this->logger->warning(self::UNAVAILABLE, [LogContextKey::Operation->value => $operation, LogContextKey::Exception->value => $exception]);
     }
 }

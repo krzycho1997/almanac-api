@@ -55,13 +55,30 @@ final class InMemoryCircuitBreakerStore implements CircuitBreakerStore
         unset($this->failures[$circuit]);
     }
 
-    public function open(string $circuit, \DateTimeImmutable $until): void
+    public function open(string $circuit, \DateTimeImmutable $until): bool
     {
+        $previous = $this->openUntil[$circuit] ?? null;
+
+        if (self::lastsAtLeastUntil($previous, $until)) {
+            return false;
+        }
+
         $this->openUntil[$circuit] = $until;
         unset($this->failures[$circuit], $this->trials[$circuit]);
+
+        return null === $previous || $this->isPast($previous);
     }
 
     public function claimTrial(string $circuit, \DateTimeImmutable $leaseUntil): bool
+    {
+        if ($this->isHalfOpen($circuit)) {
+            return $this->lease($circuit, $leaseUntil);
+        }
+
+        return false;
+    }
+
+    private function lease(string $circuit, \DateTimeImmutable $leaseUntil): bool
     {
         if ($this->isLeased($circuit)) {
             return false;
@@ -72,9 +89,12 @@ final class InMemoryCircuitBreakerStore implements CircuitBreakerStore
         return true;
     }
 
-    public function close(string $circuit): void
+    public function close(string $circuit): bool
     {
+        $wasOpen = \array_key_exists($circuit, $this->openUntil);
         unset($this->failures[$circuit], $this->openUntil[$circuit], $this->trials[$circuit]);
+
+        return $wasOpen;
     }
 
     private function liveFailures(string $circuit): int
@@ -96,5 +116,25 @@ final class InMemoryCircuitBreakerStore implements CircuitBreakerStore
     private function isPast(\DateTimeImmutable $moment): bool
     {
         return $moment <= $this->clock->now();
+    }
+
+    private static function lastsAtLeastUntil(?\DateTimeImmutable $previous, \DateTimeImmutable $until): bool
+    {
+        if (null === $previous) {
+            return false;
+        }
+
+        return $previous >= $until;
+    }
+
+    private function isHalfOpen(string $circuit): bool
+    {
+        $openUntil = $this->openUntil[$circuit] ?? null;
+
+        if (null === $openUntil) {
+            return false;
+        }
+
+        return $this->isPast($openUntil);
     }
 }

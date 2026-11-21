@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Support\Briefing\CircuitBreaker;
 
 use App\Briefing\CircuitBreaker\CircuitBreakerStore;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
 
@@ -13,10 +14,12 @@ abstract class CircuitBreakerStoreContract extends TestCase
     private const string CIRCUIT = 'apod';
     private const string OTHER_CIRCUIT = 'weather';
     private const string LATER = '+1 minute';
+    private const string MUCH_LATER = '+1 hour';
     private const string EARLIER = '-1 second';
-    private const string SOON = '+50 milliseconds';
-    private const int A_WHILE_MS = 30;
-    private const int PAST_THE_WINDOW_MS = 60;
+    private const string RIGHT_NOW = '+0 seconds';
+    private const string SOON = '+500 milliseconds';
+    private const int A_WHILE_MS = 300;
+    private const int PAST_THE_WINDOW_MS = 600;
 
     abstract protected function store(): CircuitBreakerStore;
 
@@ -136,7 +139,7 @@ abstract class CircuitBreakerStoreContract extends TestCase
     public function testGrantsOneTrialPerLease(): void
     {
         // Given
-        $store = $this->store();
+        $store = $this->halfOpenStore();
         $first = $store->claimTrial(self::CIRCUIT, $this->at(self::LATER));
 
         // When
@@ -150,7 +153,7 @@ abstract class CircuitBreakerStoreContract extends TestCase
     public function testGrantsATrialAgainOnceTheLeaseHasExpired(): void
     {
         // Given
-        $store = $this->store();
+        $store = $this->halfOpenStore();
         $store->claimTrial(self::CIRCUIT, $this->at(self::EARLIER));
 
         // When
@@ -163,7 +166,7 @@ abstract class CircuitBreakerStoreContract extends TestCase
     public function testKeepsALeaseAgainstAClaimThatWouldEndAtOnce(): void
     {
         // Given
-        $store = $this->store();
+        $store = $this->halfOpenStore();
         $store->claimTrial(self::CIRCUIT, $this->at(self::LATER));
 
         // When
@@ -189,14 +192,41 @@ abstract class CircuitBreakerStoreContract extends TestCase
     public function testReopeningReleasesTheTrial(): void
     {
         // Given
-        $store = $this->store();
+        $store = $this->halfOpenStore();
         $store->claimTrial(self::CIRCUIT, $this->at(self::LATER));
+        $store->open(self::CIRCUIT, $this->at(self::SOON));
 
         // When
-        $store->open(self::CIRCUIT, $this->at(self::LATER));
+        $this->elapse(self::PAST_THE_WINDOW_MS);
 
         // Then
         self::assertTrue($store->claimTrial(self::CIRCUIT, $this->at(self::LATER)));
+    }
+
+    public function testRefusesATrialWhileTheCircuitIsClosed(): void
+    {
+        // Given
+        $store = $this->store();
+
+        // When
+        $claimed = $store->claimTrial(self::CIRCUIT, $this->at(self::LATER));
+
+        // Then
+        self::assertFalse($claimed);
+    }
+
+    public function testRefusesATrialWhileTheCircuitIsOpen(): void
+    {
+        // Given
+        $store = $this->halfOpenStore();
+        $store->claimTrial(self::CIRCUIT, $this->at(self::LATER));
+        $store->open(self::CIRCUIT, $this->at(self::LATER));
+
+        // When
+        $claimed = $store->claimTrial(self::CIRCUIT, $this->at(self::LATER));
+
+        // Then
+        self::assertFalse($claimed);
     }
 
     public function testClosingForgetsEverything(): void
@@ -212,8 +242,136 @@ abstract class CircuitBreakerStoreContract extends TestCase
 
         // Then
         self::assertNull($store->openUntil(self::CIRCUIT));
+        self::assertFalse($store->claimTrial(self::CIRCUIT, $this->at(self::LATER)));
+        $store->open(self::CIRCUIT, $this->at(self::EARLIER));
         self::assertTrue($store->claimTrial(self::CIRCUIT, $this->at(self::LATER)));
         self::assertSame(1, $store->recordFailure(self::CIRCUIT, $this->at(self::LATER)));
+    }
+
+    /**
+     * @param list<string> $before
+     */
+    #[DataProvider('openings')]
+    public function testTellsWhetherOpeningStartsAnOpening(array $before, bool $expected): void
+    {
+        // Given
+        $store = $this->store();
+        foreach ($before as $until) {
+            $store->open(self::CIRCUIT, $this->at($until));
+        }
+
+        // When
+        $opened = $store->open(self::CIRCUIT, $this->at(self::MUCH_LATER));
+
+        // Then
+        self::assertSame($expected, $opened);
+        self::assertEquals($this->at(self::MUCH_LATER), $store->openUntil(self::CIRCUIT));
+    }
+
+    /**
+     * @return iterable<string, array{list<string>, bool}>
+     */
+    public static function openings(): iterable
+    {
+        yield 'a closed circuit' => [[], true];
+        yield 'an open circuit' => [[self::LATER], false];
+        yield 'a half-open circuit' => [[self::EARLIER], true];
+        yield 'a circuit open until exactly now' => [['+0 seconds'], true];
+    }
+
+    public function testTellsAnOpeningAfterTheCircuitClosed(): void
+    {
+        // Given
+        $store = $this->store();
+        $store->open(self::CIRCUIT, $this->at(self::LATER));
+        $store->close(self::CIRCUIT);
+
+        // When
+        $opened = $store->open(self::CIRCUIT, $this->at(self::LATER));
+
+        // Then
+        self::assertTrue($opened);
+        self::assertTrue($store->open(self::OTHER_CIRCUIT, $this->at(self::LATER)));
+    }
+
+    public function testKeepsALongerOpeningAgainstAShorterOne(): void
+    {
+        // Given
+        $store = $this->store();
+        $store->open(self::CIRCUIT, $this->at(self::MUCH_LATER));
+        $store->recordFailure(self::CIRCUIT, $this->at(self::LATER));
+
+        // When
+        $opened = $store->open(self::CIRCUIT, $this->at(self::LATER));
+
+        // Then
+        self::assertFalse($opened);
+        self::assertEquals($this->at(self::MUCH_LATER), $store->openUntil(self::CIRCUIT));
+        self::assertSame(2, $store->recordFailure(self::CIRCUIT, $this->at(self::LATER)));
+    }
+
+    public function testTellsWhetherClosingEndedAnOpening(): void
+    {
+        // Given
+        $store = $this->store();
+        $store->open(self::CIRCUIT, $this->at(self::EARLIER));
+
+        // When
+        $first = $store->close(self::CIRCUIT);
+        $second = $store->close(self::CIRCUIT);
+
+        // Then
+        self::assertTrue($first);
+        self::assertFalse($second);
+    }
+
+    public function testKeepsTheFailuresAgainstAnOpeningUntilTheSameInstant(): void
+    {
+        // Given
+        $store = $this->store();
+        $store->open(self::CIRCUIT, $this->at(self::MUCH_LATER));
+        $store->recordFailure(self::CIRCUIT, $this->at(self::LATER));
+
+        // When
+        $opened = $store->open(self::CIRCUIT, $this->at(self::MUCH_LATER));
+
+        // Then
+        self::assertFalse($opened);
+        self::assertSame(2, $store->recordFailure(self::CIRCUIT, $this->at(self::LATER)));
+    }
+
+    public function testForgetsAFailureWhoseWindowEndsRightNow(): void
+    {
+        // Given
+        $store = $this->store();
+        $store->recordFailure(self::CIRCUIT, $this->at(self::LATER));
+
+        // When
+        $count = $store->recordFailure(self::CIRCUIT, $this->at(self::RIGHT_NOW));
+
+        // Then
+        self::assertSame(1, $count);
+        self::assertSame(1, $store->recordFailure(self::CIRCUIT, $this->at(self::LATER)));
+    }
+
+    public function testGrantsATrialWhoseLeaseEndsRightNowWhenNoneIsLeased(): void
+    {
+        // Given
+        $store = $this->halfOpenStore();
+
+        // When
+        $claimed = $store->claimTrial(self::CIRCUIT, $this->at(self::RIGHT_NOW));
+
+        // Then
+        self::assertTrue($claimed);
+    }
+
+    private function halfOpenStore(): CircuitBreakerStore
+    {
+        $store = $this->store();
+        $store->open(self::CIRCUIT, $this->at(self::EARLIER));
+
+        return $store;
     }
 
     private function at(string $modifier): \DateTimeImmutable

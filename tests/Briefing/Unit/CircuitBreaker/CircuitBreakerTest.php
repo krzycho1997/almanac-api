@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Briefing\Unit\CircuitBreaker;
 
 use App\Briefing\CircuitBreaker\CircuitBreaker;
+use App\Briefing\CircuitBreaker\CircuitLog;
 use App\Briefing\CircuitBreaker\CircuitPermit;
 use App\Briefing\CircuitBreaker\CircuitState;
 use App\Briefing\FailureKind;
@@ -13,6 +14,10 @@ use App\Briefing\SourceName;
 use App\Briefing\SourceResult;
 use App\Tests\Support\Briefing\CircuitBreaker\InMemoryCircuitBreakerStore;
 use App\Tests\Support\Briefing\FakePayload;
+use Monolog\Handler\TestHandler;
+use Monolog\Level;
+use Monolog\Logger;
+use Monolog\LogRecord;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
@@ -23,16 +28,22 @@ final class CircuitBreakerTest extends TestCase
     private const SourceName SOURCE = SourceName::Apod;
     private const string OK = 'ok';
     private const string RIGHT_AWAY = '+0 seconds';
+    private const string CHANNEL = 'briefing';
+    private const string OPENED = 'Circuit {source} opened for {openSeconds}s';
+    private const string HALF_OPEN = 'Circuit {source} half-open, trial allowed';
+    private const string CLOSED = 'Circuit {source} closed after its trial';
 
     private MockClock $clock;
     private InMemoryCircuitBreakerStore $store;
+    private TestHandler $log;
     private CircuitBreaker $breaker;
 
     protected function setUp(): void
     {
         $this->clock = new MockClock(self::NOW);
         $this->store = new InMemoryCircuitBreakerStore($this->clock);
-        $this->breaker = new CircuitBreaker($this->store, $this->clock);
+        $this->log = new TestHandler();
+        $this->breaker = new CircuitBreaker($this->store, $this->clock, new CircuitLog(new Logger(self::CHANNEL, [$this->log])));
     }
 
     /**
@@ -280,11 +291,161 @@ final class CircuitBreakerTest extends TestCase
         self::assertSame(CircuitState::HalfOpen, $this->breaker->state(self::SOURCE));
     }
 
+    /**
+     * @param list<array{string, string, ?string}>             $calls
+     * @param list<array{Level, string, array<string, mixed>}> $expected
+     */
+    #[DataProvider('loggedCalls')]
+    public function testLogsAnOpeningOnceWhenCallsOpenTheCircuit(array $calls, array $expected): void
+    {
+        // When
+        foreach ($calls as [$at, $kind, $retryAt]) {
+            $this->clock->modify(self::NOW.' '.$at);
+            $this->breaker->record(self::resultOf($kind, self::moment($retryAt)), CircuitPermit::Call);
+        }
+
+        // Then
+        self::assertSame($expected, $this->logged());
+    }
+
+    /**
+     * @return iterable<string, array{list<array{string, string, ?string}>, list<array{Level, string, array<string, mixed>}>}>
+     */
+    public static function loggedCalls(): iterable
+    {
+        $unavailable = FailureKind::Unavailable->value;
+        $rateLimited = FailureKind::RateLimited->value;
+
+        yield 'two outages log nothing' => [self::outages(2, $unavailable), []];
+        yield 'three outages log the opening with their count' => [self::outages(3, $unavailable), [self::opened(['source' => 'apod', 'kind' => 'unavailable', 'failures' => 3, 'openSeconds' => 60, 'trial' => false])]];
+        yield 'outages after the opening log nothing more' => [self::outages(5, $unavailable), [self::opened(['source' => 'apod', 'kind' => 'unavailable', 'failures' => 3, 'openSeconds' => 60, 'trial' => false])]];
+        yield 'a 429 logs the opening until Retry-After without a count' => [[[self::RIGHT_AWAY, $rateLimited, '+2 hours']], [self::opened(['source' => 'apod', 'kind' => 'rate_limited', 'openSeconds' => 7200, 'trial' => false])]];
+        yield 'a 429 without Retry-After logs fifteen minutes' => [[[self::RIGHT_AWAY, $rateLimited, null]], [self::opened(['source' => 'apod', 'kind' => 'rate_limited', 'openSeconds' => 900, 'trial' => false])]];
+        yield 'a Retry-After within a second rounds the opening up' => [[[self::RIGHT_AWAY, $rateLimited, '+90 seconds +1 millisecond']], [self::opened(['source' => 'apod', 'kind' => 'rate_limited', 'openSeconds' => 91, 'trial' => false])]];
+        yield 'a later 429 lengthens the opening without logging it again' => [[[self::RIGHT_AWAY, $rateLimited, '+2 hours'], ['+30 seconds', $rateLimited, '+3 hours']], [self::opened(['source' => 'apod', 'kind' => 'rate_limited', 'openSeconds' => 7200, 'trial' => false])]];
+        yield 'a 429 after outages opened it logs nothing more' => [[...self::outages(3, $unavailable), ['+30 seconds', $rateLimited, '+2 hours']], [self::opened(['source' => 'apod', 'kind' => 'unavailable', 'failures' => 3, 'openSeconds' => 60, 'trial' => false])]];
+        yield 'a success logs nothing' => [[[self::RIGHT_AWAY, self::OK, null]], []];
+        yield 'rejections log nothing' => [self::outages(3, FailureKind::Rejected->value), []];
+    }
+
+    public function testLogsAnOpeningFromHalfOpenAfterOutagesOfCallsStartedBeforeTheTrial(): void
+    {
+        // Given
+        self::openUntil($this->store, self::moment('-1 minute'));
+
+        // When
+        $this->recordCalls(3, FailureKind::Unavailable);
+
+        // Then
+        self::assertSame([self::opened(['source' => 'apod', 'kind' => 'unavailable', 'failures' => 3, 'openSeconds' => 60, 'trial' => false])], $this->logged());
+    }
+
+    /**
+     * @param list<array{Level, string, array<string, mixed>}> $expected
+     */
+    #[DataProvider('loggedTrials')]
+    public function testLogsTheHalfOpenTrialAndHowItEnds(string $kind, ?string $retryAt, array $expected): void
+    {
+        // Given
+        self::openUntil($this->store, self::moment('-1 minute'));
+        $permit = $this->breaker->tryAcquire(self::SOURCE);
+
+        // When
+        $this->breaker->record(self::resultOf($kind, self::moment($retryAt)), $permit);
+
+        // Then
+        self::assertSame([[Level::Info, self::HALF_OPEN, ['source' => 'apod']], ...$expected], $this->logged());
+    }
+
+    /**
+     * @return iterable<string, array{string, ?string, list<array{Level, string, array<string, mixed>}>}>
+     */
+    public static function loggedTrials(): iterable
+    {
+        yield 'a success closes it' => [self::OK, null, [[Level::Info, self::CLOSED, ['source' => 'apod']]]];
+        yield 'a rejection closes it' => [FailureKind::Rejected->value, null, [[Level::Info, self::CLOSED, ['source' => 'apod']]]];
+        yield 'an outage reopens it' => [FailureKind::Unavailable->value, null, [self::opened(['source' => 'apod', 'kind' => 'unavailable', 'openSeconds' => 60, 'trial' => true])]];
+        yield 'a 429 reopens it until Retry-After' => [FailureKind::RateLimited->value, '+2 hours', [self::opened(['source' => 'apod', 'kind' => 'rate_limited', 'openSeconds' => 7200, 'trial' => true])]];
+    }
+
+    public function testLogsTheClosingOnceWhenTwoTrialsSucceed(): void
+    {
+        // Given
+        self::openUntil($this->store, self::moment('-1 minute'));
+        $first = $this->breaker->tryAcquire(self::SOURCE);
+        $this->clock->modify(self::NOW.' +30 seconds');
+        $second = $this->breaker->tryAcquire(self::SOURCE);
+        $this->breaker->record(self::resultOf(self::OK, null), $first);
+        $this->log->clear();
+
+        // When
+        $this->breaker->record(self::resultOf(self::OK, null), $second);
+
+        // Then
+        self::assertSame([CircuitPermit::Trial, CircuitPermit::Trial], [$first, $second]);
+        self::assertSame([], $this->logged());
+    }
+
+    public function testLogsHalfOpenOnlyForTheCallerThatTakesTheTrial(): void
+    {
+        // Given
+        self::openUntil($this->store, self::moment('-1 minute'));
+
+        // When
+        $permits = [$this->breaker->tryAcquire(self::SOURCE), $this->breaker->tryAcquire(self::SOURCE)];
+
+        // Then
+        self::assertSame([CircuitPermit::Trial, CircuitPermit::Refused], $permits);
+        self::assertSame([[Level::Info, self::HALF_OPEN, ['source' => 'apod']]], $this->logged());
+    }
+
+    #[DataProvider('silentReads')]
+    public function testLogsNothingWhenReadingOrRefusing(?string $openUntil): void
+    {
+        // Given
+        self::openUntil($this->store, self::moment($openUntil));
+
+        // When
+        $this->breaker->state(self::SOURCE);
+        $this->breaker->record(self::resultOf(FailureKind::RateLimited->value, null), CircuitPermit::Refused);
+
+        // Then
+        self::assertSame([], $this->logged());
+    }
+
+    /**
+     * @return iterable<string, array{?string}>
+     */
+    public static function silentReads(): iterable
+    {
+        yield 'closed' => [null];
+        yield 'open' => ['+30 seconds'];
+        yield 'half-open' => ['-1 minute'];
+    }
+
     private function recordCalls(int $count, FailureKind $kind): void
     {
         foreach (range(1, $count) as $ignored) {
             $this->breaker->record(self::resultOf($kind->value, null), CircuitPermit::Call);
         }
+    }
+
+    /**
+     * @return list<array{Level, string, array<string, mixed>}>
+     */
+    private function logged(): array
+    {
+        return array_values(array_map(static fn (LogRecord $record): array => [$record->level, $record->message, $record->context], $this->log->getRecords()));
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     *
+     * @return array{Level, string, array<string, mixed>}
+     */
+    private static function opened(array $context): array
+    {
+        return [Level::Warning, self::OPENED, $context];
     }
 
     private function takeTrialIf(bool $taken): void

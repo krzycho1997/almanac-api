@@ -12,9 +12,9 @@ interface CircuitBreakerStore
 
     public function forgetFailures(string $circuit): void;
 
-    public function open(string $circuit, \DateTimeImmutable $until): void;
+    public function open(string $circuit, \DateTimeImmutable $until): bool;
 
     public function claimTrial(string $circuit, \DateTimeImmutable $leaseUntil): bool;
 
-    public function close(string $circuit): void;
+    public function close(string $circuit): bool;
 }
