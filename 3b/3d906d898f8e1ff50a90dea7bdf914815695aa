@@ -1,0 +1,34 @@
+src/Briefing/Exception/DateNotReadyException.php
+  s_4da5374f6e605f::t_a4731147fdbe8c 1-6,9-10,12-20
+  s_4da5374f6e605f::t_d6a7eecb92bf7a 7-8,11
+config/packages/messenger.yaml
+  s_4da5374f6e605f::t_9e07048d1f30c3 26
+  s_4da5374f6e605f::t_a4731147fdbe8c 12
+  s_4da5374f6e605f::t_b7f7ffe8941f87 17-20
+tests/Briefing/Unit/MessageHandler/PrefetchRetryStrategyTest.php
+  s_4da5374f6e605f::t_a4731147fdbe8c 1-7,9-55,57-79,81-93,95,100,107-108
+  s_4da5374f6e605f::t_add15332b7b8ea 8,56,80,94,96-99,101-106
+tests/Shared/Integration/Messenger/MessengerTransportsTest.php
+  s_4da5374f6e605f::t_72970088301968 12,35-40,43-44,60
+  s_4da5374f6e605f::t_d2d267fd311f45 41-42,45-49,59,61-67
+src/Briefing/MessageHandler/PrefetchRetryStrategy.php
+  s_4da5374f6e605f::t_02f9bda44309d3 69
+  s_4da5374f6e605f::t_a4731147fdbe8c 1-17,20-30,32-34,36-39,41,44-45,47-53,55-59,61,63-64,66,68,71-74,77,82
+  s_4da5374f6e605f::t_d6a7eecb92bf7a 18-19,31,35,40,42-43,46,54,60,62,65,67,70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3b3d906d898f8e1ff50a90dea7bdf914815695aa",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
