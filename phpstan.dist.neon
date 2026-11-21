@@ -29,6 +29,17 @@ rules:
 
 services:
     -
+        class: App\PHPStan\Rule\ProviderLiteralRule
+        arguments:
+            sourceRoot: %currentWorkingDirectory%/src
+            allowedHosts:
+                - tools.ietf.org
+                - www.rfc-editor.org
+                - symfony.com
+                - creativecommons.org
+        tags:
+            - phpstan.rules.rule
+    -
         factory: PHPStan\Type\Doctrine\Descriptors\ReflectionDescriptor('App\Bookmark\Doctrine\BookmarkIdType')
         tags:
             - phpstan.doctrine.typeDescriptor
