@@ -19,7 +19,10 @@ final class HealthControllerTest extends FunctionalTestCase
         // Then
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame('Content-Type', 'application/json');
-        self::assertJsonStringEqualsJsonString('{"status":"ok","checks":{}}', (string) $this->client->getResponse()->getContent());
+        $health = json_decode((string) $this->client->getResponse()->getContent(), true, flags: \JSON_THROW_ON_ERROR);
+        self::assertIsArray($health);
+        self::assertSame('ok', $health['status'] ?? null);
+        self::assertIsArray($health['checks'] ?? null);
     }
 
     public function testAnswersHeadRequests(): void

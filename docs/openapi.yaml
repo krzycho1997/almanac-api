@@ -724,6 +724,25 @@ components:
           description: The state each module reports, keyed by the name of its check.
           type: object
           additionalProperties: false
+          required: [circuits]
+          properties:
+            circuits:
+              $ref: '#/components/schemas/Circuits'
+    Circuits:
+      description: The circuit breaker of each source. An open circuit skips the source and serves its last good data; once the opening is over, the circuit is half-open and the first request tries the source once.
+      type: object
+      additionalProperties: false
+      required: [apod, onThisDay, weather]
+      properties:
+        apod:
+          $ref: '#/components/schemas/CircuitState'
+        onThisDay:
+          $ref: '#/components/schemas/CircuitState'
+        weather:
+          $ref: '#/components/schemas/CircuitState'
+    CircuitState:
+      type: string
+      enum: [closed, open, half_open]
     Problem:
       description: Problem Details (RFC 9457) without internals.
       type: object

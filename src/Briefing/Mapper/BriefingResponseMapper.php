@@ -88,7 +88,7 @@ final readonly class BriefingResponseMapper
      */
     private static function missing(BriefingResult $briefing): array
     {
-        return array_map(self::key(...), $briefing->missing());
+        return array_map(SourceKeyMapper::keyOf(...), $briefing->missing());
     }
 
     private static function location(Location $location): LocationDto
@@ -135,15 +135,6 @@ final readonly class BriefingResponseMapper
             MediaType::Image => ApodMediaType::Image,
             MediaType::Video => ApodMediaType::Video,
             MediaType::Other => ApodMediaType::Other,
-        };
-    }
-
-    private static function key(SourceName $source): SourceKey
-    {
-        return match ($source) {
-            SourceName::Apod => SourceKey::Apod,
-            SourceName::OnThisDay => SourceKey::OnThisDay,
-            SourceName::Weather => SourceKey::Weather,
         };
     }
 
@@ -213,7 +204,7 @@ final readonly class BriefingResponseMapper
     private static function attributionOf(SourceEntry $entry): ?AttributionDto
     {
         if ($entry->payload instanceof SourcePayload) {
-            return self::attribution(self::key($entry->source), $entry->payload->attribution);
+            return self::attribution(SourceKeyMapper::keyOf($entry->source), $entry->payload->attribution);
         }
 
         return null;
