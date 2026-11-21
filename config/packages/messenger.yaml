@@ -9,9 +9,7 @@ framework:
                     queue_name: async
                     redeliver_timeout: 300
                 retry_strategy:
-                    max_retries: 3
-                    delay: 1000
-                    multiplier: 4
+                    service: App\Briefing\MessageHandler\PrefetchRetryStrategy
             failed:
                 dsn: 'doctrine://default?auto_setup=0'
                 options:

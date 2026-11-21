@@ -3,6 +3,7 @@
 parameters:
     app.briefing.retry_delay_ms: 250
     app.briefing.fetch_deadline_seconds: 3.5
+    app.briefing.messenger.wait_spread_ms: 30000
 
 services:
     _defaults:
@@ -67,6 +68,14 @@ services:
     app.briefing.upstream_stream:
         alias: nasa.client
 
+    app.briefing.messenger.code_failures:
+        class: Symfony\Component\Messenger\Retry\MultiplierRetryStrategy
+        arguments:
+            $maxRetries: 3
+            $delayMilliseconds: 1000
+            $multiplier: 4
+            $jitter: 0.0
+
     app.briefing.fetch_clock:
         class: Symfony\Component\Clock\MonotonicClock
 
@@ -83,6 +92,7 @@ services:
 when@test:
     parameters:
         app.briefing.retry_delay_ms: 0
+        app.briefing.messenger.wait_spread_ms: 0
 
     services:
         serializer.normalizer.problem:

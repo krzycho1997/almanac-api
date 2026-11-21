@@ -116,6 +116,43 @@ final class BriefingResultTest extends TestCase
         ], $problems);
     }
 
+    /**
+     * @param list<SourceEntry>  $entries
+     * @param list<SourceResult> $results
+     */
+    #[DataProvider('incompleteDates')]
+    public function testTellsUntilWhenADateCannotBeCompleted(array $entries, array $results, ?string $expected): void
+    {
+        // Given
+        $now = new \DateTimeImmutable(self::NOW);
+
+        // When
+        $until = new BriefingResult($now, Location::fromCoordinates(52.23, 21.01), $entries, $results)->incompleteUntil();
+
+        // Then
+        self::assertEquals(null === $expected ? null : $now->modify($expected), $until);
+    }
+
+    /**
+     * @return iterable<string, array{list<SourceEntry>, list<SourceResult>, ?string}>
+     */
+    public static function incompleteDates(): iterable
+    {
+        $now = new \DateTimeImmutable(self::NOW);
+        $outage = SourceEntry::missing(SourceName::Apod, new SourceFailure(FailureKind::Unavailable), $now);
+        $rejected = SourceEntry::missing(SourceName::Apod, new SourceFailure(FailureKind::Rejected), $now);
+        $stale = SourceEntry::stale(SourceName::Apod, new FakePayload([]), $now, new SourceFailure(FailureKind::Unavailable), $now);
+
+        yield 'complete' => [[SourceEntry::fresh(SourceName::Apod, new FakePayload([]), $now)], [], null];
+        yield 'an outage waits for its pause' => [[$outage], [SourceResult::failed(SourceName::Apod, FailureKind::Unavailable, 503)], '+10 minutes'];
+        yield 'an outage earlier, still in its pause' => [[SourceEntry::missing(SourceName::Apod, new SourceFailure(FailureKind::Unavailable), $now->modify('-4 minutes'))], [], '+6 minutes'];
+        yield 'a rejection is final' => [[$rejected], [SourceResult::failed(SourceName::Apod, FailureKind::Rejected, 400)], null];
+        yield 'stale data is served' => [[$stale], [SourceResult::failed(SourceName::Apod, FailureKind::Unavailable, 503)], null];
+        yield 'a rate limit waits for its Retry-After' => [[SourceEntry::missing(SourceName::Apod, new SourceFailure(FailureKind::RateLimited), $now)], [SourceResult::failed(SourceName::Apod, FailureKind::RateLimited, 429, $now->modify('+2 hours'))], '+2 hours'];
+        yield 'a refusal waits for its opening' => [[SourceEntry::missing(SourceName::Weather, new SourceFailure(FailureKind::CircuitOpen), $now)], [SourceResult::circuitOpen(SourceName::Weather, $now->modify('+15 minutes'))], '+15 minutes'];
+        yield 'the latest of an outage and a refusal' => [[$outage, SourceEntry::missing(SourceName::Weather, new SourceFailure(FailureKind::CircuitOpen), $now)], [SourceResult::circuitOpen(SourceName::Weather, $now->modify('+1 minute'))], '+10 minutes'];
+    }
+
     public function testTellsUntilWhenTheLatestRefusalLasts(): void
     {
         // Given

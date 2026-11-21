@@ -47,6 +47,15 @@ final readonly class SourceResult
         return $this->failure instanceof SourceFailure;
     }
 
+    public function rateLimitedUntil(): ?\DateTimeImmutable
+    {
+        if (FailureKind::RateLimited === $this->failure?->kind) {
+            return $this->failure->retryAt;
+        }
+
+        return null;
+    }
+
     public function refusedUntil(): ?\DateTimeImmutable
     {
         if ($this->calledUpstream()) {
