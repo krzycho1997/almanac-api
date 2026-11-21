@@ -4,12 +4,20 @@ declare(strict_types=1);
 
 namespace App\Tests\Briefing\Unit\Discovery;
 
+use App\Briefing\Contract\DiscoveryId;
+use App\Briefing\Contract\DiscoveryType;
 use App\Briefing\Discovery\DiscoveryExtractor;
+use App\Briefing\Discovery\DiscoveryRecord;
+use App\Briefing\Entity\Discovery;
 use App\Briefing\Model\ApodPicture;
 use App\Briefing\Model\Attribution;
 use App\Briefing\Model\HistoricalEvent;
 use App\Briefing\Model\MediaType;
 use App\Briefing\Model\NotablePerson;
+use App\Briefing\Model\OnThisDayFeed;
+use App\Briefing\Model\PageRef;
+use App\Tests\Support\Briefing\FakePayload;
+use App\Tests\Support\Briefing\SourcePayloads;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -158,6 +166,15 @@ final class DiscoveryExtractorTest extends TestCase
         yield 'case kept' => ['https://en.wikipedia.org/wiki/Foo', 'https://en.wikipedia.org/wiki/foo'];
     }
 
+    public function testKeysAPersonWhoseWikidataItemIsTooLongByTheirPage(): void
+    {
+        // When
+        $id = new DiscoveryExtractor()->personId(new NotablePerson(1950, 'John Smith', null, 'https://en.wikipedia.org/wiki/John_Smith_(footballer)', null, 'Q'.str_repeat('1', Discovery::LONGEST_KEY)));
+
+        // Then
+        self::assertSame('fa271102-bc32-56f2-b685-1b0b4ce8dcc5', $id->toRfc4122());
+    }
+
     #[DataProvider('addressesWithoutATitle')]
     public function testKeysAPersonWithoutAReadablePageTitleAsUnlinked(string $address): void
     {
@@ -180,7 +197,7 @@ final class DiscoveryExtractorTest extends TestCase
         yield 'not an article path' => ['https://en.wikipedia.org/w/index.php?title=Jan_Kowalski'];
         yield 'article path further in' => ['https://en.wikipedia.org/w/wiki/Jan_Kowalski'];
         yield 'control character in the title' => ['https://en.wikipedia.org/wiki/Jan%00Kowalski'];
-        yield 'title too long for the key' => ['https://en.wikipedia.org/wiki/'.str_repeat('J', DiscoveryExtractor::LONGEST_KEY)];
+        yield 'title too long for the key' => ['https://en.wikipedia.org/wiki/'.str_repeat('J', Discovery::LONGEST_KEY)];
     }
 
     public function testTreatsComposedAndDecomposedNamesOfAnUnlinkedPersonAlike(): void
@@ -194,6 +211,90 @@ final class DiscoveryExtractorTest extends TestCase
 
         // Then
         self::assertTrue($composed->equals($decomposed));
+    }
+
+    public function testDescribesEveryItemOfADayInHistory(): void
+    {
+        // Given
+        $feed = new OnThisDayFeed(
+            [new HistoricalEvent(1939, 'Germany occupies Bohemia.', [new PageRef('Bohemia', 'https://en.wikipedia.org/wiki/Bohemia', null)])],
+            [new NotablePerson(1950, 'John Smith', 'Footballer', 'https://en.wikipedia.org/wiki/John_Smith_(footballer)', null)],
+            [new NotablePerson(-44, 'Julius Caesar', 'Roman dictator', 'https://en.wikipedia.org/wiki/Julius_Caesar', null, 'Q1048')],
+            self::attribution(),
+        );
+
+        // When
+        $records = new DiscoveryExtractor()->extract($feed, new \DateTimeImmutable(self::IDES));
+
+        // Then
+        self::assertEquals([
+            new DiscoveryRecord(DiscoveryId::fromString('1604e20a-544e-5ab3-97a4-e7861e6ea31a'), 'event:1939-03-15:55ad9960237be57d', DiscoveryType::Event, new \DateTimeImmutable('1939-03-15'), 'Germany occupies Bohemia.', null, 'https://en.wikipedia.org/wiki/Bohemia'),
+            new DiscoveryRecord(DiscoveryId::fromString('fa271102-bc32-56f2-b685-1b0b4ce8dcc5'), 'person:page:John Smith (footballer)', DiscoveryType::Person, null, 'John Smith', 'Footballer', 'https://en.wikipedia.org/wiki/John_Smith_(footballer)'),
+            new DiscoveryRecord(DiscoveryId::fromString('30ad2d96-39f2-514a-806e-58f2041d1ce6'), 'person:Q1048', DiscoveryType::Person, null, 'Julius Caesar', 'Roman dictator', 'https://en.wikipedia.org/wiki/Julius_Caesar'),
+        ], $records);
+    }
+
+    public function testDescribesThePictureOfADay(): void
+    {
+        // Given
+        $picture = new ApodPicture(new \DateTimeImmutable(self::IDES), 'Portrait of NGC 1055', 'A galaxy.', MediaType::Image, 'https://apod.nasa.gov/a.jpg', null, null, self::attribution());
+
+        // When
+        $records = new DiscoveryExtractor()->extract($picture, new \DateTimeImmutable(self::IDES));
+
+        // Then
+        self::assertEquals([new DiscoveryRecord(DiscoveryId::fromString('c05f9b6a-9262-5859-b45d-743a62e1bc6e'), 'apod:2024-03-15', DiscoveryType::Apod, new \DateTimeImmutable(self::IDES), 'Portrait of NGC 1055', 'A galaxy.', 'https://apod.nasa.gov/a.jpg')], $records);
+    }
+
+    #[DataProvider('eventsWithoutADate')]
+    public function testLeavesTheDateOutWhenTheCalendarCannotHoldIt(int $year, string $day): void
+    {
+        // Given
+        $feed = new OnThisDayFeed([new HistoricalEvent($year, 'Something happens.', [])], [], [], self::attribution());
+
+        // When
+        $records = new DiscoveryExtractor()->extract($feed, new \DateTimeImmutable($day));
+
+        // Then
+        self::assertNull($records[0]->date);
+    }
+
+    /**
+     * @return iterable<string, array{int, string}>
+     */
+    public static function eventsWithoutADate(): iterable
+    {
+        yield 'before the common era' => [-44, self::IDES];
+        yield 'year zero' => [0, self::IDES];
+        yield 'leap day in a common year' => [1900, '2024-02-29'];
+    }
+
+    public function testKeepsTheLeapDayOfALeapYear(): void
+    {
+        // Given
+        $feed = new OnThisDayFeed([new HistoricalEvent(1904, 'Something happens.', [])], [], [], self::attribution());
+
+        // When
+        $records = new DiscoveryExtractor()->extract($feed, new \DateTimeImmutable('2024-02-29'));
+
+        // Then
+        self::assertSame('1904-02-29', $records[0]->date?->format('Y-m-d'));
+    }
+
+    public function testFindsNothingToDiscoverInTheWeather(): void
+    {
+        // When
+        $records = new DiscoveryExtractor()->extract(SourcePayloads::dailyWeather(), new \DateTimeImmutable(self::IDES));
+
+        // Then
+        self::assertSame([], $records);
+    }
+
+    public function testRefusesAPayloadWithoutKeys(): void
+    {
+        // Then / When
+        $this->expectException(\LogicException::class);
+        new DiscoveryExtractor()->extract(new FakePayload([]), new \DateTimeImmutable(self::IDES));
     }
 
     private static function attribution(): Attribution

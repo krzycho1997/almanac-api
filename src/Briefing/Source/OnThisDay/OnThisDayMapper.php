@@ -149,7 +149,16 @@ final readonly class OnThisDayMapper
             return null;
         }
 
-        return self::personFrom($year, $text, self::pageAbout($text, $entry->pages));
+        return self::named(self::personFrom($year, $text, self::pageAbout($text, $entry->pages)));
+    }
+
+    private static function named(NotablePerson $person): ?NotablePerson
+    {
+        if (self::EMPTY === $person->name) {
+            return null;
+        }
+
+        return $person;
     }
 
     /**

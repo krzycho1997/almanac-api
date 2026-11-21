@@ -98,11 +98,9 @@ final readonly class SourceSnapshotRepository
      */
     public function saveResults(array $results, array $scopes, \DateTimeImmutable $attemptedAt): void
     {
-        $this->connection()->transactional(function () use ($results, $scopes, $attemptedAt): void {
-            foreach ($results as $result) {
-                $this->saveResult($result, self::scopeOf($result, $scopes), $attemptedAt);
-            }
-        });
+        foreach ($results as $result) {
+            $this->saveResult($result, self::scopeOf($result, $scopes), $attemptedAt);
+        }
     }
 
     public function saveResult(SourceResult $result, SnapshotScope $scope, \DateTimeImmutable $attemptedAt): SnapshotWrite

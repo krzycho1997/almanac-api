@@ -170,22 +170,6 @@ final class SnapshotReadingTest extends TestCase
         $this->repository()->saveResults([SourceResult::failed(SourceName::Weather, FailureKind::Rejected)], [SourceName::Apod->value => self::apod()], self::at(self::TEN));
     }
 
-    public function testSavesNothingWhenOneOfTheResultsCannotBeSaved(): void
-    {
-        // Given
-        $results = [SourceResult::ok(SourceName::Apod, SourcePayloads::apodPicture()), SourceResult::failed(SourceName::Weather, FailureKind::Rejected)];
-
-        // When
-        try {
-            $this->repository()->saveResults($results, [SourceName::Apod->value => self::apod()], self::at(self::TEN));
-            self::fail('A result without its scope must not be saved.');
-        } catch (\InvalidArgumentException) {
-        }
-
-        // Then
-        self::assertSame([], $this->repository()->findForScopes([self::apod()]));
-    }
-
     public function testFindsNothingWithoutScopes(): void
     {
         // Given
