@@ -1,0 +1,55 @@
+src/Bookmark/Dto/Response/DiscoveryKind.php
+  s_79485d0750c5ec::t_faf713b0304e17 1-10,12
+  s_79485d0750c5ec::t_8b989adfecb75d 11
+docs/openapi.yaml
+  s_79485d0750c5ec::t_38475550f20cc1 13-14,90-126,141-146,148-168,170-194,205,242-246,248-294
+  s_79485d0750c5ec::t_c91d494a6aa56b 169
+src/Bookmark/Dto/Response/DiscoveryDto.php
+  s_79485d0750c5ec::t_faf713b0304e17 1-18
+tests/Support/Identity/IssuesAccessTokens.php
+  s_79485d0750c5ec::t_b2393f41a9ee3f 1-30
+tests/Bookmark/Unit/Mapper/BookmarkResponseMapperTest.php
+  s_79485d0750c5ec::t_c91d494a6aa56b 1-66
+src/Bookmark/Dto/Request/CreateBookmarkRequest.php
+  s_79485d0750c5ec::t_52692e868b45de 24-28
+  s_79485d0750c5ec::t_faf713b0304e17 1-23,29-30
+src/Bookmark/Controller/BookmarkController.php
+  s_79485d0750c5ec::t_faf713b0304e17 1-17,19-30,32-34,36-40
+  s_79485d0750c5ec::t_0f0f7d01f35e35 31
+  s_79485d0750c5ec::t_c91d494a6aa56b 18,35
+tests/Bookmark/Functional/CreateBookmarkTest.php
+  s_79485d0750c5ec::t_37722a6b3802c5 1-28,30-49,51-54,57-66,68-78,80-89,91-92,94-114,116-123,131-142,144-157,160-164,166-168,194-202,210-227
+  s_79485d0750c5ec::t_52692e868b45de 55-56
+  s_79485d0750c5ec::t_c91d494a6aa56b 29,50,67,79,90,93,115,124-130,143,158-159,165,169-193,203-209
+tests/Briefing/Integration/Discovery/DiscoveryCatalogTest.php
+  s_79485d0750c5ec::t_faf713b0304e17 31,96
+src/Bookmark/Mapper/BookmarkResponseMapper.php
+  s_79485d0750c5ec::t_faf713b0304e17 1-31,33-36
+  s_79485d0750c5ec::t_f860ac9af7fbef 32
+config/services.yaml
+  s_79485d0750c5ec::t_faf713b0304e17 135-139
+src/Bookmark/Dto/Response/BookmarkResponse.php
+  s_79485d0750c5ec::t_faf713b0304e17 1-15
+src/Bookmark/Exception/InvalidPageRequestException.php
+  s_79485d0750c5ec::t_937bd3daa1eeb7 14-18
+src/Bookmark/PageRequest.php
+  s_79485d0750c5ec::t_6aacea21a36f4a 12,26-28
+tests/Bookmark/Unit/PageRequestTest.php
+  s_79485d0750c5ec::t_1c9478bd442db5 42,60-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "29529b1bf17cce7f7af8e05a8793e0b356ec5584",
+  "prompts": {},
+  "sessions": {
+    "s_79485d0750c5ec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a02bf82-600a-499e-b66e-8863bae65409",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}

@@ -1,0 +1,41 @@
+src/Bookmark/Dto/Request/BookmarkListQuery.php
+  s_79485d0750c5ec::t_920f4660a8fede 1-17,19-43
+  s_79485d0750c5ec::t_4d7bc74a1a8f1d 18
+docs/openapi.yaml
+  s_79485d0750c5ec::t_4d7bc74a1a8f1d 105,330
+  s_79485d0750c5ec::t_920f4660a8fede 91-104,106-131,246,311-329,331-340
+src/Bookmark/Controller/BookmarkController.php
+  s_79485d0750c5ec::t_920f4660a8fede 8,10,16,33-41
+  s_79485d0750c5ec::t_c207b39223ea44 42-43
+tests/Bookmark/Unit/Mapper/BookmarkResponseMapperTest.php
+  s_79485d0750c5ec::t_4d7bc74a1a8f1d 69,76
+  s_79485d0750c5ec::t_3e64929de8cb73 8-9,12,65-68,70-75,77-82
+  s_79485d0750c5ec::t_3b4710618e255f 83
+src/Bookmark/Dto/Response/PaginationMeta.php
+  s_79485d0750c5ec::t_920f4660a8fede 1-16
+tests/Bookmark/Functional/ListBookmarksTest.php
+  s_79485d0750c5ec::t_3e64929de8cb73 37-38,144-145,199-207
+  s_79485d0750c5ec::t_afc85adc23edec 1-36,39-60,62-81,83-94,96-108,110-111,114-115,117-119,130-132,134-142,146-158,162-181,183-198,208-214
+  s_79485d0750c5ec::t_4d7bc74a1a8f1d 61,82,95,109,133,143,159-161,182
+src/Bookmark/Dto/Response/BookmarkListResponse.php
+  s_79485d0750c5ec::t_920f4660a8fede 1-17
+src/Bookmark/Mapper/BookmarkResponseMapper.php
+  s_79485d0750c5ec::t_920f4660a8fede 8-9,13,26-34
+  s_79485d0750c5ec::t_471bbd41cfce68 35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "64c564fdf78f41dd6f25aa87dc2324bddc8ba6b9",
+  "prompts": {},
+  "sessions": {
+    "s_79485d0750c5ec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a02bf82-600a-499e-b66e-8863bae65409",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
