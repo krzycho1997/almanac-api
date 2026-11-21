@@ -1,0 +1,25 @@
+docs/openapi.yaml
+  s_4da5374f6e605f::t_e82d1e153026a2 66
+  s_4da5374f6e605f::t_b9f333d6412210 10-11
+src/Shared/Controller/OpenApiController.php
+  s_4da5374f6e605f::t_e82d1e153026a2 16,30
+tests/Shared/Functional/OpenApiControllerTest.php
+  s_4da5374f6e605f::t_e82d1e153026a2 22-25,37-40
+  s_4da5374f6e605f::t_a2719e8919c140 41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "15509197e6574864a3505131a95c06466526032c",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
