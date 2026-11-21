@@ -1,0 +1,26 @@
+config/packages/briefing_nasa.yaml
+  s_4da5374f6e605f::t_f5a0cb13454f8a 8-10
+  s_4da5374f6e605f::t_ae2b2f1443b7d3 1-7,11-13
+config/packages/briefing_open_meteo.yaml
+  s_4da5374f6e605f::t_ae2b2f1443b7d3 1-7,11-16,20-21
+  s_4da5374f6e605f::t_f5a0cb13454f8a 8-10,17-19
+config/packages/briefing_wikipedia.yaml
+  s_4da5374f6e605f::t_ae2b2f1443b7d3 1-7,11-12
+  s_4da5374f6e605f::t_f5a0cb13454f8a 8-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2f9fa302811e0f21265ab5e26bdbadc054f557d8",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
