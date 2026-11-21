@@ -1,0 +1,49 @@
+tests/Support/Metrics/FailingMetricsStorage.php
+  s_4da5374f6e605f::t_a121b4a2aee515 1-49
+tools/phpstan/tests/Architecture/ArchitectureRulesTest.php
+  s_4da5374f6e605f::t_6049b49230c320 44-45
+tests/Architecture/LayerTest.php
+  s_4da5374f6e605f::t_6049b49230c320 11,188-197
+  s_4da5374f6e605f::t_181efec2e30b9b 198-200
+src/Shared/Metrics/Metric.php
+  s_4da5374f6e605f::t_eab8136992bd0e 1-60
+src/Shared/Metrics/PrometheusMetrics.php
+  s_4da5374f6e605f::t_6fdbeaaa68e709 1-95
+src/Shared/Logging/LogContextKey.php
+  s_4da5374f6e605f::t_14b5ed4ebf70ee 21
+config/services.yaml
+  s_4da5374f6e605f::t_14b5ed4ebf70ee 92-105,168-169
+  s_4da5374f6e605f::t_b611c83a46bff9 170
+tests/Shared/Unit/Metrics/PrometheusMetricsTest.php
+  s_4da5374f6e605f::t_2800f698da4907 1-99
+tools/phpstan/tests/Architecture/Fixtures/Briefing/ProbeUsesPrometheus.php
+  s_4da5374f6e605f::t_6049b49230c320 1-14
+composer.json
+  s_4da5374f6e605f::t_52552d31c8101c 22
+src/Shared/Metrics/Metrics.php
+  s_4da5374f6e605f::t_eab8136992bd0e 1-18
+src/Shared/Metrics/MetricsExporter.php
+  s_4da5374f6e605f::t_eab8136992bd0e 1-12
+tools/phpstan/tests/Architecture/Fixtures/Briefing/ProbeUsesMetricsAdapter.php
+  s_4da5374f6e605f::t_6049b49230c320 1-14
+tools/phpstan/tests/Architecture/Fixtures/Briefing/ProbeUsesMetricsPort.php
+  s_4da5374f6e605f::t_6049b49230c320 1-15
+composer.lock
+  s_4da5374f6e605f::t_782f405a39b2d1 7,1417-1487
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "067fc1d25439f9837b699ca2048b2cec64261f4b",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
