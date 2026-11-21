@@ -57,6 +57,15 @@ final readonly class SourceEntry
         return $this->payload instanceof SourcePayload;
     }
 
+    public function isMissingAfterOutage(): bool
+    {
+        if ($this->isMissingAfterFailure()) {
+            return $this->lastFailure->kind->countsAsOutage();
+        }
+
+        return false;
+    }
+
     /**
      * @phpstan-assert-if-true !null $this->lastFailure
      */

@@ -26,6 +26,7 @@ final readonly class PrefetchCommand
     private const string NO_STATUS = '-';
     private const string FAILED_NOW = 'now';
     private const string IN_PAUSE = 'earlier, in pause';
+    private const string QUEUED = 'Queued dates: %d. The worker fetches them; their sources show in the briefings, and messages that keep failing in bin/console messenger:failed:show.';
     private const string SKIPPED = 'skipped, circuit open';
 
     public function __construct(
@@ -39,9 +40,22 @@ final readonly class PrefetchCommand
     public function __invoke(#[MapInput] PrefetchInput $input, SymfonyStyle $io): int
     {
         $range = $input->toRange($this->clock->now()->getTimezone());
+
+        if ($input->async) {
+            return $this->enqueue($input, $range, $io);
+        }
+
         $problems = self::problemRowsOf($this->briefingsOf($input, $range, $io));
 
         return self::report($problems, \count($range), $io);
+    }
+
+    private function enqueue(PrefetchInput $input, DateRange $range, SymfonyStyle $io): int
+    {
+        $queued = $this->prefetcher->enqueue($range, $input->locationOr($this->defaultLocation), $input->delayMs());
+        $io->success(\sprintf(self::QUEUED, $queued));
+
+        return Command::SUCCESS;
     }
 
     /**

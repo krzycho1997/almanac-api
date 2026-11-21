@@ -251,6 +251,30 @@ final class CircuitBreakerTest extends TestCase
         self::assertEquals(self::moment('+30 seconds'), $this->store->openUntil(self::SOURCE->value));
     }
 
+    #[DataProvider('refusals')]
+    public function testTellsUntilWhenACircuitRefuses(?string $openUntil, string $expected): void
+    {
+        // Given
+        self::openUntil($this->store, self::moment($openUntil));
+
+        // When
+        $until = $this->breaker->refusedUntil(self::SOURCE);
+
+        // Then
+        self::assertEquals(self::moment($expected), $until);
+    }
+
+    /**
+     * @return iterable<string, array{?string, string}>
+     */
+    public static function refusals(): iterable
+    {
+        yield 'open for an hour' => ['+1 hour', '+1 hour'];
+        yield 'open for less than a trial lease' => ['+10 seconds', '+30 seconds'];
+        yield 'half-open with its trial taken' => ['-1 minute', '+30 seconds'];
+        yield 'closed again meanwhile' => [null, '+30 seconds'];
+    }
+
     public function testStaysHalfOpenAfterA429UntilATrial(): void
     {
         // Given

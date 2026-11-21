@@ -40,6 +40,18 @@ final readonly class CircuitBreaker
         };
     }
 
+    public function refusedUntil(SourceName $source): \DateTimeImmutable
+    {
+        $trialFreeAgain = $this->after(self::TRIAL_LEASE);
+        $openUntil = $this->store->openUntil($source->value);
+
+        if (null === $openUntil) {
+            return $trialFreeAgain;
+        }
+
+        return max($openUntil, $trialFreeAgain);
+    }
+
     public function state(SourceName $source): CircuitState
     {
         $openUntil = $this->store->openUntil($source->value);

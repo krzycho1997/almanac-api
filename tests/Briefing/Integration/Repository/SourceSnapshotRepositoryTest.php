@@ -278,7 +278,7 @@ final class SourceSnapshotRepositoryTest extends TestCase
     {
         yield 'not applicable' => [SourceResult::notApplicable(SourceName::Weather)];
         yield 'result of another source' => [SourceResult::failed(SourceName::Apod, FailureKind::Unavailable)];
-        yield 'refused by an open circuit' => [SourceResult::circuitOpen(SourceName::Weather)];
+        yield 'refused by an open circuit' => [SourceResult::circuitOpen(SourceName::Weather, new \DateTimeImmutable('2026-11-18 12:01'))];
     }
 
     private function repository(): SourceSnapshotRepository

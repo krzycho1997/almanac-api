@@ -32,7 +32,7 @@ docker run --rm --entrypoint sh -e RUNTIME_SETTINGS="$runtime_settings" "$image"
 
 refuses_to_start() {
     if output=$(docker run --rm "$image" "$@" 2>&1); then
-        echo "check-prod-image: php-fpm starts without the runtime settings (arguments: $*)" >&2
+        echo "check-prod-image: the image starts without the runtime settings (arguments: $*)" >&2
         exit 1
     fi
 
@@ -47,3 +47,4 @@ refuses_to_start() {
 
 refuses_to_start
 refuses_to_start -t
+refuses_to_start bin/console messenger:consume async

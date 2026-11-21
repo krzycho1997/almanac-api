@@ -47,6 +47,7 @@ final class BriefingAggregatorTest extends KernelTestCase
     use InteractsWithTestServices;
 
     private const string NOW = '2026-11-20 12:00:00';
+    private const string OPENED_UNTIL = '2026-11-20 12:01:00';
     private const string DAY = '2026-11-20';
     private const string URL = 'https://upstream.test/resource';
 
@@ -323,7 +324,7 @@ final class BriefingAggregatorTest extends KernelTestCase
         // Then
         self::assertSame(CircuitState::Open, $breaker->state(SourceName::OnThisDay));
         self::assertSame(0, $requests);
-        self::assertEquals([SourceResult::circuitOpen(SourceName::OnThisDay)], $briefing->failures());
+        self::assertEquals([SourceResult::circuitOpen(SourceName::OnThisDay, new \DateTimeImmutable(self::OPENED_UNTIL))], $briefing->failures());
         self::assertEquals(SourceEntry::missing(SourceName::OnThisDay, new SourceFailure(FailureKind::CircuitOpen), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
         self::assertFalse($briefing->hasFetched());
         self::assertSame([], $logs->getRecords());
@@ -419,7 +420,7 @@ final class BriefingAggregatorTest extends KernelTestCase
 
         // Then
         self::assertTrue($briefing->entryFor(SourceName::Apod)->hasData());
-        self::assertEquals([SourceResult::circuitOpen(SourceName::OnThisDay)], $briefing->failures());
+        self::assertEquals([SourceResult::circuitOpen(SourceName::OnThisDay, new \DateTimeImmutable(self::OPENED_UNTIL))], $briefing->failures());
         self::assertTrue($briefing->hasFetched());
     }
 

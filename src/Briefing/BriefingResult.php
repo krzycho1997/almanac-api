@@ -44,6 +44,32 @@ final readonly class BriefingResult
         return array_any($this->entries, static fn (SourceEntry $entry): bool => $entry->hasData());
     }
 
+    public function incompleteUntil(): ?\DateTimeImmutable
+    {
+        $untils = array_filter([
+            $this->refusedUntil(),
+            ...array_map(static fn (SourceResult $result): ?\DateTimeImmutable => $result->rateLimitedUntil(), $this->results),
+            ...array_map(self::pauseEndOf(...), $this->entries),
+        ]);
+
+        if ([] === $untils) {
+            return null;
+        }
+
+        return max($untils);
+    }
+
+    public function refusedUntil(): ?\DateTimeImmutable
+    {
+        $untils = array_filter(array_map(static fn (SourceResult $result): ?\DateTimeImmutable => $result->refusedUntil(), $this->results));
+
+        if ([] === $untils) {
+            return null;
+        }
+
+        return max($untils);
+    }
+
     public function hasFetched(): bool
     {
         return array_any($this->results, static fn (SourceResult $result): bool => $result->calledUpstream());
@@ -116,5 +142,14 @@ final readonly class BriefingResult
         }
 
         return ProblemTiming::Skipped;
+    }
+
+    private static function pauseEndOf(SourceEntry $entry): ?\DateTimeImmutable
+    {
+        if ($entry->isMissingAfterOutage()) {
+            return $entry->lastAttemptAt?->add(new \DateInterval(RefreshPolicy::FAILURE_PAUSE));
+        }
+
+        return null;
     }
 }

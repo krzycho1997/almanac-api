@@ -4,7 +4,7 @@ FROM docker.io/library/composer:2.11@sha256:919efe8e62179c71dfd31fad035fd671fe74
 FROM docker.io/library/php:8.5.13-fpm-alpine@sha256:51414d5291758fe27f58a64c7e8a078465d32cc7dcef7bda803f5b36019802e0 AS runtime
 
 COPY --from=php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
-RUN install-php-extensions apcu intl pdo_pgsql redis \
+RUN install-php-extensions apcu intl pcntl pdo_pgsql redis \
     && rm /usr/local/bin/install-php-extensions
 
 WORKDIR /srv/app

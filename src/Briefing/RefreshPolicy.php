@@ -6,7 +6,7 @@ namespace App\Briefing;
 
 final readonly class RefreshPolicy
 {
-    private const string FAILURE_PAUSE = 'PT10M';
+    public const string FAILURE_PAUSE = 'PT10M';
 
     public function __construct(
         private \DateInterval $failurePause = new \DateInterval(self::FAILURE_PAUSE),
