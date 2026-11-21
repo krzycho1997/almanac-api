@@ -114,6 +114,19 @@ final class SnapshotRefresherTest extends KernelTestCase
         self::assertSame('person:page:'.$title, self::discoveries()[0]->key);
     }
 
+    public function testReadsAgainOnlyTheScopesItJustSaved(): void
+    {
+        // Given
+        $scopes = [SourceName::Apod->value => self::apod(), SourceName::Weather->value => self::weather()];
+        self::refresher()->saveAndReread([SourceResult::ok(SourceName::Apod, SourcePayloads::apodPicture())], $scopes, new \DateTimeImmutable(self::DAY), new \DateTimeImmutable(self::TEN));
+
+        // When
+        $stored = self::refresher()->saveAndReread([SourceResult::failed(SourceName::Weather, FailureKind::Unavailable)], $scopes, new \DateTimeImmutable(self::DAY), new \DateTimeImmutable(self::TEN));
+
+        // Then
+        self::assertSame([SourceName::Weather->value], array_keys($stored));
+    }
+
     private static function refresher(): SnapshotRefresher
     {
         return self::testService(SnapshotRefresher::class);

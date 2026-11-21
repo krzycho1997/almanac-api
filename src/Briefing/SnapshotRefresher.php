@@ -43,7 +43,18 @@ final readonly class SnapshotRefresher
             $this->discoveries->upsertDiscoveries($this->recordsOf($results, $day), $now);
         });
 
-        return $this->snapshots->findForScopes(array_values($scopes));
+        return $this->snapshots->findForScopes(self::scopesOf($results, $scopes));
+    }
+
+    /**
+     * @param list<SourceResult>                         $results
+     * @param array<value-of<SourceName>, SnapshotScope> $scopes
+     *
+     * @return list<SnapshotScope>
+     */
+    private static function scopesOf(array $results, array $scopes): array
+    {
+        return array_values(array_intersect_key($scopes, array_flip(array_map(static fn (SourceResult $result): string => $result->source->value, $results))));
     }
 
     /**

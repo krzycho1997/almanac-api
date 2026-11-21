@@ -129,7 +129,7 @@ final readonly class BriefingAggregator
             return $stored;
         }
 
-        return $this->refresher->saveAndReread(array_map(static fn (SettledFetch $fetch): SourceResult => $fetch->result, $settled), $scopes, $date, $now);
+        return array_replace($stored, $this->refresher->saveAndReread(array_map(static fn (SettledFetch $fetch): SourceResult => $fetch->result, $settled), $scopes, $date, $now));
     }
 
     /**
