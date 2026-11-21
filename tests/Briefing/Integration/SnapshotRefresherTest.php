@@ -16,7 +16,6 @@ use App\Briefing\SourceName;
 use App\Briefing\SourceResult;
 use App\Tests\Support\Briefing\SourcePayloads;
 use App\Tests\Support\InteractsWithTestServices;
-use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -93,8 +92,8 @@ final class SnapshotRefresherTest extends KernelTestCase
         // When
         try {
             self::refresher()->saveAndReread([SourceResult::ok(SourceName::OnThisDay, $feed)], [SourceName::OnThisDay->value => self::onThisDay()], new \DateTimeImmutable(self::DAY), new \DateTimeImmutable(self::TEN));
-            self::fail('A discovery that breaks the table must not be stored.');
-        } catch (DriverException) {
+            self::fail('A discovery that cannot be built must not be stored.');
+        } catch (\InvalidArgumentException) {
         }
 
         // Then

@@ -30,6 +30,7 @@ use App\Tests\Support\Briefing\JournalingSource;
 use App\Tests\Support\Briefing\SourcePayloads;
 use App\Tests\Support\Briefing\StubSource;
 use App\Tests\Support\InteractsWithTestServices;
+use Doctrine\DBAL\Connection;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -47,6 +48,7 @@ final class BriefingAggregatorTest extends KernelTestCase
     use InteractsWithTestServices;
 
     private const string NOW = '2026-11-20 12:00:00';
+    private const string REFUSES_EVERY_WRITE = 'simulated_database_refusing_every_write';
     private const string OPENED_UNTIL = '2026-11-20 12:01:00';
     private const string DAY = '2026-11-20';
     private const string URL = 'https://upstream.test/resource';
@@ -243,11 +245,11 @@ final class BriefingAggregatorTest extends KernelTestCase
     {
         // Given
         $logs = new TestHandler();
-        $unsavable = new SnapshotScope(SourceName::OnThisDay, '11-20', self::day());
+        self::refuseEveryWriteOfSnapshots();
 
         // When
         try {
-            self::aggregator([new StubSource(SourceName::OnThisDay, static fn (): PendingFetch => self::failingFetch(), scope: $unsavable)], new MockClock(self::NOW), new Logger('briefing', [$logs]))->briefingFor(self::day(), self::warsaw());
+            self::aggregator([new StubSource(SourceName::OnThisDay, static fn (): PendingFetch => self::failingFetch(), scope: new SnapshotScope(SourceName::OnThisDay, '11-20', null))], new MockClock(self::NOW), new Logger('briefing', [$logs]))->briefingFor(self::day(), self::warsaw());
             self::fail('A failed save must reach the caller.');
         } catch (\Doctrine\DBAL\Exception) {
         }
@@ -393,12 +395,12 @@ final class BriefingAggregatorTest extends KernelTestCase
         // Given
         $clock = new MockClock(self::NOW);
         $breaker = self::breaker($clock);
-        $unsavable = new SnapshotScope(SourceName::OnThisDay, '11-20', self::day());
+        self::refuseEveryWriteOfSnapshots();
 
         // When
         foreach (range(1, 3) as $attempt) {
             try {
-                self::aggregator([new StubSource(SourceName::OnThisDay, static fn (): PendingFetch => self::failingFetch(), scope: $unsavable)], $clock, breaker: $breaker)->briefingFor(self::day(), self::warsaw());
+                self::aggregator([new StubSource(SourceName::OnThisDay, static fn (): PendingFetch => self::failingFetch(), scope: new SnapshotScope(SourceName::OnThisDay, '11-20', null))], $clock, breaker: $breaker)->briefingFor(self::day(), self::warsaw());
                 self::fail('A failed save must reach the caller.');
             } catch (\Doctrine\DBAL\Exception) {
             }
@@ -430,6 +432,11 @@ final class BriefingAggregatorTest extends KernelTestCase
     private static function aggregator(array $sources, MockClock $clock, LoggerInterface $logger = new NullLogger(), ?CircuitBreaker $breaker = null): BriefingAggregator
     {
         return new BriefingAggregator($sources, new ConcurrentFetcher(new MockHttpClient(), $clock, new NullLogger(), 3.5), $clock, new SourceFailureLog($logger), self::testService(SnapshotRefresher::class), new RefreshPolicy(), $breaker ?? self::breaker($clock));
+    }
+
+    private static function refuseEveryWriteOfSnapshots(): void
+    {
+        self::testService(Connection::class)->executeStatement('ALTER TABLE briefing_source_snapshot ADD CONSTRAINT '.self::REFUSES_EVERY_WRITE.' CHECK (false) NOT VALID');
     }
 
     private static function breaker(MockClock $clock): CircuitBreaker
