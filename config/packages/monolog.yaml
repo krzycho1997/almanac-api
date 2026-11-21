@@ -6,7 +6,7 @@ monolog:
 
 services:
     app.monolog.formatter.json:
-        class: Monolog\Formatter\JsonFormatter
+        class: App\Shared\Logging\ClientErrorJsonFormatter
         arguments:
             $includeStacktraces: true
 

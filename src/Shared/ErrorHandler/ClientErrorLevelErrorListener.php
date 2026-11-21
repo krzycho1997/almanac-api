@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Shared\ErrorHandler;
 
+use App\Shared\Logging\ClientError;
 use Psr\Log\LogLevel;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\WithLogLevel;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 #[Exclude]
 final class ClientErrorLevelErrorListener extends ErrorListener
@@ -35,16 +34,7 @@ final class ClientErrorLevelErrorListener extends ErrorListener
     private function isFrameworkDefaultForClientError(\Throwable $exception, ?string $logLevel): bool
     {
         if (self::FRAMEWORK_CLIENT_ERROR_LEVEL === $logLevel) {
-            return self::isClientError($exception) && $this->isLevelLeftToTheFramework($exception);
-        }
-
-        return false;
-    }
-
-    private static function isClientError(\Throwable $exception): bool
-    {
-        if ($exception instanceof HttpExceptionInterface) {
-            return $exception->getStatusCode() < Response::HTTP_INTERNAL_SERVER_ERROR;
+            return ClientError::matches($exception) && $this->isLevelLeftToTheFramework($exception);
         }
 
         return false;
