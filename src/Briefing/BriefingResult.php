@@ -40,6 +40,11 @@ final readonly class BriefingResult
         return array_any($this->entries, static fn (SourceEntry $entry): bool => $entry->hasData());
     }
 
+    public function hasFetched(): bool
+    {
+        return [] !== $this->results;
+    }
+
     public function entryFor(SourceName $source): SourceEntry
     {
         return array_find($this->entries, static fn (SourceEntry $entry): bool => $source === $entry->source)
