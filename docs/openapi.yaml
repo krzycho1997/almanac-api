@@ -10,6 +10,8 @@ servers:
   - url: http://127.0.0.1:8080
     description: Local Docker Compose stack
 tags:
+  - name: bookmark
+    description: Discoveries the user keeps, behind a Bearer token
   - name: briefing
     description: Daily briefing for a date
   - name: health
@@ -85,6 +87,112 @@ paths:
           $ref: '#/components/responses/InternalServerError'
         '502':
           $ref: '#/components/responses/BadGateway'
+  /api/bookmarks:
+    get:
+      operationId: listBookmarks
+      summary: List the user's bookmarks, newest first
+      tags: [bookmark]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: Page from 1; a page after the last one is empty.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000000
+            default: 1
+        - name: limit
+          in: query
+          required: false
+          description: Bookmarks per page.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: One page of bookmarks, newest first, with the counts for paging.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookmarkList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      operationId: createBookmark
+      summary: Bookmark a discovery from a briefing
+      tags: [bookmark]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookmark'
+      responses:
+        '201':
+          description: The bookmark, with the discovery it points at.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bookmark'
+        '400':
+          $ref: '#/components/responses/MalformedBody'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/bookmarks/{id}:
+    delete:
+      operationId: deleteBookmark
+      summary: Remove one of the user's bookmarks
+      tags: [bookmark]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the bookmark as the API returns it, a version 7 UUID in lower case; any other form is a 404.
+          schema:
+            type: string
+            format: uuid
+            pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+      responses:
+        '204':
+          description: The bookmark is gone.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   headers:
     RequestId:
@@ -99,7 +207,60 @@ components:
       schema:
         type: integer
         minimum: 0
+    WwwAuthenticate:
+      description: Bearer challenge (RFC 6750); a token that is unknown, revoked or expired adds error="invalid_token".
+      required: true
+      schema:
+        type: string
+        enum: ['Bearer', 'Bearer error="invalid_token"']
   responses:
+    Unauthorized:
+      description: The Bearer token is missing, unknown, revoked by a later almanac:user:create or expired.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+        WWW-Authenticate:
+          $ref: '#/components/headers/WwwAuthenticate'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    MalformedBody:
+      description: The body is not valid JSON.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    UnsupportedMediaType:
+      description: The body is not sent as application/json, for example as a form or XML.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotFound:
+      description: The resource the request points at does not exist, for example a discovery id no briefing produced, or a bookmark that is gone or belongs to another user.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Conflict:
+      description: The user has already bookmarked this discovery.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
     BadRequest:
       description: The request is malformed, for example the date is not a calendar date in Y-m-d.
       headers:
@@ -110,7 +271,7 @@ components:
           schema:
             $ref: '#/components/schemas/ValidationProblem'
     UnprocessableEntity:
-      description: The request is well formed but not allowed, for example the date is outside the briefing window, or a coordinate is not a plain decimal in range or comes without its pair.
+      description: The request is well formed but not allowed, for example a briefing date outside the window, a coordinate that is not a plain decimal in range or comes without its pair, a discovery id that is not a version 5 UUID, or a page or limit that is not a whole number in range.
       headers:
         X-Request-Id:
           $ref: '#/components/headers/RequestId'
@@ -147,7 +308,89 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Access token printed once by bin/console almanac:user:create; a later run for the same address revokes it.
   schemas:
+    CreateBookmark:
+      type: object
+      required: [discoveryId]
+      properties:
+        discoveryId:
+          type: string
+          format: uuid
+          description: The discoveryId of a picture, event or person from a briefing.
+    Bookmark:
+      type: object
+      additionalProperties: false
+      required: [id, createdAt, discovery]
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+          pattern: 'Z$'
+        discovery:
+          $ref: '#/components/schemas/Discovery'
+    BookmarkList:
+      type: object
+      additionalProperties: false
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Bookmark'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+    PaginationMeta:
+      type: object
+      additionalProperties: false
+      required: [page, limit, total, totalPages]
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          maximum: 1000000
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+        total:
+          type: integer
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+    Discovery:
+      type: object
+      additionalProperties: false
+      required: [id, type, date, title, summary, url]
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [apod, event, person]
+        date:
+          type: string
+          format: date
+          nullable: true
+          description: The day of the picture or the event; null for a person.
+        title:
+          type: string
+        summary:
+          type: string
+          nullable: true
+        url:
+          type: string
+          format: uri
+          nullable: true
     Briefing:
       type: object
       additionalProperties: false

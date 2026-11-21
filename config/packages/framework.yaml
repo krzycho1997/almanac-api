@@ -1,6 +1,12 @@
 framework:
     secret: '%env(APP_SECRET)%'
     exceptions:
+        App\Bookmark\Exception\AlreadyBookmarkedException:
+            status_code: 409
+        App\Bookmark\Exception\BookmarkNotFoundException:
+            status_code: 404
+        App\Bookmark\Exception\DiscoveryNotFoundException:
+            status_code: 404
         App\Briefing\Exception\NoSourceDataException:
             status_code: 502
             log_level: warning

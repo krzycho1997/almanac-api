@@ -25,6 +25,8 @@ final class ArchitectureRulesTest extends TestCase
             'Identity/Exception/ProbeHttpException.php' => ['phpat.servicesAndExceptionsDoNotKnowHttp'],
             'Bookmark/Contract/ProbeContractUsesInternal.php' => ['phpat.contractsDependOnlyOnContracts'],
             'Bookmark/Contract/ProbeContractUsesDoctrineBridge.php' => ['phpat.modelAndContractsStayPure'],
+            'Shared/Contract/ProbeSharedContractUsesDoctrine.php' => ['phpat.modelAndContractsStayPure'],
+            'Identity/Contract/ProbeUserIdType.php' => ['phpat.modelAndContractsStayPure'],
             'Briefing/Model/ProbeDayIdType.php' => ['phpat.modelAndContractsStayPure', 'phpat.modelCarriesReadonlyData'],
             'Briefing/Model/ProbeMutableModel.php' => ['phpat.modelCarriesReadonlyData'],
             'Briefing/ProbeUsesSourceInterior.php' => ['phpat.sourceInteriorsStayPrivate.Apod'],
