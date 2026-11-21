@@ -182,6 +182,18 @@ final class OnThisDayMapperTest extends TestCase
         self::assertSame(['Wings Hauser'], array_map(static fn (NotablePerson $person): string => $person->name, $feed->births));
     }
 
+    public function testSkipsAPersonWithoutAName(): void
+    {
+        // Given
+        $births = [new OnThisDayEntry(', a painter', 1900), new OnThisDayEntry('(painter), somebody', 1901, [self::page('(painter)', 'Somebody')]), self::born()];
+
+        // When
+        $feed = self::mapper()->map(self::selected([self::event()]), self::births($births), self::deaths([self::born()]));
+
+        // Then
+        self::assertSame(['Wings Hauser'], array_map(static fn (NotablePerson $person): string => $person->name, $feed->births));
+    }
+
     public function testSkipsAnEntryWhoseYearIsNotWhole(): void
     {
         // Given

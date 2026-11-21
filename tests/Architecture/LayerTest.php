@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Architecture;
 
+use App\Briefing\Contract\DiscoveryId;
+use App\Briefing\Discovery\DiscoveryExtractor;
 use App\Kernel;
 use PHPat\Selector\Selector;
 use PHPat\Selector\SelectorInterface;
@@ -165,6 +167,19 @@ final class LayerTest
             ->should()
             ->beReadonly()
             ->because('the internal model is stored in snapshots and read back, so it never changes after mapping')
+            ->nonIgnorable();
+    }
+
+    #[TestRule]
+    public function onlyTheExtractorMintsDiscoveryIds(): Rule
+    {
+        return PHPat::rule()
+            ->classes(Selector::inNamespace('App'))
+            ->excluding(Selector::inNamespace('App\Tests'), Selector::inNamespace('App\PHPStan'), Selector::classname(DiscoveryExtractor::class))
+            ->shouldNot()
+            ->construct()
+            ->classes(Selector::classname(DiscoveryId::class))
+            ->because('a discovery id is the UUIDv5 of its key, so only the owner of the keys and the namespace makes one; others parse it with fromString()')
             ->nonIgnorable();
     }
 

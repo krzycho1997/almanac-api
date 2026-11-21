@@ -9,6 +9,8 @@ use App\Tests\Support\Briefing\UpstreamMock;
 use App\Tests\Support\Briefing\UpstreamMockResponseFactory;
 use App\Tests\Support\FunctionalTestCase;
 use App\Tests\Support\InteractsWithTestServices;
+use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Connection;
 use Monolog\Level;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -64,6 +66,7 @@ final class BriefingControllerTest extends FunctionalTestCase
         self::assertSame([], $briefing['missing']);
         self::assertSame(
             [
+                'discoveryId' => 'c05f9b6a-9262-5859-b45d-743a62e1bc6e',
                 'title' => 'Portrait of NGC 1055',
                 'explanation' => self::apodExplanation($briefing),
                 'mediaType' => 'image',
@@ -110,12 +113,30 @@ final class BriefingControllerTest extends FunctionalTestCase
 
         // Then
         self::assertResponseIsSuccessful();
-        /** @var array{events: list<array{year: int, text: string, pages: list<array{title: string, url: string, thumbnail: ?string}>}>, births: list<array{year: int, name: string, description: ?string, url: string, thumbnail: ?string}>, deaths: list<array{year: int, name: string, description: ?string, url: string, thumbnail: ?string}>} $history */
+        /** @var array{events: list<array{discoveryId: string, year: int, text: string, pages: list<array{title: string, url: string, thumbnail: ?string}>}>, births: list<array{discoveryId: string, year: int, name: string, description: ?string, url: string, thumbnail: ?string}>, deaths: list<array{discoveryId: string, year: int, name: string, description: ?string, url: string, thumbnail: ?string}>} $history */
         $history = self::json($this->client->getResponse()->getContent());
         self::assertSame([20, 20, 20], [\count($history['events']), \count($history['births']), \count($history['deaths'])]);
         self::assertSame([1990, 'Farzad Bazoft', 'https://en.wikipedia.org/wiki/Farzad_Bazoft'], [$history['events'][0]['year'], $history['events'][0]['pages'][0]['title'], $history['events'][0]['pages'][0]['url']]);
         self::assertSame([2005, 'Rodri Mendoza', 'Spanish footballer', 'https://en.wikipedia.org/wiki/Rodri_Mendoza'], [$history['births'][0]['year'], $history['births'][0]['name'], $history['births'][0]['description'], $history['births'][0]['url']]);
-        self::assertSame([-44, 'Julius Caesar'], [$history['deaths'][19]['year'], $history['deaths'][19]['name']]);
+        self::assertSame([-44, 'Julius Caesar', '30ad2d96-39f2-514a-806e-58f2041d1ce6'], [$history['deaths'][19]['year'], $history['deaths'][19]['name'], $history['deaths'][19]['discoveryId']]);
+        self::assertSame('e9b46a81-debf-5313-adf4-562da5ece32d', $history['events'][0]['discoveryId']);
+    }
+
+    public function testStoresEveryItemItHandsOutAnIdFor(): void
+    {
+        // Given
+        self::upstream()->respondWith(self::scenario()->apod()->fixture(self::PICTURE));
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        /** @var array{apod: array{discoveryId: string}, events: list<array{discoveryId: string}>, births: list<array{discoveryId: string}>, deaths: list<array{discoveryId: string}>} $briefing */
+        $briefing = self::json($this->client->getResponse()->getContent());
+        $ids = array_values(array_unique([$briefing['apod']['discoveryId'], ...array_column([...$briefing['events'], ...$briefing['births'], ...$briefing['deaths']], 'discoveryId')]));
+        $stored = self::testService(Connection::class)->fetchFirstColumn('SELECT id::text FROM briefing_discovery WHERE id::text IN (?)', [$ids], [ArrayParameterType::STRING]);
+        self::assertEqualsCanonicalizing($ids, $stored);
     }
 
     public function testBuildsTheBriefingForAPictureWithoutMediaOrCredit(): void

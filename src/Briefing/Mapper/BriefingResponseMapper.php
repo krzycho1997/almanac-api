@@ -6,6 +6,7 @@ namespace App\Briefing\Mapper;
 
 use App\Briefing\BriefingDay;
 use App\Briefing\BriefingResult;
+use App\Briefing\Discovery\DiscoveryExtractor;
 use App\Briefing\Dto\Response\ApodDto;
 use App\Briefing\Dto\Response\ApodMediaType;
 use App\Briefing\Dto\Response\AttributionDto;
@@ -44,6 +45,11 @@ final readonly class BriefingResponseMapper
 {
     private const bool NOT_STALE = false;
 
+    public function __construct(
+        private DiscoveryExtractor $discoveries,
+    ) {
+    }
+
     public function create(BriefingResult $briefing): BriefingResponse
     {
         $apod = $briefing->entryFor(SourceName::Apod);
@@ -54,10 +60,10 @@ final readonly class BriefingResponseMapper
             self::location($briefing->location),
             self::sources($briefing),
             self::missing($briefing),
-            self::apod($apod),
-            array_map(self::event(...), $onThisDay->events ?? []),
-            array_map(self::person(...), $onThisDay->births ?? []),
-            array_map(self::person(...), $onThisDay->deaths ?? []),
+            $this->apod($apod),
+            array_map(fn (HistoricalEvent $event): EventDto => $this->event($event, $briefing->date), $onThisDay->events ?? []),
+            array_map($this->person(...), $onThisDay->births ?? []),
+            array_map($this->person(...), $onThisDay->deaths ?? []),
             self::weather($briefing->entryFor(SourceName::Weather)),
             self::attributions($briefing),
         );
@@ -152,9 +158,9 @@ final readonly class BriefingResponseMapper
         return null;
     }
 
-    private static function event(HistoricalEvent $event): EventDto
+    private function event(HistoricalEvent $event, \DateTimeImmutable $day): EventDto
     {
-        return new EventDto($event->year, $event->text, array_map(self::page(...), $event->pages));
+        return new EventDto($this->discoveries->eventId($event, $day), $event->year, $event->text, array_map(self::page(...), $event->pages));
     }
 
     private static function page(PageRef $page): PageDto
@@ -162,9 +168,9 @@ final readonly class BriefingResponseMapper
         return new PageDto($page->title, $page->url, $page->thumbnail);
     }
 
-    private static function person(NotablePerson $person): PersonDto
+    private function person(NotablePerson $person): PersonDto
     {
-        return new PersonDto($person->year, $person->name, $person->description, $person->url, $person->thumbnail);
+        return new PersonDto($this->discoveries->personId($person), $person->year, $person->name, $person->description, $person->url, $person->thumbnail);
     }
 
     private static function weather(SourceEntry $entry): ?WeatherDto
@@ -236,12 +242,12 @@ final readonly class BriefingResponseMapper
         };
     }
 
-    private static function apod(SourceEntry $entry): ?ApodDto
+    private function apod(SourceEntry $entry): ?ApodDto
     {
         $picture = $entry->payload;
 
         if ($picture instanceof ApodPicture) {
-            return new ApodDto($picture->title, $picture->explanation, self::mediaType($picture->mediaType), $picture->url, $picture->hdUrl, $picture->credit);
+            return new ApodDto($this->discoveries->apodId($picture), $picture->title, $picture->explanation, self::mediaType($picture->mediaType), $picture->url, $picture->hdUrl, $picture->credit);
         }
 
         return null;

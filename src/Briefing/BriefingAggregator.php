@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Briefing;
 
-use App\Briefing\Repository\SourceSnapshotRepository;
 use App\Briefing\Source\ConcurrentFetcher;
 use App\Briefing\Source\SettledFetch;
 use App\Briefing\Source\Source;
@@ -28,7 +27,7 @@ final readonly class BriefingAggregator
         private ConcurrentFetcher $fetcher,
         private ClockInterface $clock,
         private SourceFailureLog $failureLog,
-        private SourceSnapshotRepository $snapshots,
+        private SnapshotRefresher $refresher,
         private RefreshPolicy $policy,
     ) {
         $this->sources = self::inNameOrder([...$sources]);
@@ -56,7 +55,7 @@ final readonly class BriefingAggregator
         $now = $this->clock->now();
         $covering = $this->sourcesCovering($date);
         $scopes = self::scopesOf($covering, $date, $location);
-        $stored = $this->snapshots->findForScopes(array_values($scopes));
+        $stored = $this->refresher->storedFor(array_values($scopes));
         $decisions = $this->decisionsFor($covering, $stored, $date, $now);
         $settled = $this->fetcher->settleAll(self::startAll(self::dueForFetch($covering, $decisions), $date, $location));
         $entries = $this->entriesAfterSaving($settled, $scopes, $stored, $decisions, $date, $now);
@@ -124,15 +123,13 @@ final readonly class BriefingAggregator
      *
      * @return array<value-of<SourceName>, StoredSnapshot>
      */
-    private function savedAndReread(array $settled, array $scopes, array $stored, \DateTimeImmutable $now): array
+    private function savedAndReread(array $settled, array $scopes, array $stored, \DateTimeImmutable $date, \DateTimeImmutable $now): array
     {
         if ([] === $settled) {
             return $stored;
         }
 
-        $this->snapshots->saveResults(array_map(static fn (SettledFetch $fetch): SourceResult => $fetch->result, $settled), $scopes, $now);
-
-        return $this->snapshots->findForScopes(array_values($scopes));
+        return array_replace($stored, $this->refresher->saveAndReread(array_map(static fn (SettledFetch $fetch): SourceResult => $fetch->result, $settled), $scopes, $date, $now));
     }
 
     /**
@@ -186,7 +183,7 @@ final readonly class BriefingAggregator
     private function entriesAfterSaving(array $settled, array $scopes, array $stored, array $decisions, \DateTimeImmutable $date, \DateTimeImmutable $now): array
     {
         try {
-            return $this->inSourceOrder($this->savedAndReread($settled, $scopes, $stored, $now), $decisions);
+            return $this->inSourceOrder($this->savedAndReread($settled, $scopes, $stored, $date, $now), $decisions);
         } catch (\Throwable $exception) {
             $this->recordFailures($settled, [], $date);
 

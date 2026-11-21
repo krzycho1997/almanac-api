@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Briefing\Integration;
 
+use App\Briefing\Discovery\DiscoveryExtractor;
 use App\Briefing\FailureKind;
 use App\Briefing\Mapper\BriefingResponseMapper;
 use App\Briefing\Model\Attribution;
@@ -38,7 +39,7 @@ final class BriefingResponseSchemaTest extends KernelTestCase
     public function testDescribesSourcesWithoutDataAsOpenApiSays(BriefingResultBuilder $briefingResult, array $expectedSource): void
     {
         // Given
-        $response = new BriefingResponseMapper()->create($briefingResult->attemptedAt(self::CHECKED_AT)->build());
+        $response = new BriefingResponseMapper(new DiscoveryExtractor())->create($briefingResult->attemptedAt(self::CHECKED_AT)->build());
 
         // When
         $briefing = self::serialized($response);
@@ -53,7 +54,7 @@ final class BriefingResponseSchemaTest extends KernelTestCase
     public function testDescribesStaleDataAsOpenApiSays(): void
     {
         // Given
-        $response = new BriefingResponseMapper()->create(BriefingResultBuilder::create()->stale(SourceName::Weather, SourcePayloads::dailyWeather(), '2026-11-18T09:00:00+01:00', FailureKind::RateLimited)->attemptedAt(self::CHECKED_AT)->build());
+        $response = new BriefingResponseMapper(new DiscoveryExtractor())->create(BriefingResultBuilder::create()->stale(SourceName::Weather, SourcePayloads::dailyWeather(), '2026-11-18T09:00:00+01:00', FailureKind::RateLimited)->attemptedAt(self::CHECKED_AT)->build());
 
         // When
         $briefing = self::serialized($response);
@@ -72,15 +73,15 @@ final class BriefingResponseSchemaTest extends KernelTestCase
             [new NotablePerson(-44, 'Julius Caesar', null, 'https://en.wikipedia.org/wiki/Julius_Caesar', null)],
             new Attribution('Wikipedia', 'https://en.wikipedia.org/', 'CC BY-SA 4.0', 'https://creativecommons.org/licenses/by-sa/4.0/', true, null),
         );
-        $response = new BriefingResponseMapper()->create(BriefingResultBuilder::create()->notApplicable(SourceName::Apod)->ok(SourceName::OnThisDay, $feed)->notApplicable(SourceName::Weather)->build());
+        $response = new BriefingResponseMapper(new DiscoveryExtractor())->create(BriefingResultBuilder::create()->notApplicable(SourceName::Apod)->ok(SourceName::OnThisDay, $feed)->notApplicable(SourceName::Weather)->build());
 
         // When
         $briefing = self::serialized($response);
 
         // Then
         new SchemaValidator()->validate($briefing, OpenApiDocument::instance()->schemas()[self::SCHEMA]);
-        self::assertSame([['year' => -44, 'text' => 'Julius Caesar is assassinated.', 'pages' => [['title' => 'Julius Caesar', 'url' => 'https://en.wikipedia.org/wiki/Julius_Caesar', 'thumbnail' => null]]]], $briefing['events']);
-        self::assertSame([['year' => 1947, 'name' => 'Wings Hauser', 'description' => 'American actor', 'url' => 'https://en.wikipedia.org/wiki/Wings_Hauser', 'thumbnail' => 'https://upload.wikimedia.org/hauser.jpg']], $briefing['births']);
+        self::assertSame([['discoveryId' => 'cceb60e2-30ae-570b-9905-b4b06b700682', 'year' => -44, 'text' => 'Julius Caesar is assassinated.', 'pages' => [['title' => 'Julius Caesar', 'url' => 'https://en.wikipedia.org/wiki/Julius_Caesar', 'thumbnail' => null]]]], $briefing['events']);
+        self::assertSame([['discoveryId' => 'ea4bbfc2-451d-5320-892a-3779e0c01d78', 'year' => 1947, 'name' => 'Wings Hauser', 'description' => 'American actor', 'url' => 'https://en.wikipedia.org/wiki/Wings_Hauser', 'thumbnail' => 'https://upload.wikimedia.org/hauser.jpg']], $briefing['births']);
     }
 
     /**
@@ -102,7 +103,7 @@ final class BriefingResponseSchemaTest extends KernelTestCase
     public function testDescribesTheWeatherAsOpenApiSays(DailyWeather $weather, array $expected): void
     {
         // Given
-        $response = new BriefingResponseMapper()->create(BriefingResultBuilder::create()->notApplicable(SourceName::Apod)->notApplicable(SourceName::OnThisDay)->ok(SourceName::Weather, $weather)->build());
+        $response = new BriefingResponseMapper(new DiscoveryExtractor())->create(BriefingResultBuilder::create()->notApplicable(SourceName::Apod)->notApplicable(SourceName::OnThisDay)->ok(SourceName::Weather, $weather)->build());
 
         // When
         $briefing = self::serialized($response);

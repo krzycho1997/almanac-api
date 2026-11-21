@@ -10,6 +10,7 @@ use App\Briefing\Location;
 use App\Briefing\Model\SourcePayload;
 use App\Briefing\RefreshPolicy;
 use App\Briefing\Repository\SourceSnapshotRepository;
+use App\Briefing\SnapshotRefresher;
 use App\Briefing\SnapshotScope;
 use App\Briefing\Source\ConcurrentFetcher;
 use App\Briefing\Source\PendingFetch;
@@ -293,7 +294,7 @@ final class BriefingAggregatorTest extends KernelTestCase
      */
     private static function aggregator(array $sources, MockClock $clock, LoggerInterface $logger = new NullLogger()): BriefingAggregator
     {
-        return new BriefingAggregator($sources, new ConcurrentFetcher(new MockHttpClient(), $clock, new NullLogger(), 3.5), $clock, new SourceFailureLog($logger), self::testService(SourceSnapshotRepository::class), new RefreshPolicy());
+        return new BriefingAggregator($sources, new ConcurrentFetcher(new MockHttpClient(), $clock, new NullLogger(), 3.5), $clock, new SourceFailureLog($logger), self::testService(SnapshotRefresher::class), new RefreshPolicy());
     }
 
     private static function pendingFetch(SourceName $source = SourceName::OnThisDay): PendingFetch
