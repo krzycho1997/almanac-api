@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Briefing;
 
+use App\Briefing\CircuitBreaker\CircuitBreaker;
+use App\Briefing\CircuitBreaker\CircuitPermit;
 use App\Briefing\Source\ConcurrentFetcher;
 use App\Briefing\Source\SettledFetch;
 use App\Briefing\Source\Source;
@@ -29,6 +31,7 @@ final readonly class BriefingAggregator
         private SourceFailureLog $failureLog,
         private SnapshotRefresher $refresher,
         private RefreshPolicy $policy,
+        private CircuitBreaker $breaker,
     ) {
         $this->sources = self::inNameOrder([...$sources]);
     }
@@ -57,11 +60,86 @@ final readonly class BriefingAggregator
         $scopes = self::scopesOf($covering, $date, $location);
         $stored = $this->refresher->storedFor(array_values($scopes));
         $decisions = $this->decisionsFor($covering, $stored, $date, $now);
-        $settled = $this->fetcher->settleAll(self::startAll(self::dueForFetch($covering, $decisions), $date, $location));
-        $entries = $this->entriesAfterSaving($settled, $scopes, $stored, $decisions, $date, $now);
+        $due = self::dueForFetch($covering, $decisions);
+        $permits = $this->permitsFor($due);
+        $settled = $this->fetcher->settleAll(self::startAll(self::allowed($due, $permits), $date, $location));
+        $this->recordInCircuits($settled, $permits);
+        $refused = self::refusedResults($permits);
+        $entries = $this->entriesFor($settled, $refused, $scopes, $stored, $decisions, $date, $now);
         $this->recordFailures($settled, $entries, $date);
 
-        return new BriefingResult($date, $location, array_values($entries), self::resultsOf($settled));
+        return new BriefingResult($date, $location, array_values($entries), self::thisRun($settled, $refused));
+    }
+
+    /**
+     * @param list<Source> $sources
+     *
+     * @return array<value-of<SourceName>, CircuitPermit>
+     */
+    private function permitsFor(array $sources): array
+    {
+        $permits = [];
+
+        foreach ($sources as $source) {
+            $permits[$source->name()->value] = $this->breaker->tryAcquire($source->name());
+        }
+
+        return $permits;
+    }
+
+    /**
+     * @param list<Source>                               $sources
+     * @param array<value-of<SourceName>, CircuitPermit> $permits
+     *
+     * @return list<Source>
+     */
+    private static function allowed(array $sources, array $permits): array
+    {
+        return array_values(array_filter($sources, static fn (Source $source): bool => $permits[$source->name()->value]->allowsCall()));
+    }
+
+    /**
+     * @param list<SettledFetch>                         $settled
+     * @param array<value-of<SourceName>, CircuitPermit> $permits
+     */
+    private function recordInCircuits(array $settled, array $permits): void
+    {
+        foreach ($settled as $fetch) {
+            $this->breaker->record($fetch->result, $permits[$fetch->result->source->value]);
+        }
+    }
+
+    /**
+     * @param array<value-of<SourceName>, CircuitPermit> $permits
+     *
+     * @return list<SourceResult>
+     */
+    private static function refusedResults(array $permits): array
+    {
+        $refused = [];
+
+        foreach ($permits as $source => $permit) {
+            if (CircuitPermit::Refused === $permit) {
+                $refused[] = SourceResult::circuitOpen(SourceName::from($source));
+            }
+        }
+
+        return $refused;
+    }
+
+    /**
+     * @param array<value-of<SourceName>, SourceEntry> $entries
+     * @param list<SourceResult>                       $refused
+     *
+     * @return array<value-of<SourceName>, SourceEntry>
+     */
+    private static function withRefusals(array $entries, array $refused, \DateTimeImmutable $now): array
+    {
+        foreach ($refused as $result) {
+            $entries[$result->source->value] = $entries[$result->source->value]->refusedAt($now);
+        }
+
+        return $entries;
     }
 
     /**
@@ -180,6 +258,33 @@ final readonly class BriefingAggregator
         foreach ($fetches as $fetch) {
             $fetch->pending->cancel();
         }
+    }
+
+    /**
+     * @param list<SettledFetch>                           $settled
+     * @param list<SourceResult>                           $refused
+     * @param array<value-of<SourceName>, SnapshotScope>   $scopes
+     * @param array<value-of<SourceName>, StoredSnapshot>  $stored
+     * @param array<value-of<SourceName>, RefreshDecision> $decisions
+     *
+     * @return array<value-of<SourceName>, SourceEntry>
+     */
+    private function entriesFor(array $settled, array $refused, array $scopes, array $stored, array $decisions, \DateTimeImmutable $date, \DateTimeImmutable $now): array
+    {
+        $entries = $this->entriesAfterSaving($settled, $scopes, $stored, $decisions, $date, $now);
+
+        return self::withRefusals($entries, $refused, $now);
+    }
+
+    /**
+     * @param list<SettledFetch> $settled
+     * @param list<SourceResult> $refused
+     *
+     * @return list<SourceResult>
+     */
+    private static function thisRun(array $settled, array $refused): array
+    {
+        return [...self::resultsOf($settled), ...$refused];
     }
 
     /**

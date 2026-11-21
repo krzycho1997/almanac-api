@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Tests\Briefing\Integration;
 
 use App\Briefing\BriefingAggregator;
+use App\Briefing\CircuitBreaker\CircuitBreaker;
+use App\Briefing\CircuitBreaker\CircuitPermit;
+use App\Briefing\CircuitBreaker\CircuitState;
 use App\Briefing\FailureKind;
 use App\Briefing\Location;
 use App\Briefing\Model\SourcePayload;
@@ -21,6 +24,7 @@ use App\Briefing\SourceFailureLog;
 use App\Briefing\SourceName;
 use App\Briefing\SourceResult;
 use App\Tests\Support\Briefing\CallJournal;
+use App\Tests\Support\Briefing\CircuitBreaker\InMemoryCircuitBreakerStore;
 use App\Tests\Support\Briefing\JournalingSource;
 use App\Tests\Support\Briefing\SourcePayloads;
 use App\Tests\Support\Briefing\StubSource;
@@ -303,12 +307,151 @@ final class BriefingAggregatorTest extends KernelTestCase
         self::assertEquals(new SourceFailure(FailureKind::Unavailable), $briefing->entryFor(SourceName::OnThisDay)->lastFailure);
     }
 
+    public function testOpensTheCircuitAfterThreeOutagesAndThenSkipsTheSource(): void
+    {
+        // Given
+        $clock = new MockClock(self::NOW);
+        $breaker = self::breaker($clock);
+        self::openCircuitOfOnThisDay($clock, $breaker);
+        $requests = 0;
+        $logs = new TestHandler();
+
+        // When
+        $briefing = self::aggregator([new StubSource(SourceName::OnThisDay, self::counting($requests, self::pendingFetch(...)))], $clock, new Logger('briefing', [$logs]), $breaker)->briefingFor(self::day(), self::warsaw());
+
+        // Then
+        self::assertSame(CircuitState::Open, $breaker->state(SourceName::OnThisDay));
+        self::assertSame(0, $requests);
+        self::assertEquals([SourceResult::circuitOpen(SourceName::OnThisDay)], $briefing->failures());
+        self::assertEquals(SourceEntry::missing(SourceName::OnThisDay, new SourceFailure(FailureKind::CircuitOpen), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
+        self::assertFalse($briefing->hasFetched());
+        self::assertSame([], $logs->getRecords());
+        self::assertSame([], self::testService(SnapshotRefresher::class)->storedFor([new SnapshotScope(SourceName::OnThisDay, '11-20', null)]));
+    }
+
+    public function testServesStoredDataAsStaleWithoutSavingTheRefusal(): void
+    {
+        // Given
+        $clock = new MockClock(self::NOW);
+        $breaker = self::breaker($clock);
+        $interval = new \DateInterval('PT1H');
+        self::aggregator([new StubSource(SourceName::OnThisDay, static fn (): PendingFetch => self::pendingFetch(), true, $interval)], $clock, breaker: $breaker)->briefingFor(self::day(), self::warsaw());
+        $fetchedAt = $clock->now();
+        $clock->modify('+1 hour');
+        self::openCircuitOfOnThisDay($clock, $breaker);
+
+        // When
+        $briefing = self::aggregator([new StubSource(SourceName::OnThisDay, self::unrequested(), true, $interval)], $clock, breaker: $breaker)->briefingFor(self::day(), self::warsaw());
+
+        // Then
+        self::assertEquals(SourceEntry::stale(SourceName::OnThisDay, SourcePayloads::onThisDayFeed(), $fetchedAt, new SourceFailure(FailureKind::CircuitOpen), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
+        self::assertTrue($briefing->hasAnyData());
+        $stored = self::testService(SnapshotRefresher::class)->storedFor([new SnapshotScope(SourceName::OnThisDay, '11-20', null)]);
+        $snapshot = $stored[SourceName::OnThisDay->value] ?? null;
+        self::assertEquals([$fetchedAt, null], [$snapshot?->lastAttemptAt, $snapshot?->lastError]);
+    }
+
+    public function testLetsOneTrialThroughAfterTheOpeningAndClosesTheCircuitOnItsSuccess(): void
+    {
+        // Given
+        $clock = new MockClock(self::NOW);
+        $breaker = self::breaker($clock);
+        self::openCircuitOfOnThisDay($clock, $breaker);
+        $clock->modify('+60 seconds');
+        $requests = 0;
+
+        // When
+        $briefing = self::aggregator([new StubSource(SourceName::OnThisDay, self::counting($requests, self::pendingFetch(...)))], $clock, breaker: $breaker)->briefingFor(self::day(), self::warsaw());
+
+        // Then
+        self::assertSame(1, $requests);
+        self::assertSame(CircuitState::Closed, $breaker->state(SourceName::OnThisDay));
+        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, SourcePayloads::onThisDayFeed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
+    }
+
+    public function testAsksTheBreakerOnlyForTheSourcesThePolicyFetches(): void
+    {
+        // Given
+        $clock = new MockClock(self::NOW);
+        $breaker = self::breaker($clock);
+        self::aggregator([new StubSource(SourceName::OnThisDay, static fn (): PendingFetch => self::pendingFetch())], $clock, breaker: $breaker)->briefingFor(self::day(), self::warsaw());
+        self::openCircuitOfOnThisDay($clock, $breaker);
+        $clock->modify('+60 seconds');
+
+        // When
+        $briefing = self::aggregator([new StubSource(SourceName::OnThisDay, self::unrequested())], $clock, breaker: $breaker)->briefingFor(self::day(), self::warsaw());
+
+        // Then
+        self::assertSame([], $briefing->failures());
+        self::assertSame(CircuitPermit::Trial, $breaker->tryAcquire(SourceName::OnThisDay));
+    }
+
+    public function testCountsTheOutagesInTheCircuitEvenWhenTheyCannotBeSaved(): void
+    {
+        // Given
+        $clock = new MockClock(self::NOW);
+        $breaker = self::breaker($clock);
+        $unsavable = new SnapshotScope(SourceName::OnThisDay, '11-20', self::day());
+
+        // When
+        foreach (range(1, 3) as $attempt) {
+            try {
+                self::aggregator([new StubSource(SourceName::OnThisDay, static fn (): PendingFetch => self::failingFetch(), scope: $unsavable)], $clock, breaker: $breaker)->briefingFor(self::day(), self::warsaw());
+                self::fail('A failed save must reach the caller.');
+            } catch (\Doctrine\DBAL\Exception) {
+            }
+        }
+
+        // Then
+        self::assertSame(CircuitState::Open, $breaker->state(SourceName::OnThisDay));
+    }
+
+    public function testSkipsOnlyTheSourceWhoseCircuitIsOpen(): void
+    {
+        // Given
+        $clock = new MockClock(self::NOW);
+        $breaker = self::breaker($clock);
+        self::openCircuitOfOnThisDay($clock, $breaker);
+
+        // When
+        $briefing = self::aggregator([new StubSource(SourceName::Apod, static fn (): PendingFetch => self::pendingFetch(SourceName::Apod)), new StubSource(SourceName::OnThisDay, self::unrequested())], $clock, breaker: $breaker)->briefingFor(self::day(), self::warsaw());
+
+        // Then
+        self::assertTrue($briefing->entryFor(SourceName::Apod)->hasData());
+        self::assertEquals([SourceResult::circuitOpen(SourceName::OnThisDay)], $briefing->failures());
+        self::assertTrue($briefing->hasFetched());
+    }
+
     /**
      * @param list<Source> $sources
      */
-    private static function aggregator(array $sources, MockClock $clock, LoggerInterface $logger = new NullLogger()): BriefingAggregator
+    private static function aggregator(array $sources, MockClock $clock, LoggerInterface $logger = new NullLogger(), ?CircuitBreaker $breaker = null): BriefingAggregator
     {
-        return new BriefingAggregator($sources, new ConcurrentFetcher(new MockHttpClient(), $clock, new NullLogger(), 3.5), $clock, new SourceFailureLog($logger), self::testService(SnapshotRefresher::class), new RefreshPolicy());
+        return new BriefingAggregator($sources, new ConcurrentFetcher(new MockHttpClient(), $clock, new NullLogger(), 3.5), $clock, new SourceFailureLog($logger), self::testService(SnapshotRefresher::class), new RefreshPolicy(), $breaker ?? self::breaker($clock));
+    }
+
+    private static function breaker(MockClock $clock): CircuitBreaker
+    {
+        return new CircuitBreaker(new InMemoryCircuitBreakerStore($clock), $clock);
+    }
+
+    /**
+     * @return \Closure(): PendingFetch
+     */
+    private static function counting(int &$requests, \Closure $fetch): \Closure
+    {
+        return static function () use (&$requests, $fetch): PendingFetch {
+            ++$requests;
+
+            return $fetch();
+        };
+    }
+
+    private static function openCircuitOfOnThisDay(MockClock $clock, CircuitBreaker $breaker): void
+    {
+        foreach (['01-01', '01-02', '01-03'] as $day) {
+            self::aggregator([new StubSource(SourceName::OnThisDay, static fn (): PendingFetch => self::failingFetch(), scope: new SnapshotScope(SourceName::OnThisDay, $day, null))], $clock, breaker: $breaker)->briefingFor(self::day(), self::warsaw());
+        }
     }
 
     private static function pendingFetch(SourceName $source = SourceName::OnThisDay): PendingFetch

@@ -8,4 +8,5 @@ enum ProblemTiming
 {
     case FailedNow;
     case InPause;
+    case Skipped;
 }

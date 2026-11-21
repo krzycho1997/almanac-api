@@ -43,4 +43,30 @@ final class SourceEntryTest extends TestCase
         yield 'missing' => [SourceEntry::missing(SourceName::Weather, $failure, $attemptedAt), [false, true, null, '12:00'], FailureOutcome::Missing];
         yield 'not applicable' => [SourceEntry::notApplicable(SourceName::Weather), [false, false, null, null], FailureOutcome::Missing];
     }
+
+    #[DataProvider('refusals')]
+    public function testKeepsTheDataOfARefusedSourceAndTellsWhenItWasRefused(SourceEntry $entry, SourceEntry $expected): void
+    {
+        // When
+        $refused = $entry->refusedAt(new \DateTimeImmutable(self::ATTEMPTED_AT));
+
+        // Then
+        self::assertEquals($expected, $refused);
+    }
+
+    /**
+     * @return iterable<string, array{SourceEntry, SourceEntry}>
+     */
+    public static function refusals(): iterable
+    {
+        $fetchedAt = new \DateTimeImmutable(self::FETCHED_AT);
+        $refusedAt = new \DateTimeImmutable(self::ATTEMPTED_AT);
+        $circuitOpen = new SourceFailure(FailureKind::CircuitOpen);
+        $earlier = new SourceFailure(FailureKind::Unavailable, 503);
+
+        yield 'fresh' => [SourceEntry::fresh(SourceName::Weather, SourcePayloads::dailyWeather(), $fetchedAt), SourceEntry::stale(SourceName::Weather, SourcePayloads::dailyWeather(), $fetchedAt, $circuitOpen, $refusedAt)];
+        yield 'stale' => [SourceEntry::stale(SourceName::Weather, SourcePayloads::dailyWeather(), $fetchedAt, $earlier, $fetchedAt), SourceEntry::stale(SourceName::Weather, SourcePayloads::dailyWeather(), $fetchedAt, $circuitOpen, $refusedAt)];
+        yield 'missing' => [SourceEntry::missing(SourceName::Weather, $earlier, $fetchedAt), SourceEntry::missing(SourceName::Weather, $circuitOpen, $refusedAt)];
+        yield 'not stored' => [SourceEntry::notApplicable(SourceName::Weather), SourceEntry::missing(SourceName::Weather, $circuitOpen, $refusedAt)];
+    }
 }

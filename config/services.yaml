@@ -137,6 +137,10 @@ when@test:
             public: true
             arguments: ['@.inner']
 
+        App\Briefing\CircuitBreaker\CircuitBreakerStore:
+            class: App\Tests\Support\Briefing\CircuitBreaker\InMemoryCircuitBreakerStore
+            arguments: ['@clock']
+
         test.identity.access_token_handler:
             alias: App\Identity\Security\AccessTokenHandler
             public: true

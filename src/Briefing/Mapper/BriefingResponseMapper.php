@@ -121,7 +121,7 @@ final readonly class BriefingResponseMapper
     private static function error(FailureKind $kind): SourceError
     {
         return match ($kind) {
-            FailureKind::Unavailable => SourceError::Unavailable,
+            FailureKind::Unavailable, FailureKind::CircuitOpen => SourceError::Unavailable,
             FailureKind::RateLimited => SourceError::RateLimited,
             FailureKind::Rejected => SourceError::Rejected,
             FailureKind::Misconfigured => SourceError::Misconfigured,

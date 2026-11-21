@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Briefing\Functional;
 
+use App\Briefing\CircuitBreaker\CircuitBreakerStore;
 use App\Shared\ErrorHandler\ProblemJsonErrorRenderer;
 use App\Tests\Support\Briefing\UpstreamMock;
 use App\Tests\Support\Briefing\UpstreamMockResponseFactory;
@@ -447,6 +448,61 @@ final class BriefingControllerTest extends FunctionalTestCase
         self::assertSame([], self::recordsOf(self::BRIEFING_CHANNEL));
     }
 
+    public function testSkipsNasaWhileItsCircuitIsOpen(): void
+    {
+        // Given
+        self::openCircuit('apod', '2026-11-18 12:01:00');
+        self::upstream()->respondWith(self::scenario());
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        $briefing = self::json($this->client->getResponse()->getContent());
+        self::assertSame(['apod' => self::failed('unavailable'), 'onThisDay' => self::FRESH, 'weather' => self::FRESH], $briefing['sources']);
+        self::assertSame(['apod'], $briefing['missing']);
+        self::assertSame([], self::requestedHosts(self::NASA_HOST));
+        self::assertSame([], self::recordsOf(self::BRIEFING_CHANNEL));
+        self::assertSame([], self::testService(Connection::class)->fetchFirstColumn("SELECT scope_key FROM briefing_source_snapshot WHERE source = 'apod'"));
+    }
+
+    public function testServesTheLastGoodWeatherAsStaleWhileItsCircuitIsOpen(): void
+    {
+        // Given
+        self::upstream()->respondWith(UpstreamMock::create()->onThisDayFrom(self::HISTORY_DAY)->forecastOn(self::UNPUBLISHED_DAY));
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::UNPUBLISHED_DAY);
+        $weather = self::json($this->client->getResponse()->getContent())['weather'];
+        self::mockTime(new \DateTimeImmutable('2026-11-18 13:00:00', new \DateTimeZone(self::TIMEZONE)));
+        self::openCircuit('weather', '2026-11-18 13:01:00');
+        self::upstream()->respondWith(UpstreamMock::create());
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::UNPUBLISHED_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        $briefing = self::json($this->client->getResponse()->getContent());
+        self::assertSame(['apod' => self::NOT_APPLICABLE, 'onThisDay' => self::FRESH, 'weather' => ['status' => 'ok', 'fetchedAt' => '2026-11-18T12:00:00Z', 'stale' => true, 'error' => 'unavailable', 'lastAttemptAt' => '2026-11-18T13:00:00Z']], $briefing['sources']);
+        self::assertSame($weather, $briefing['weather']);
+        self::assertSame([], self::upstream()->served());
+    }
+
+    public function testAsksNasaAgainOnceTheOpeningIsOver(): void
+    {
+        // Given
+        self::openCircuit('apod', '2026-11-18 11:59:00');
+        self::upstream()->respondWith(self::scenario()->apod()->fixture(self::PICTURE));
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        self::assertSame(self::ALL_FRESH, self::json($this->client->getResponse()->getContent())['sources']);
+        self::assertNull(self::testService(CircuitBreakerStore::class)->openUntil('apod'));
+    }
+
     public function testMarksThePictureNotApplicableWithoutAskingNasa(): void
     {
         // Given
@@ -675,6 +731,11 @@ final class BriefingControllerTest extends FunctionalTestCase
     private static function failed(string $error): array
     {
         return ['status' => 'failed', 'error' => $error, 'lastAttemptAt' => self::LAST_ATTEMPT];
+    }
+
+    private static function openCircuit(string $circuit, string $until): void
+    {
+        self::testService(CircuitBreakerStore::class)->open($circuit, new \DateTimeImmutable($until, new \DateTimeZone(self::TIMEZONE)));
     }
 
     private static function onThisDayRejected(): UpstreamMock

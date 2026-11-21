@@ -89,9 +89,11 @@ final class BriefingResponseSchemaTest extends KernelTestCase
      */
     public static function sourcesWithoutData(): iterable
     {
-        foreach (FailureKind::cases() as $kind) {
+        foreach (array_filter(FailureKind::cases(), static fn (FailureKind $kind): bool => FailureKind::CircuitOpen !== $kind) as $kind) {
             yield $kind->value => [BriefingResultBuilder::create()->failed(SourceName::Apod, $kind)->failed(SourceName::OnThisDay, $kind)->failed(SourceName::Weather, $kind), ['status' => 'failed', 'error' => $kind->value, 'lastAttemptAt' => '2026-11-18T11:00:00Z']];
         }
+
+        yield 'circuit open' => [BriefingResultBuilder::create()->failed(SourceName::Apod, FailureKind::CircuitOpen)->failed(SourceName::OnThisDay, FailureKind::CircuitOpen)->failed(SourceName::Weather, FailureKind::CircuitOpen), ['status' => 'failed', 'error' => 'unavailable', 'lastAttemptAt' => '2026-11-18T11:00:00Z']];
 
         yield 'not applicable' => [BriefingResultBuilder::create()->notApplicable(SourceName::Apod)->notApplicable(SourceName::OnThisDay)->notApplicable(SourceName::Weather), ['status' => 'not_applicable']];
     }

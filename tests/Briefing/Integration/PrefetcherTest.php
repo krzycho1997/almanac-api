@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Briefing\Integration;
 
 use App\Briefing\BriefingResult;
+use App\Briefing\CircuitBreaker\CircuitBreakerStore;
 use App\Briefing\DateRange;
 use App\Briefing\FailureKind;
 use App\Briefing\Location;
@@ -114,6 +115,24 @@ final class PrefetcherTest extends KernelTestCase
         self::assertSame([false, true], array_map(static fn (BriefingResult $briefing): bool => $briefing->hasFetched(), $briefings));
         self::assertEquals(new \DateTimeImmutable(self::NOW), Clock::get()->now());
         self::assertSame([], self::upstream()->unserved());
+    }
+
+    public function testDoesNotPauseAfterADateWhoseSourcesWereAllSkippedByOpenCircuits(): void
+    {
+        // Given
+        foreach (SourceName::cases() as $source) {
+            self::testService(CircuitBreakerStore::class)->open($source->value, new \DateTimeImmutable(self::NOW)->modify('+1 minute'));
+        }
+        self::upstream()->respondWith(UpstreamMock::create());
+
+        // When
+        $briefings = iterator_to_array(self::prefetcher()->prefetch(self::range('2024-03-15', '2024-03-16'), self::warsaw(), 2000), false);
+
+        // Then
+        self::assertSame([[false, 3], [false, 3]], array_map(static fn (BriefingResult $briefing): array => [$briefing->hasFetched(), \count($briefing->failures())], $briefings));
+        self::assertEquals(new \DateTimeImmutable(self::NOW), Clock::get()->now());
+        self::assertSame([], self::upstream()->served());
+        self::assertSame(['failures' => 0, 'problems' => 6], array_intersect_key(self::summaries()[0]->context, ['failures' => true, 'problems' => true]));
     }
 
     public function testLogsTheDatesDoneWhenTheCallerStopsEarly(): void

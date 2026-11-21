@@ -46,7 +46,7 @@ final readonly class BriefingResult
 
     public function hasFetched(): bool
     {
-        return [] !== $this->results;
+        return array_any($this->results, static fn (SourceResult $result): bool => $result->calledUpstream());
     }
 
     public function entryFor(SourceName $source): SourceEntry
@@ -74,7 +74,7 @@ final readonly class BriefingResult
 
         foreach ($this->results as $result) {
             if ($result->hasFailed()) {
-                $problems[] = new BriefingProblem($result->source, $result->failure, ProblemTiming::FailedNow);
+                $problems[] = new BriefingProblem($result->source, $result->failure, self::timingOf($result));
             }
         }
 
@@ -107,5 +107,14 @@ final readonly class BriefingResult
         }
 
         return false;
+    }
+
+    private static function timingOf(SourceResult $result): ProblemTiming
+    {
+        if ($result->calledUpstream()) {
+            return ProblemTiming::FailedNow;
+        }
+
+        return ProblemTiming::Skipped;
     }
 }

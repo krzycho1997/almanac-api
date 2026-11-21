@@ -30,5 +30,6 @@ final class FailureKindTest extends TestCase
         yield 'rejected' => [FailureKind::Rejected, 'rejected', LogLevel::NOTICE, false];
         yield 'misconfigured' => [FailureKind::Misconfigured, 'misconfigured', LogLevel::ERROR, false];
         yield 'invalid payload' => [FailureKind::InvalidPayload, 'invalid_payload', LogLevel::ERROR, false];
+        yield 'circuit open' => [FailureKind::CircuitOpen, 'circuit_open', LogLevel::DEBUG, false];
     }
 }

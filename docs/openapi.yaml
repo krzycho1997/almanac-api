@@ -504,7 +504,7 @@ components:
           type: string
           format: date-time
           pattern: 'Z$'
-          description: When the failed refresh was attempted; present only when stale.
+          description: When the failed refresh was attempted, or skipped while the source was unavailable; present only when stale.
     SourceFailed:
       type: object
       additionalProperties: false
@@ -521,6 +521,7 @@ components:
           type: string
           format: date-time
           pattern: 'Z$'
+          description: When the failed refresh was attempted, or skipped while the source was unavailable.
     SourceNotApplicable:
       type: object
       additionalProperties: false

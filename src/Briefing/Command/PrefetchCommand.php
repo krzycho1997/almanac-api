@@ -26,6 +26,7 @@ final readonly class PrefetchCommand
     private const string NO_STATUS = '-';
     private const string FAILED_NOW = 'now';
     private const string IN_PAUSE = 'earlier, in pause';
+    private const string SKIPPED = 'skipped, circuit open';
 
     public function __construct(
         private Prefetcher $prefetcher,
@@ -90,6 +91,7 @@ final readonly class PrefetchCommand
         return match ($timing) {
             ProblemTiming::FailedNow => self::FAILED_NOW,
             ProblemTiming::InPause => self::IN_PAUSE,
+            ProblemTiming::Skipped => self::SKIPPED,
         };
     }
 

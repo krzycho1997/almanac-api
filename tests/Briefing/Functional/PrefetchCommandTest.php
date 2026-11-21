@@ -110,6 +110,29 @@ final class PrefetchCommandTest extends KernelTestCase
         self::assertStringContainsString('Prefetched dates: 1, problems: 1.', $result->getDisplay());
     }
 
+    public function testReportsASourceSkippedByItsOpenCircuitAsAProblem(): void
+    {
+        // Given
+        self::upstream()->respondWith(UpstreamMock::create()
+            ->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)
+            ->onThisDayFrom('03-15')->archiveOn('2024-03-15')
+            ->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)
+            ->onThisDayFrom('03-15')->archiveOn('2024-03-16')
+            ->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)
+            ->onThisDayFrom('03-15')->archiveOn('2024-03-17')
+            ->onThisDayFrom('03-15')->archiveOn('2024-03-18'));
+
+        // When
+        $result = self::runCommand(self::COMMAND, ['from' => '2024-03-15', 'to' => '2024-03-18']);
+
+        // Then
+        $this->assertCommandFailed($result, $result->getDisplay());
+        self::assertMatchesRegularExpression('/2024-03-17\s+apod\s+unavailable\s+503\s+now/', $result->getDisplay());
+        self::assertMatchesRegularExpression('/2024-03-18\s+apod\s+circuit_open\s+-\s+skipped, circuit open/', $result->getDisplay());
+        self::assertStringContainsString('Prefetched dates: 4, problems: 4.', $result->getDisplay());
+        self::assertSame([], self::upstream()->unserved());
+    }
+
     /**
      * @param array<string, string> $input
      */

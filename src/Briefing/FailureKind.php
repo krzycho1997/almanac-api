@@ -13,6 +13,7 @@ enum FailureKind: string
     case Rejected = 'rejected';
     case Misconfigured = 'misconfigured';
     case InvalidPayload = 'invalid_payload';
+    case CircuitOpen = 'circuit_open';
 
     /**
      * @return LogLevel::*
@@ -23,6 +24,7 @@ enum FailureKind: string
             self::Unavailable, self::RateLimited => LogLevel::WARNING,
             self::Rejected => LogLevel::NOTICE,
             self::Misconfigured, self::InvalidPayload => LogLevel::ERROR,
+            self::CircuitOpen => LogLevel::DEBUG,
         };
     }
 
@@ -30,7 +32,7 @@ enum FailureKind: string
     {
         return match ($this) {
             self::Unavailable, self::RateLimited => true,
-            self::Rejected, self::Misconfigured, self::InvalidPayload => false,
+            self::Rejected, self::Misconfigured, self::InvalidPayload, self::CircuitOpen => false,
         };
     }
 }
