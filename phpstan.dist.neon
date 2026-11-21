@@ -29,6 +29,10 @@ rules:
 
 services:
     -
+        factory: PHPStan\Type\Doctrine\Descriptors\ReflectionDescriptor('App\Bookmark\Doctrine\BookmarkIdType')
+        tags:
+            - phpstan.doctrine.typeDescriptor
+    -
         factory: PHPStan\Type\Doctrine\Descriptors\ReflectionDescriptor('App\Briefing\Contract\DiscoveryIdType')
         tags:
             - phpstan.doctrine.typeDescriptor
