@@ -32,6 +32,7 @@ final class CreateBookmarkTest extends FunctionalTestCase
     private const string CONTENT_TYPE = 'CONTENT_TYPE';
     private const string CONTENT_TYPE_HEADER = 'Content-Type';
     private const string DISCOVERY_ID = 'discoveryId';
+    private const string USER_ID = 'userId';
     private const string VIOLATIONS = 'violations';
     private const string PROPERTY_PATH = 'propertyPath';
 
@@ -141,6 +142,21 @@ final class CreateBookmarkTest extends FunctionalTestCase
         // Then
         self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
         $this->assertViolationOfTheDiscoveryId();
+    }
+
+    public function testRefusesAFieldTheBodyDoesNotDefineWithAViolation(): void
+    {
+        // Given
+        [, $authorization] = self::signedIn(self::ADA);
+
+        // When
+        $this->post([self::DISCOVERY_ID => self::PICTURE, self::USER_ID => 'someone-else'], $authorization);
+
+        // Then
+        self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $problem = self::json((string) $this->client->getResponse()->getContent());
+        self::assertIsArray($problem[self::VIOLATIONS] ?? null);
+        self::assertSame([self::USER_ID], array_column($problem[self::VIOLATIONS], self::PROPERTY_PATH));
     }
 
     public function testRefusesMalformedJson(): void
