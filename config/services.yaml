@@ -2,7 +2,7 @@
 
 parameters:
     app.briefing.retry_delay_ms: 250
-    app.briefing.fetch_deadline_seconds: 3.5
+    app.briefing.fetch_deadline_seconds: 8.5
     app.briefing.messenger.wait_spread_ms: 30000
 
 services:

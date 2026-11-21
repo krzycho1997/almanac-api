@@ -26,6 +26,7 @@ framework:
             wikipedia.client:
                 base_uri: '%env(WIKIPEDIA_BASE_URI)%'
                 <<: *upstream_options
+                max_duration: 8
                 headers: &almanac_headers
                     User-Agent: '%env(ALMANAC_USER_AGENT)%'
             open_meteo.client:

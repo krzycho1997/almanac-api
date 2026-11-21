@@ -15,8 +15,8 @@ enum Metric: string
     case CircuitTransitions = 'circuit_transitions_total';
     case MessengerFailedMessages = 'messenger_failed_messages';
 
-    private const array HTTP_BUCKETS = [0.025, 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 10, 30];
-    private const array UPSTREAM_BUCKETS = [0.1, 0.25, 0.5, 1, 1.5, 2, 3, 3.5];
+    private const array HTTP_BUCKETS = [0.025, 0.05, 0.1, 0.25, 0.5, 1, 2, 4, 9, 30];
+    private const array UPSTREAM_BUCKETS = [0.1, 0.25, 0.5, 1, 1.5, 2, 3, 5, 8, 8.5];
 
     public function help(): string
     {
