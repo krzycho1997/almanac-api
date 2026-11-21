@@ -1,0 +1,16 @@
+README.md
+  h_2da2cad4b4f8df 180
+docs/SPEC.md
+  h_2da2cad4b4f8df 32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e749cd25585d7779435c09bf1b85beed85ed01e7",
+  "prompts": {},
+  "humans": {
+    "h_2da2cad4b4f8df": {
+      "author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
