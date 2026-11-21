@@ -9,8 +9,11 @@ use App\Shared\RequestId\RequestIdListener;
 use App\Tests\Support\OpenApi\OpenApiDocument;
 use cebe\openapi\spec\Response;
 use cebe\openapi\spec\Schema;
+use League\OpenAPIValidation\Schema\Exception\SchemaMismatch;
+use League\OpenAPIValidation\Schema\SchemaValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Yaml\Yaml;
 
 final class OpenApiDocumentTest extends TestCase
 {
@@ -20,6 +23,14 @@ final class OpenApiDocumentTest extends TestCase
     private const array ERROR_RANGES = ['4', '5'];
     private const string TYPE = 'type';
     private const array COMPOSITIONS = ['oneOf', 'anyOf', 'allOf'];
+    private const string POINTER_SEPARATOR = '/';
+    private const array FIXTURE_DATES = [
+        '/paths//items/get/responses/200/content/application/json/example/day',
+        '/paths//items/get/responses/200/content/application/json/examples/unquotedDate/value/day',
+        '/paths//items/post/requestBody/content/application/json/examples/unquotedDate/value/day',
+        '/components/examples/UnquotedDate/value/day',
+        '/components/schemas/Day/properties/day/example',
+    ];
 
     /**
      * @param list<string> $expected
@@ -85,6 +96,123 @@ final class OpenApiDocumentTest extends TestCase
     {
         yield 'openapi.yaml' => [OpenApiDocument::instance(), []];
         yield 'rule-breaking fixture' => [OpenApiDocument::fromFile(self::RULE_BREAKING), ['UntypedChoice']];
+    }
+
+    /**
+     * @param list<string> $expected
+     */
+    #[DataProvider('documentsWithExamplesOutsideTheirSchema')]
+    public function testGivesOnlyExamplesThatMatchTheirSchemaAfterPhpParsesTheYaml(OpenApiDocument $document, array $expected): void
+    {
+        // When
+        $invalid = [
+            ...array_keys(array_filter($document->requestExamples(), self::breaksItsRequestSchema(...))),
+            ...array_keys(array_filter($document->responseExamples(), self::breaksItsResponseSchema(...))),
+        ];
+
+        // Then
+        self::assertSame($expected, $invalid);
+    }
+
+    /**
+     * @return iterable<string, array{OpenApiDocument, list<string>}>
+     */
+    public static function documentsWithExamplesOutsideTheirSchema(): iterable
+    {
+        yield 'openapi.yaml' => [OpenApiDocument::instance(), []];
+        yield 'rule-breaking fixture' => [OpenApiDocument::fromFile(self::RULE_BREAKING), [
+            'post /items request application/json unquotedDate',
+            'get /items 200 application/json example',
+            'get /items 200 application/json unquotedDate',
+            'get /items 200 application/json sharedUnquotedDate',
+        ]];
+    }
+
+    /**
+     * @param list<string> $expected
+     */
+    #[DataProvider('documentsWithDatesThatPhpWouldNotKeepAsText')]
+    public function testKeepsEveryDateAsTextWhenPhpParsesTheYaml(string $path, array $expected): void
+    {
+        // Given
+        $tree = Yaml::parseFile($path, Yaml::PARSE_OBJECT_FOR_MAP | Yaml::PARSE_DATETIME);
+
+        // When
+        $dates = self::datesIn($tree, '');
+
+        // Then
+        self::assertSame($expected, $dates);
+    }
+
+    /**
+     * @return iterable<string, array{string, list<string>}>
+     */
+    public static function documentsWithDatesThatPhpWouldNotKeepAsText(): iterable
+    {
+        yield 'openapi.yaml' => [OpenApiDocument::PATH, []];
+        yield 'rule-breaking fixture' => [self::RULE_BREAKING, self::FIXTURE_DATES];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function datesIn(mixed $node, string $at): array
+    {
+        if ($node instanceof \DateTimeInterface) {
+            return [$at];
+        }
+
+        if (\is_array($node) || $node instanceof \stdClass) {
+            return self::datesUnder((array) $node, $at);
+        }
+
+        return [];
+    }
+
+    /**
+     * @param array<array-key, mixed> $children
+     *
+     * @return list<string>
+     */
+    private static function datesUnder(array $children, string $at): array
+    {
+        $dates = [];
+
+        foreach ($children as $key => $child) {
+            array_push($dates, ...self::datesIn($child, $at.self::POINTER_SEPARATOR.$key));
+        }
+
+        return $dates;
+    }
+
+    /**
+     * @param array{mixed, Schema} $example
+     */
+    private static function breaksItsRequestSchema(array $example): bool
+    {
+        return self::breaksItsSchema($example, SchemaValidator::VALIDATE_AS_REQUEST);
+    }
+
+    /**
+     * @param array{mixed, Schema} $example
+     */
+    private static function breaksItsResponseSchema(array $example): bool
+    {
+        return self::breaksItsSchema($example, SchemaValidator::VALIDATE_AS_RESPONSE);
+    }
+
+    /**
+     * @param array{mixed, Schema} $example
+     */
+    private static function breaksItsSchema(array $example, int $direction): bool
+    {
+        try {
+            new SchemaValidator($direction)->validate($example[0], $example[1]);
+        } catch (SchemaMismatch) {
+            return true;
+        }
+
+        return false;
     }
 
     private static function isUntypedComposition(Schema $schema): bool

@@ -7,6 +7,8 @@ info:
     name: Proprietary
     url: https://github.com/krzycho1997/almanac-api
 servers:
+  - url: /
+    description: The host that serves this document
   - url: http://127.0.0.1:8080
     description: Local Docker Compose stack
 tags:
@@ -14,6 +16,8 @@ tags:
     description: Discoveries the user keeps, behind a Bearer token
   - name: briefing
     description: Daily briefing for a date
+  - name: docs
+    description: This API description
   - name: health
     description: Liveness of the application
 paths:
@@ -21,6 +25,7 @@ paths:
     get:
       operationId: getHealth
       summary: Report that the application is up
+      description: Answers 200 with status ok whenever the application can answer, with the state of each source's circuit breaker as Redis holds it; an open circuit never changes the status code, and while Redis is unreachable every circuit is reported closed. Nothing is cached, and only a failure of the application itself answers 500.
       tags: [health]
       security: []
       responses:
@@ -33,12 +38,56 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Health'
+              examples:
+                everyCircuitClosed:
+                  summary: Every source is reachable
+                  value:
+                    status: ok
+                    checks:
+                      circuits:
+                        apod: closed
+                        onThisDay: closed
+                        weather: closed
+                weatherCircuitOpen:
+                  summary: 'Open-Meteo keeps failing, so its circuit is open; the status stays ok'
+                  value:
+                    status: ok
+                    checks:
+                      circuits:
+                        apod: closed
+                        onThisDay: closed
+                        weather: open
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/docs.json:
+    get:
+      operationId: getOpenApiDocument
+      summary: Serve this OpenAPI document as JSON
+      description: This document as JSON, converted from docs/openapi.yaml on each request so it never differs from the file the tests validate against. Clients may cache it for five minutes; only a failure of the application answers 500.
+      tags: [docs]
+      security: []
+      externalDocs:
+        description: JSON Schema of OpenAPI 3.0 documents
+        url: https://spec.openapis.org/oas/3.0/schema/2024-10-18
+      responses:
+        '200':
+          description: This document, converted from docs/openapi.yaml.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+            Cache-Control:
+              $ref: '#/components/headers/PublicCache'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenApiDocument'
         '500':
           $ref: '#/components/responses/InternalServerError'
   /api/briefings/{date}:
     get:
       operationId: getBriefing
       summary: Build the briefing for a date
+      description: Combines NASA's Astronomy Picture of the Day, Wikipedia's On This Day and the Open-Meteo weather for the date and place, by default the one in ALMANAC_DEFAULT_LAT and ALMANAC_DEFAULT_LON (Warsaw in .env). Each source's data is stored in PostgreSQL; the picture and On This Day are kept once fetched, the weather is fetched again after an hour until the day is past, and a source that fails is tried again no sooner than ten minutes later and only when its circuit breaker lets calls through, meanwhile serving its last good data marked stale. A source without data is listed in missing and the answer is still 200; it is 502 only when no source has data, 400 for a date that is not a calendar date in Y-m-d, 422 for a date outside the window or invalid coordinates, and 429 above 60 requests a minute from one client.
       tags: [briefing]
       security: []
       parameters:
@@ -77,6 +126,181 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Briefing'
+              examples:
+                everySourceOk:
+                  summary: 'Warsaw, the default place, with every source; each list trimmed to two of its items'
+                  value:
+                    date: '2024-03-15'
+                    location:
+                      latitude: 52.23
+                      longitude: 21.01
+                      name: Warsaw
+                      isDefault: true
+                    sources:
+                      apod:
+                        status: ok
+                        fetchedAt: '2026-11-18T12:00:00Z'
+                        stale: false
+                      onThisDay:
+                        status: ok
+                        fetchedAt: '2026-11-18T12:00:00Z'
+                        stale: false
+                      weather:
+                        status: ok
+                        fetchedAt: '2026-11-18T12:00:00Z'
+                        stale: false
+                    missing: []
+                    apod:
+                      discoveryId: c05f9b6a-9262-5859-b45d-743a62e1bc6e
+                      title: Portrait of NGC 1055
+                      explanation: 'Big, beautiful spiral galaxy NGC 1055 is a dominant member of a small galaxy group a mere 60 million light-years away toward the aquatically intimidating constellation Cetus.'
+                      mediaType: image
+                      url: 'https://assets.science.nasa.gov/dynamicimage/assets/science/cds/apod/apod/2024/march/Image133k_n1055.jpg?w=2730&h=2298&fit=clip'
+                      hdUrl: 'https://assets.science.nasa.gov/dynamicimage/assets/science/cds/apod/apod/2024/march/Image133k_n1055.jpg?w=2730&h=2298&fit=clip'
+                      credit: 'Image Credit & Copyright: Dave Doctor'
+                    events:
+                      - discoveryId: '060e8d09-77b0-5b02-a0d1-bbea0eb215d5'
+                        year: 1956
+                        text: 'The musical My Fair Lady, based on George Bernard Shaw''s play Pygmalion, debuted at the Mark Hellinger Theatre in New York City.'
+                        pages:
+                          - title: My Fair Lady
+                            url: 'https://en.wikipedia.org/wiki/My_Fair_Lady'
+                            thumbnail: 'https://upload.wikimedia.org/wikipedia/en/9/97/Myfairlady.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled'
+                          - title: George Bernard Shaw
+                            url: 'https://en.wikipedia.org/wiki/George_Bernard_Shaw'
+                            thumbnail: 'https://thumb.wikimedia.org/wikipedia/en/thumb/3/30/Bernard-Shaw-ILN-1911-original.jpg/330px-Bernard-Shaw-ILN-1911-original.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail'
+                      - discoveryId: cbd9124f-65a1-5e62-9be2-d3263e772687
+                        year: 1927
+                        text: 'In rowing, Oxford defeated Cambridge in the inaugural edition of the Women''s Boat Race.'
+                        pages:
+                          - title: University of Oxford
+                            url: 'https://en.wikipedia.org/wiki/University_of_Oxford'
+                            thumbnail: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/Arms_of_University_of_Oxford.svg/330px-Arms_of_University_of_Oxford.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail'
+                          - title: University of Cambridge
+                            url: 'https://en.wikipedia.org/wiki/University_of_Cambridge'
+                            thumbnail: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Coat_of_Arms_of_the_University_of_Cambridge.svg/330px-Coat_of_Arms_of_the_University_of_Cambridge.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail'
+                    births:
+                      - discoveryId: '052ba15b-74a1-5beb-a7b2-fb0719c1cce9'
+                        year: 1886
+                        name: Gerda Wegener
+                        description: Danish artist (1886–1940)
+                        url: 'https://en.wikipedia.org/wiki/Gerda_Wegener'
+                        thumbnail: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Gerda_Wegener.jpg/330px-Gerda_Wegener.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail'
+                      - discoveryId: '144a7078-7037-5030-802d-79a1fe564b26'
+                        year: 1791
+                        name: Charles Knight
+                        description: English publisher, editor, and author (1791–1873)
+                        url: 'https://en.wikipedia.org/wiki/Charles_Knight_(publisher)'
+                        thumbnail: 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Charlesknight1860s.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled'
+                    deaths:
+                      - discoveryId: d26fba04-358f-539f-b7c7-340aece53578
+                        year: 1575
+                        name: Annibale Padovano
+                        description: Italian composer
+                        url: 'https://en.wikipedia.org/wiki/Annibale_Padovano'
+                        thumbnail: null
+                      - discoveryId: '30ad2d96-39f2-514a-806e-58f2041d1ce6'
+                        year: -44
+                        name: Julius Caesar
+                        description: Roman general and dictator (100–44 BC)
+                        url: 'https://en.wikipedia.org/wiki/Julius_Caesar'
+                        thumbnail: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/Retrato_de_Julio_C%C3%A9sar_%2826724093101%29_%28cropped%29.jpg/330px-Retrato_de_Julio_C%C3%A9sar_%2826724093101%29_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail'
+                    weather:
+                      kind: final
+                      timezone: Europe/Warsaw
+                      temperatureMin: 1.7
+                      temperatureMax: 10.0
+                      precipitationSum: 0.0
+                      windSpeedMax: 18.5
+                      weatherCode: 3
+                      description: Overcast
+                      sunrise: '2024-03-15T05:49:42+01:00'
+                      sunset: '2024-03-15T17:41:12+01:00'
+                      daylightDuration: 42700
+                    attributions:
+                      - source: apod
+                        name: Astronomy Picture of the Day
+                        url: 'https://apod.nasa.gov/'
+                        license: null
+                        licenseUrl: null
+                        modified: true
+                        notice: null
+                      - source: onThisDay
+                        name: Wikipedia
+                        url: 'https://en.wikipedia.org/'
+                        license: CC BY-SA 4.0
+                        licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/'
+                        modified: true
+                        notice: null
+                      - source: weather
+                        name: Open-Meteo
+                        url: 'https://open-meteo.com/'
+                        license: CC BY 4.0
+                        licenseUrl: 'https://creativecommons.org/licenses/by/4.0/'
+                        modified: true
+                        notice: Generated using Copernicus Climate Change Service information
+                onThisDayUnavailable:
+                  summary: Warsaw while Wikipedia is unavailable, so the lists are empty
+                  value:
+                    date: '2024-03-15'
+                    location:
+                      latitude: 52.23
+                      longitude: 21.01
+                      name: Warsaw
+                      isDefault: true
+                    sources:
+                      apod:
+                        status: ok
+                        fetchedAt: '2026-11-18T12:00:00Z'
+                        stale: false
+                      onThisDay:
+                        status: failed
+                        error: unavailable
+                        lastAttemptAt: '2026-11-18T12:00:00Z'
+                      weather:
+                        status: ok
+                        fetchedAt: '2026-11-18T12:00:00Z'
+                        stale: false
+                    missing:
+                      - onThisDay
+                    apod:
+                      discoveryId: c05f9b6a-9262-5859-b45d-743a62e1bc6e
+                      title: Portrait of NGC 1055
+                      explanation: 'Big, beautiful spiral galaxy NGC 1055 is a dominant member of a small galaxy group a mere 60 million light-years away toward the aquatically intimidating constellation Cetus.'
+                      mediaType: image
+                      url: 'https://assets.science.nasa.gov/dynamicimage/assets/science/cds/apod/apod/2024/march/Image133k_n1055.jpg?w=2730&h=2298&fit=clip'
+                      hdUrl: 'https://assets.science.nasa.gov/dynamicimage/assets/science/cds/apod/apod/2024/march/Image133k_n1055.jpg?w=2730&h=2298&fit=clip'
+                      credit: 'Image Credit & Copyright: Dave Doctor'
+                    events: []
+                    births: []
+                    deaths: []
+                    weather:
+                      kind: final
+                      timezone: Europe/Warsaw
+                      temperatureMin: 1.7
+                      temperatureMax: 10.0
+                      precipitationSum: 0.0
+                      windSpeedMax: 18.5
+                      weatherCode: 3
+                      description: Overcast
+                      sunrise: '2024-03-15T05:49:42+01:00'
+                      sunset: '2024-03-15T17:41:12+01:00'
+                      daylightDuration: 42700
+                    attributions:
+                      - source: apod
+                        name: Astronomy Picture of the Day
+                        url: 'https://apod.nasa.gov/'
+                        license: null
+                        licenseUrl: null
+                        modified: true
+                        notice: null
+                      - source: weather
+                        name: Open-Meteo
+                        url: 'https://open-meteo.com/'
+                        license: CC BY 4.0
+                        licenseUrl: 'https://creativecommons.org/licenses/by/4.0/'
+                        modified: true
+                        notice: Generated using Copernicus Climate Change Service information
         '400':
           $ref: '#/components/responses/BadRequest'
         '422':
@@ -91,6 +315,7 @@ paths:
     get:
       operationId: listBookmarks
       summary: List the user's bookmarks, newest first
+      description: Pages through the bookmarks of the user the Bearer token belongs to, newest first, each with the discovery it points at as the briefing stored it. nginx adds the header Cache-Control no-store, so nothing is cached. 401 without a valid token, 422 for a page or limit that is not a whole number in range.
       tags: [bookmark]
       security:
         - bearerAuth: []
@@ -123,6 +348,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookmarkList'
+              examples:
+                twoBookmarks:
+                  summary: 'The bookmarks of a user who kept a person and a picture from the briefing of 2024-03-15'
+                  value:
+                    data:
+                      - id: '01a1fcbb-27c3-7de8-b46d-34ff422b393c'
+                        createdAt: '2026-11-18T12:00:00Z'
+                        discovery:
+                          id: '30ad2d96-39f2-514a-806e-58f2041d1ce6'
+                          type: person
+                          date: null
+                          title: Julius Caesar
+                          summary: Roman general and dictator (100–44 BC)
+                          url: 'https://en.wikipedia.org/wiki/Julius_Caesar'
+                      - id: '01a1fcbb-27c1-7a08-a000-896e55ba8cdf'
+                        createdAt: '2026-11-18T12:00:00Z'
+                        discovery:
+                          id: c05f9b6a-9262-5859-b45d-743a62e1bc6e
+                          type: apod
+                          date: '2024-03-15'
+                          title: Portrait of NGC 1055
+                          summary: 'Big, beautiful spiral galaxy NGC 1055 is a dominant member of a small galaxy group a mere 60 million light-years away toward the aquatically intimidating constellation Cetus. Seen edge-on, the island universe spans over 100,000 light-years, a little larger than our own Milky Way galaxy. The colorful, spiky stars decorating this cosmic portrait of NGC 1055 are in the foreground, well within the Milky Way. But the telltale pinkish star forming regions are scattered through winding dust lanes along the distant galaxy''s thin disk. With a smattering of even more distant background galaxies, the deep image also reveals a boxy halo that extends far above and below the central bulge and disk of NGC 1055. The halo itself is laced with faint, narrow structures, and could represent the mixed and spread out debris from a satellite galaxy disrupted by the larger spiral some 10 billion years ago.'
+                          url: 'https://assets.science.nasa.gov/dynamicimage/assets/science/cds/apod/apod/2024/march/Image133k_n1055.jpg?w=2730&h=2298&fit=clip'
+                    meta:
+                      page: 1
+                      limit: 20
+                      total: 2
+                      totalPages: 1
+                afterTheLastPage:
+                  summary: A page after the last one is empty but still counts
+                  value:
+                    data: []
+                    meta:
+                      page: 3
+                      limit: 2
+                      total: 3
+                      totalPages: 2
         '401':
           $ref: '#/components/responses/Unauthorized'
         '422':
@@ -132,6 +394,7 @@ paths:
     post:
       operationId: createBookmark
       summary: Bookmark a discovery from a briefing
+      description: Bookmarks a picture, event or person by the discoveryId a briefing gave it, and answers with the bookmark and its discovery; nginx adds the header Cache-Control no-store, so nothing is cached. 400 when the body is not valid JSON, 415 when it is not sent as application/json, 422 when discoveryId is missing or not a version 5 UUID, 404 when no briefing produced that id and 409 when the user has already bookmarked it.
       tags: [bookmark]
       security:
         - bearerAuth: []
@@ -141,6 +404,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateBookmark'
+            examples:
+              person:
+                summary: 'Bookmark Julius Caesar from the deaths of 2024-03-15'
+                value:
+                  discoveryId: '30ad2d96-39f2-514a-806e-58f2041d1ce6'
       responses:
         '201':
           description: The bookmark, with the discovery it points at.
@@ -151,6 +419,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Bookmark'
+              examples:
+                person:
+                  summary: The new bookmark with the discovery it points at
+                  value:
+                    id: '01a1fcbb-27c3-7de8-b46d-34ff422b393c'
+                    createdAt: '2026-11-18T12:00:00Z'
+                    discovery:
+                      id: '30ad2d96-39f2-514a-806e-58f2041d1ce6'
+                      type: person
+                      date: null
+                      title: Julius Caesar
+                      summary: Roman general and dictator (100–44 BC)
+                      url: 'https://en.wikipedia.org/wiki/Julius_Caesar'
         '400':
           $ref: '#/components/responses/MalformedBody'
         '401':
@@ -169,6 +450,7 @@ paths:
     delete:
       operationId: deleteBookmark
       summary: Remove one of the user's bookmarks
+      description: Deletes the bookmark for good. The answer is 404, never 403, when the id is not a lower-case version 7 UUID, the bookmark does not exist or it belongs to another user, so ids of other users' bookmarks reveal nothing; a malformed id answers 404 even without a token. nginx adds the header Cache-Control no-store, so nothing is cached.
       tags: [bookmark]
       security:
         - bearerAuth: []
@@ -201,6 +483,12 @@ components:
       schema:
         type: string
         pattern: '^[A-Za-z0-9._-]{1,64}$'
+    PublicCache:
+      description: Shared caches may keep the document for five minutes.
+      required: true
+      schema:
+        type: string
+        enum: ['max-age=300, public']
     RetryAfter:
       description: Seconds to wait before the next request is accepted.
       required: true
@@ -225,6 +513,14 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
+          examples:
+            missingToken:
+              summary: No Authorization header, or a token that is unknown, revoked or expired
+              value:
+                type: 'https://tools.ietf.org/html/rfc2616#section-10'
+                title: An error occurred
+                status: 401
+                detail: Unauthorized
     MalformedBody:
       description: The body is not valid JSON.
       headers:
@@ -234,6 +530,14 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
+          examples:
+            truncatedJson:
+              summary: The body ends in the middle of a JSON object
+              value:
+                type: 'https://tools.ietf.org/html/rfc2616#section-10'
+                title: An error occurred
+                status: 400
+                detail: Bad Request
     UnsupportedMediaType:
       description: The body is not sent as application/json, for example as a form or XML.
       headers:
@@ -243,6 +547,14 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
+          examples:
+            formBody:
+              summary: The body is sent as a form
+              value:
+                type: 'https://tools.ietf.org/html/rfc2616#section-10'
+                title: An error occurred
+                status: 415
+                detail: Unsupported Media Type
     NotFound:
       description: The resource the request points at does not exist, for example a discovery id no briefing produced, or a bookmark that is gone or belongs to another user.
       headers:
@@ -252,6 +564,14 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
+          examples:
+            unknownDiscovery:
+              summary: No briefing produced this discovery id
+              value:
+                type: 'https://tools.ietf.org/html/rfc2616#section-10'
+                title: An error occurred
+                status: 404
+                detail: Not Found
     Conflict:
       description: The user has already bookmarked this discovery.
       headers:
@@ -261,6 +581,14 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
+          examples:
+            alreadyBookmarked:
+              summary: The user bookmarks the same discovery a second time
+              value:
+                type: 'https://tools.ietf.org/html/rfc2616#section-10'
+                title: An error occurred
+                status: 409
+                detail: Conflict
     BadRequest:
       description: The request is malformed, for example the date is not a calendar date in Y-m-d.
       headers:
@@ -270,6 +598,21 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ValidationProblem'
+          examples:
+            notACalendarDate:
+              summary: 'GET /api/briefings/2026-02-30'
+              value:
+                type: 'https://symfony.com/errors/validation'
+                title: Validation Failed
+                status: 400
+                detail: 'date: This value is not a valid date.'
+                violations:
+                  - propertyPath: date
+                    title: This value is not a valid date.
+                    template: This value is not a valid date.
+                    parameters:
+                      '{{ value }}': '"2026-02-30"'
+                    type: 'urn:uuid:3c184ce5-b31d-4de7-8b76-326da7b2be93'
     UnprocessableEntity:
       description: The request is well formed but not allowed, for example a briefing date outside the window, a coordinate that is not a plain decimal in range or comes without its pair, a discovery id that is not a version 5 UUID, or a page or limit that is not a whole number in range.
       headers:
@@ -279,6 +622,67 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ValidationProblem'
+          examples:
+            dateOutsideTheWindow:
+              summary: 'GET /api/briefings/2026-12-04 on 2026-11-18'
+              value:
+                type: 'https://symfony.com/errors/validation'
+                title: Validation Failed
+                status: 422
+                detail: 'date: The date must be between 1995-06-16 and 15 days after today.'
+                violations:
+                  - propertyPath: date
+                    title: 'The date must be between 1995-06-16 and 15 days after today.'
+                    template: 'The date must be between 1995-06-16 and 15 days after today.'
+                    parameters:
+                      '{{ value }}': 'Dec 4, 2026, 12:00 AM'
+                      '{{ min }}': 'Jun 16, 1995, 12:00 AM'
+                      '{{ max }}': 'Dec 3, 2026, 12:00 AM'
+                    type: 'urn:uuid:04b91c99-a946-4221-afc5-e65ebac401eb'
+            coordinateNotPlainDecimal:
+              summary: 'GET /api/briefings/2024-03-15?lat=1e1&lon=21.01'
+              value:
+                type: 'https://symfony.com/errors/validation'
+                title: Validation Failed
+                status: 422
+                detail: 'lat: This value should be a number in plain decimal notation.'
+                violations:
+                  - propertyPath: lat
+                    title: This value should be a number in plain decimal notation.
+                    template: This value should be a number in plain decimal notation.
+                    parameters:
+                      '{{ value }}': '"1e1"'
+                      '{{ pattern }}': '/^-?\d{1,3}(\.\d+)?$/D'
+                    type: 'urn:uuid:de1e3db3-5ed4-4941-aae4-59f3667cc3a3'
+            discoveryIdNotVersion5:
+              summary: POST /api/bookmarks with a version 7 UUID as discoveryId
+              value:
+                type: 'https://symfony.com/errors/validation'
+                title: Validation Failed
+                status: 422
+                detail: 'discoveryId: This is not a valid UUID.'
+                violations:
+                  - propertyPath: discoveryId
+                    title: This is not a valid UUID.
+                    template: This is not a valid UUID.
+                    parameters:
+                      '{{ value }}': '"019ad6a4-2c3e-7b1f-8a2d-4e5f6a7b8c9d"'
+                    type: 'urn:uuid:21ba13b4-b185-4882-ac6f-d147355987eb'
+            pageNotWholeNumber:
+              summary: 'GET /api/bookmarks?page=-1'
+              value:
+                type: 'https://symfony.com/errors/validation'
+                title: Validation Failed
+                status: 422
+                detail: 'page: This value is not valid.'
+                violations:
+                  - propertyPath: page
+                    title: This value is not valid.
+                    template: This value is not valid.
+                    parameters:
+                      '{{ value }}': '"-1"'
+                      '{{ pattern }}': '/^\d+$/D'
+                    type: 'urn:uuid:de1e3db3-5ed4-4941-aae4-59f3667cc3a3'
     TooManyRequests:
       description: The client sent more than 60 briefing requests within a sliding minute. The limit counts every GET and HEAD with a valid date in the briefing window, whatever the date, from one IPv4 address or one IPv6 /64 network; requests rejected for their date are not counted, requests with invalid coordinates are.
       headers:
@@ -290,6 +694,14 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
+          examples:
+            overTheLimit:
+              summary: The 61st briefing request within a minute
+              value:
+                type: 'https://tools.ietf.org/html/rfc2616#section-10'
+                title: An error occurred
+                status: 429
+                detail: Too Many Requests
     BadGateway:
       description: No source has data for this briefing.
       headers:
@@ -299,6 +711,14 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
+          examples:
+            noSourceHasData:
+              summary: Every source failed and none has stored data for the day
+              value:
+                type: 'https://tools.ietf.org/html/rfc2616#section-10'
+                title: An error occurred
+                status: 502
+                detail: Bad Gateway
     InternalServerError:
       description: The application failed; the details are only in the logs.
       headers:
@@ -629,7 +1049,7 @@ components:
         kind:
           type: string
           enum: [final, provisional, forecast]
-          description: final for days more than five days before today in UTC, from the reanalysis archive; provisional for the five days before today (the values may still change), forecast from today; days from 1940 up to 14 days ahead.
+          description: How the data was classified when it was fetched, which a stored past day keeps, since it is not fetched again. final for days more than five days before the fetch in UTC, from the reanalysis archive; provisional for the five days before it (the values could still change), forecast from the day of the fetch; days from 1940 up to 14 days ahead.
         timezone:
           type: string
           description: IANA time zone of the place.
@@ -711,6 +1131,18 @@ components:
           nullable: true
           description: Further acknowledgement the original data requires.
           example: Generated using Copernicus Climate Change Service information
+    OpenApiDocument:
+      description: An OpenAPI 3.0 document; its full structure is defined by the JSON Schema in externalDocs.
+      type: object
+      required: [openapi, info, paths]
+      properties:
+        openapi:
+          type: string
+          pattern: '^3\.0\.\d+$'
+        info:
+          type: object
+        paths:
+          type: object
     Health:
       type: object
       additionalProperties: false

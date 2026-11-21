@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Tests\Support\OpenApi;
 
 use cebe\openapi\Reader;
+use cebe\openapi\spec\Example;
 use cebe\openapi\spec\Header;
+use cebe\openapi\spec\MediaType;
 use cebe\openapi\spec\OpenApi;
 use cebe\openapi\spec\Operation;
+use cebe\openapi\spec\RequestBody;
 use cebe\openapi\spec\Response;
 use cebe\openapi\spec\Schema;
 use League\OpenAPIValidation\PSR7\ValidatorBuilder as LeagueValidatorBuilder;
@@ -22,6 +25,8 @@ final class OpenApiDocument
     private const string ANY_STATUS = 'default';
     private const string STATUS_RANGE = '%dXX';
     private const int STATUSES_PER_RANGE = 100;
+    private const string INLINE_EXAMPLE = 'example';
+    private const string REQUEST = 'request';
 
     private static ?self $instance = null;
 
@@ -92,6 +97,32 @@ final class OpenApiDocument
         return array_filter($responses, static fn (mixed $response): bool => $response instanceof Response);
     }
 
+    /**
+     * @return array<string, array{mixed, Schema}>
+     */
+    public function requestExamples(): array
+    {
+        $examples = [];
+        foreach ($this->requestBodies() as $request => $body) {
+            $examples = [...$examples, ...self::examplesIn($request, $body->content)];
+        }
+
+        return $examples;
+    }
+
+    /**
+     * @return array<string, array{mixed, Schema}>
+     */
+    public function responseExamples(): array
+    {
+        $examples = [];
+        foreach ($this->responses() as $response => $documented) {
+            $examples = [...$examples, ...self::examplesIn($response, $documented->content)];
+        }
+
+        return $examples;
+    }
+
     public function problemSchema(): Schema
     {
         $schema = $this->document->components?->schemas[self::PROBLEM_SCHEMA] ?? null;
@@ -132,6 +163,52 @@ final class OpenApiDocument
         }
 
         throw new \LogicException("openapi.yaml has no {$name} header.");
+    }
+
+    /**
+     * @return array<string, RequestBody>
+     */
+    private function requestBodies(): array
+    {
+        $bodies = [];
+        foreach ($this->document->paths->getPaths() as $path => $pathItem) {
+            foreach ($pathItem->getOperations() as $method => $operation) {
+                $bodies[\sprintf('%s %s %s', $method, $path, self::REQUEST)] = $operation->requestBody;
+            }
+        }
+
+        return array_filter($bodies, static fn (mixed $body): bool => $body instanceof RequestBody);
+    }
+
+    /**
+     * @param array<string, MediaType> $content
+     *
+     * @return array<string, array{mixed, Schema}>
+     */
+    private static function examplesIn(string $owner, array $content): array
+    {
+        $examples = [];
+        foreach ($content as $mediaType => $documented) {
+            foreach (self::examplesOf($documented) as $name => $value) {
+                $examples["{$owner} {$mediaType} {$name}"] = [$value, $documented->schema];
+            }
+        }
+
+        return array_filter($examples, static fn (array $example): bool => $example[1] instanceof Schema);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function examplesOf(MediaType $content): array
+    {
+        $examples = array_map(static fn (mixed $example): mixed => $example instanceof Example ? $example->value : null, $content->examples ?? []);
+
+        if (null === $content->example) {
+            return $examples;
+        }
+
+        return [self::INLINE_EXAMPLE => $content->example, ...$examples];
     }
 
     private function operation(string $path, string $method): ?Operation
