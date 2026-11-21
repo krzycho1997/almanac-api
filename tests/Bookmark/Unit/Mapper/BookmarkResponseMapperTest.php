@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\Bookmark\Unit\Mapper;
 
 use App\Bookmark\BookmarkEntry;
+use App\Bookmark\BookmarkPage;
+use App\Bookmark\Dto\Response\BookmarkResponse;
 use App\Bookmark\Entity\Bookmark;
 use App\Bookmark\Mapper\BookmarkResponseMapper;
+use App\Bookmark\PageRequest;
 use App\Briefing\Contract\DiscoveryId;
 use App\Briefing\Contract\DiscoveryType;
 use App\Briefing\Contract\DiscoveryView;
@@ -57,6 +60,25 @@ final class BookmarkResponseMapperTest extends TestCase
         yield 'picture' => [DiscoveryType::Apod, 'apod'];
         yield 'event' => [DiscoveryType::Event, 'event'];
         yield 'person' => [DiscoveryType::Person, 'person'];
+    }
+
+    public function testMapsAPageWithItsCounts(): void
+    {
+        // Given
+        $entries = [self::entry(self::view()), self::entry(self::view())];
+        $page = new BookmarkPage($entries, 7, new PageRequest(2, 3));
+
+        // When
+        $list = new BookmarkResponseMapper()->mapPage($page);
+
+        // Then
+        self::assertSame([$entries[0]->bookmark->id->toRfc4122(), $entries[1]->bookmark->id->toRfc4122()], array_map(static fn (BookmarkResponse $bookmark): string => $bookmark->id, $list->data));
+        self::assertSame([2, 3, 7, 3], [$list->meta->page, $list->meta->limit, $list->meta->total, $list->meta->totalPages]);
+    }
+
+    private static function view(): DiscoveryView
+    {
+        return new DiscoveryView(DiscoveryId::fromString(self::DISCOVERY), DiscoveryType::Event, null, 'Title', null, null);
     }
 
     private static function entry(DiscoveryView $view): BookmarkEntry

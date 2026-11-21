@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Bookmark\Controller;
 
 use App\Bookmark\BookmarkService;
+use App\Bookmark\Dto\Request\BookmarkListQuery;
 use App\Bookmark\Dto\Request\CreateBookmarkRequest;
+use App\Bookmark\Dto\Response\BookmarkListResponse;
 use App\Bookmark\Dto\Response\BookmarkResponse;
 use App\Bookmark\Mapper\BookmarkResponseMapper;
 use App\Identity\Contract\AuthenticatedUser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Attribute\Serialize;
 use Symfony\Component\Routing\Attribute\Route;
@@ -25,6 +28,17 @@ final readonly class BookmarkController
         private BookmarkService $bookmarks,
         private BookmarkResponseMapper $mapper,
     ) {
+    }
+
+    #[Route(self::COLLECTION, name: 'bookmark_list', methods: [Request::METHOD_GET])]
+    #[Serialize]
+    public function list(
+        #[CurrentUser]
+        AuthenticatedUser $user,
+        #[MapQueryString(validationFailedStatusCode: Response::HTTP_UNPROCESSABLE_ENTITY)]
+        BookmarkListQuery $query = new BookmarkListQuery(),
+    ): BookmarkListResponse {
+        return $this->mapper->mapPage($this->bookmarks->page($user->id, $query->pageRequest()));
     }
 
     #[Route(self::COLLECTION, name: 'bookmark_create', methods: [Request::METHOD_POST])]

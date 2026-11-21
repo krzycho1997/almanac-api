@@ -88,6 +88,47 @@ paths:
         '502':
           $ref: '#/components/responses/BadGateway'
   /api/bookmarks:
+    get:
+      operationId: listBookmarks
+      summary: List the user's bookmarks, newest first
+      tags: [bookmark]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: Page from 1; a page after the last one is empty.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000000
+            default: 1
+        - name: limit
+          in: query
+          required: false
+          description: Bookmarks per page.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: One page of bookmarks, newest first, with the counts for paging.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookmarkList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     post:
       operationId: createBookmark
       summary: Bookmark a discovery from a briefing
@@ -202,7 +243,7 @@ components:
           schema:
             $ref: '#/components/schemas/ValidationProblem'
     UnprocessableEntity:
-      description: The request is well formed but not allowed, for example a briefing date outside the window, a coordinate that is not a plain decimal in range or comes without its pair, or a discovery id that is not a version 5 UUID.
+      description: The request is well formed but not allowed, for example a briefing date outside the window, a coordinate that is not a plain decimal in range or comes without its pair, a discovery id that is not a version 5 UUID, or a page or limit that is not a whole number in range.
       headers:
         X-Request-Id:
           $ref: '#/components/headers/RequestId'
@@ -267,6 +308,36 @@ components:
           pattern: 'Z$'
         discovery:
           $ref: '#/components/schemas/Discovery'
+    BookmarkList:
+      type: object
+      additionalProperties: false
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Bookmark'
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+    PaginationMeta:
+      type: object
+      additionalProperties: false
+      required: [page, limit, total, totalPages]
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          maximum: 1000000
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+        total:
+          type: integer
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
     Discovery:
       type: object
       additionalProperties: false
