@@ -79,7 +79,8 @@ final class CircuitBreakerTest extends TestCase
         yield 'three outages in a row open it for a minute' => [self::outages(3, $unavailable), '+60 seconds'];
         yield 'a late outage of a call started before the opening does not move it' => [[...self::outages(3, $unavailable), ['+30 seconds', $unavailable, null]], '+60 seconds'];
         yield 'a success between outages starts the count again' => [[...self::outages(2, $unavailable), [self::RIGHT_AWAY, self::OK, null], ...self::outages(2, $unavailable)], null];
-        yield 'a rejection between outages starts the count again' => [[...self::outages(2, $unavailable), [self::RIGHT_AWAY, FailureKind::Rejected->value, null], ...self::outages(2, $unavailable)], null];
+        yield 'a rejection between outages keeps the count' => [[...self::outages(2, $unavailable), [self::RIGHT_AWAY, FailureKind::Rejected->value, null], ...self::outages(1, $unavailable)], '+60 seconds'];
+        yield 'an invalid payload between outages keeps the count' => [[...self::outages(2, $unavailable), [self::RIGHT_AWAY, FailureKind::InvalidPayload->value, null], ...self::outages(1, $unavailable)], '+60 seconds'];
         yield 'a 400 from APOD does not open it' => [self::outages(5, FailureKind::Rejected->value), null];
         yield 'invalid payloads do not open it' => [self::outages(3, FailureKind::InvalidPayload->value), null];
         yield 'a misconfigured key does not open it' => [self::outages(3, FailureKind::Misconfigured->value), null];

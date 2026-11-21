@@ -66,7 +66,7 @@ The past-date rule comes first, so a stored forecast for a day whose last refres
 The refresh policy protects one snapshot; the breaker protects an upstream, so that an outage or NASA's `DEMO_KEY` limit is not hit again by every new date and queued message.
 
 - There is one circuit per source in Redis, shared by `php` and `worker`. One `open_until` key holds the state: missing means closed, a future instant means open, a past one means half-open.
-- Only outages count (`unavailable`, `rate_limited`). Three in a row, each within 30 minutes of the last, open the circuit for 60 seconds. A 429 opens it until `Retry-After`, or for 15 minutes without it.
+- Only outages count (`unavailable`, `rate_limited`). Three of them, each within 30 minutes of the last and with no successful call in between, open the circuit for 60 seconds. A failure that is not an outage (`rejected`, `misconfigured`, `invalid_payload`) neither counts nor resets the count: it shows the upstream answered, not that it is healthy, so a 503, a 400 and a 503 still add up. A 429 opens it until `Retry-After`, or for 15 minutes without it.
 - Half-open allows one trial, claimed with `SET NX PX`. Only the trial closes or reopens the circuit. Opening and claiming are single Lua calls, safe between processes.
 - A refused source makes no request and saves nothing. It serves stored data as stale, or is `failed` with `error: unavailable`.
 - If Redis fails, the breaker fails open and logs one warning per request or message. Lost Redis data only closes circuits. `/api/health` shows each circuit and always answers 200.
