@@ -11,15 +11,16 @@ framework:
             status_code: 502
             log_level: warning
     http_client:
+        default_options:
+            retry_failed:
+                retry_strategy: App\Briefing\Source\UpstreamRetryStrategy
+                max_retries: 1
         scoped_clients:
             nasa.client:
                 base_uri: '%env(NASA_BASE_URI)%'
                 <<: &upstream_options
                     max_duration: 3
                     max_redirects: 0
-                    retry_failed:
-                        retry_strategy: App\Briefing\Source\UpstreamRetryStrategy
-                        max_retries: 1
                 headers:
                     User-Agent: '%env(ALMANAC_USER_AGENT)%'
                     X-Api-Key: '%env(NASA_API_KEY)%'
