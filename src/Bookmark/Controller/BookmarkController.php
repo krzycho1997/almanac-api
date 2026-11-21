@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Bookmark\Controller;
 
+use App\Bookmark\BookmarkId;
 use App\Bookmark\BookmarkService;
 use App\Bookmark\Dto\Request\BookmarkListQuery;
 use App\Bookmark\Dto\Request\CreateBookmarkRequest;
@@ -17,12 +18,14 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Attribute\Serialize;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 final readonly class BookmarkController
 {
     private const string COLLECTION = '/api/bookmarks';
+    private const string ITEM = self::COLLECTION.'/{id}';
 
     public function __construct(
         private BookmarkService $bookmarks,
@@ -50,5 +53,16 @@ final readonly class BookmarkController
         CreateBookmarkRequest $request,
     ): BookmarkResponse {
         return $this->mapper->map($this->bookmarks->add($user->id, $request->discoveryId()));
+    }
+
+    #[Route(self::ITEM, name: 'bookmark_delete', requirements: ['id' => Requirement::UUID_V7], methods: [Request::METHOD_DELETE])]
+    public function delete(
+        #[CurrentUser]
+        AuthenticatedUser $user,
+        BookmarkId $id,
+    ): Response {
+        $this->bookmarks->remove($user->id, $id);
+
+        return new Response(status: Response::HTTP_NO_CONTENT);
     }
 }

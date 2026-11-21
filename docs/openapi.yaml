@@ -165,6 +165,34 @@ paths:
           $ref: '#/components/responses/UnprocessableEntity'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/bookmarks/{id}:
+    delete:
+      operationId: deleteBookmark
+      summary: Remove one of the user's bookmarks
+      tags: [bookmark]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the bookmark as the API returns it, a version 7 UUID in lower case; any other form is a 404.
+          schema:
+            type: string
+            format: uuid
+            pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+      responses:
+        '204':
+          description: The bookmark is gone.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   headers:
     RequestId:
@@ -216,7 +244,7 @@ components:
           schema:
             $ref: '#/components/schemas/Problem'
     NotFound:
-      description: The resource the request points at does not exist, for example a discovery id no briefing produced.
+      description: The resource the request points at does not exist, for example a discovery id no briefing produced, or a bookmark that is gone or belongs to another user.
       headers:
         X-Request-Id:
           $ref: '#/components/headers/RequestId'
