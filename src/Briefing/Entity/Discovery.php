@@ -7,10 +7,11 @@ namespace App\Briefing\Entity;
 use App\Briefing\Contract\DiscoveryId;
 use App\Briefing\Contract\DiscoveryIdType;
 use App\Briefing\Contract\DiscoveryType;
+use App\Briefing\Repository\DiscoveryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(readOnly: true)]
+#[ORM\Entity(repositoryClass: DiscoveryRepository::class, readOnly: true)]
 #[ORM\Table(name: 'briefing_discovery')]
 #[ORM\UniqueConstraint(name: 'briefing_discovery_key_unique', columns: ['key'])]
 class Discovery

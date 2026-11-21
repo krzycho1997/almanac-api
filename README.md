@@ -23,7 +23,7 @@ curl http://127.0.0.1:8080/api/health
 
 Get a free NASA key (by email, at https://api.nasa.gov) before the first briefing and put it in `.env.dev.local`, as described below. Without it the dev stack uses `DEMO_KEY`, whose quota is shared by everyone on your IP and is often used up already.
 
-The first start builds the image, runs `composer install`, waits for PostgreSQL and runs the migrations. Then it starts these services:
+The first start builds the image, runs `composer install`, waits for PostgreSQL and runs the migrations. Three migrations were renamed to generated version numbers, so a database volume created before that stops `php` with "relation already exists": run `docker compose down -v` once. Then it starts these services:
 
 | Service | What it does |
 |---|---|
@@ -164,7 +164,7 @@ CI (`.github/workflows/ci.yaml`) runs `check:fast`, the Redocly lint, a build an
 
 Five tables, each owned by one module and created only by Doctrine Migrations (details in [docs/SPEC.md](docs/SPEC.md#storage)):
 
-- `briefing_source_snapshot`: one row per source and scope (`2024-03-15`, `03-15`, `2024-03-15@52.23,21.01`), the internal model in a JSONB `payload`, the last attempt's status and error. Named `CHECK` constraints keep status, error, payload and dates consistent.
+- `briefing_source_snapshot`: one row per source and scope (`2024-03-15`, `03-15`, `2024-03-15@52.23,21.01`), the internal model in a JSONB `payload`, the last attempt's status and error.
 - `briefing_discovery`: everything that can be bookmarked. The id is a UUIDv5 of a stable key such as `apod:2024-03-15` or `person:Q1048`, so a briefing knows every `discoveryId` without a query.
 - `identity_user` and `identity_access_token`: users with a unique email, and tokens stored only as sha256 with an expiry; revoking a token deletes its row.
 - `bookmark`: a unique constraint on `(user_id, discovery_id)` and an index on `(user_id, created_at DESC, id DESC)` for the newest-first pages.
@@ -186,7 +186,7 @@ Tokens are 32 random bytes; only their sha256 is stored. They expire (30 days by
 
 ## With more time
 
-- Wikipedia Page Summary as a fourth source, if a briefing should carry more than On This Day's summaries: a new `Source/` directory, a case in `SourceName` and a migration of the `CHECK` constraint.
+- Wikipedia Page Summary as a fourth source, if a briefing should carry more than On This Day's summaries: a new `Source/` directory, and a case in `SourceName`, with no change to the schema.
 - A lock per scope, so parallel first requests call upstream once (it needs `symfony/lock`), and `Cache-Control` derived from the refresh policy, so clients can cache final days.
 - A separate circuit for each Open-Meteo address, because an archive outage now also stops forecasts, and a manual reset command instead of restarting Redis.
 - A one-off fetch of observed weather for a past day that has only a forecast. Stored past days must not call upstream again, so this needs an agreed exception to that rule.

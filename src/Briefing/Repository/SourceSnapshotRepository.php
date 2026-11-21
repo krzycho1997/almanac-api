@@ -17,15 +17,19 @@ use App\Briefing\SourceResult;
 use App\Briefing\SourceStatus;
 use App\Briefing\StoredSnapshot;
 use App\Shared\Logging\LogContextKey;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
+use Doctrine\Persistence\ManagerRegistry;
 use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @extends ServiceEntityRepository<SourceSnapshot>
+ */
 #[WithMonologChannel(self::CHANNEL)]
-final readonly class SourceSnapshotRepository
+final class SourceSnapshotRepository extends ServiceEntityRepository
 {
     private const string CHANNEL = 'briefing';
     private const string ALIAS = 'snapshot';
@@ -72,10 +76,11 @@ final readonly class SourceSnapshotRepository
     ];
 
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private SourcePayloadCodec $codec,
-        private LoggerInterface $logger,
+        ManagerRegistry $registry,
+        private readonly SourcePayloadCodec $codec,
+        private readonly LoggerInterface $logger,
     ) {
+        parent::__construct($registry, SourceSnapshot::class);
     }
 
     /**
@@ -156,7 +161,7 @@ final readonly class SourceSnapshotRepository
      */
     private function snapshotsFor(array $scopes): array
     {
-        $query = $this->entityManager->createQueryBuilder()->select(self::ALIAS)->from(SourceSnapshot::class, self::ALIAS);
+        $query = $this->createQueryBuilder(self::ALIAS);
 
         foreach ($scopes as $index => $scope) {
             $query->orWhere(self::ALIAS.".source = :source{$index} AND ".self::ALIAS.".scopeKey = :key{$index}")
@@ -205,7 +210,7 @@ final readonly class SourceSnapshotRepository
 
     private function connection(): Connection
     {
-        return $this->entityManager->getConnection();
+        return $this->getEntityManager()->getConnection();
     }
 
     /**
