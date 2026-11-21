@@ -1,0 +1,24 @@
+docker/nginx/default.conf
+  s_79485d0750c5ec::t_f56da9f4137109 28-33
+tests/EndToEnd/NginxCompressionTest.php
+  s_79485d0750c5ec::t_4347cb33588398 20,61
+  s_79485d0750c5ec::t_f56da9f4137109 1-7,9-13,16-19,21,24-25,27-28,30,32-33,36-37,39-40,42-44,49,53,62-63
+  s_79485d0750c5ec::t_73f7a0fc1f3535 8,14-15,22-23,26,29,31,34-35,38,41,45-48,50-52,54-60
+  s_79485d0750c5ec::t_5df9bea756abef 64-75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "980db497d17c56c567e77f4508b4a8dbfdb2b2e9",
+  "prompts": {},
+  "sessions": {
+    "s_79485d0750c5ec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a02bf82-600a-499e-b66e-8863bae65409",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
