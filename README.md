@@ -227,4 +227,4 @@ Tokens are 32 random bytes; only their sha256 is stored. They expire (30 days by
 
 ## Use of AI
 
-I designed the architecture, wrote the plan and decided every trade-off. An AI coding assistant (Claude Code) wrote the code, tests and documentation under that direction, and AI reviewers audited each change before and after it was written. Every change also had to pass the test suite and static analysis before it was merged.
+I used Claude Code as the main coding tool. I designed the architecture, wrote the plan, made every decision and reviewed every change, and I am responsible for the code. Mistakes I caught along the way include a snapshot query that matched sources and keys as a cross product instead of exact pairs, a 3-second limit that cut off Wikipedia's uncached answers (2.5 to 5.4 seconds), and a coarser weather grid that would have reported another place's elevation and daylight (Tromsø in polar day on a night with a sunset). I'm happy to go through any line of it, or change it, live.
