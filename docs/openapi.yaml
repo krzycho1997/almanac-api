@@ -714,11 +714,16 @@ components:
     Health:
       type: object
       additionalProperties: false
-      required: [status]
+      required: [status, checks]
       properties:
         status:
+          description: Always ok while the application answers; the checks describe its dependencies and never change the status code.
           type: string
           enum: [ok]
+        checks:
+          description: The state each module reports, keyed by the name of its check.
+          type: object
+          additionalProperties: false
     Problem:
       description: Problem Details (RFC 9457) without internals.
       type: object
