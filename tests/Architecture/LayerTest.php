@@ -7,6 +7,7 @@ namespace App\Tests\Architecture;
 use App\Briefing\Contract\DiscoveryId;
 use App\Briefing\Discovery\DiscoveryExtractor;
 use App\Kernel;
+use App\Shared\Contract\UidIdType;
 use PHPat\Selector\Selector;
 use PHPat\Selector\SelectorInterface;
 use PHPat\Test\Attributes\TestRule;
@@ -74,7 +75,7 @@ final class LayerTest
     {
         return PHPat::rule()
             ->classes(Codebase::contracts(), Selector::inNamespace('App\Briefing\Model'))
-            ->excluding(Selector::AllOf(Codebase::contracts(), Selector::classname('/IdType$/', regex: true)))
+            ->excluding(Selector::AllOf(Codebase::contracts(), Selector::AnyOf(Selector::classname(UidIdType::class), Selector::extends(UidIdType::class))))
             ->shouldNot()
             ->dependOn()
             ->classes(
@@ -83,7 +84,7 @@ final class LayerTest
                 Codebase::layer(self::ENTITY, self::REPOSITORY),
                 Selector::inNamespace('App\Briefing\Source'),
             )
-            ->because('the model and contracts carry data only; Doctrine id types in contracts are the one intended exception')
+            ->because('the model and contracts carry data only; Doctrine id types built on UidIdType are the one intended exception')
             ->nonIgnorable();
     }
 
