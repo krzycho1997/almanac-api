@@ -1,0 +1,24 @@
+README.md
+  s_4da5374f6e605f::t_c3a6f647779141 155,159
+  s_4da5374f6e605f::t_c1afc98cf0fa94 168,175
+  s_4da5374f6e605f::t_6cc9de78b2232f 7,24-25,44,48,51,53,66,77,97,99,103,106,117,135,144,148,152,156,162-167,169-174,180,188-195
+  s_4da5374f6e605f::t_c97cf43a4ed3bd 176
+docs/SPEC.md
+  s_4da5374f6e605f::t_5cabd0cd2035cf 25,30,32,43,60,67,70,84,114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2de2e599b1e7ac4aa04c9f1148723acc1e9e6f1f",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
