@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Shared\Integration\OpenApi;
 
+use App\Shared\Controller\MetricsController;
 use App\Tests\Support\OpenApi\OpenApiDocument;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Routing\Route;
@@ -14,6 +15,7 @@ final class OpenApiCoverageTest extends KernelTestCase
     private const string CONTROLLER = '_controller';
     private const string APPLICATION = 'App\\';
     private const string TEST_SUPPORT = 'App\\Tests\\';
+    private const array OUTSIDE_THE_PUBLIC_CONTRACT = [MetricsController::PATH];
 
     public function testDocumentsExactlyTheOperationsTheApplicationRoutes(): void
     {
@@ -43,7 +45,7 @@ final class OpenApiCoverageTest extends KernelTestCase
     private static function routedOperations(): array
     {
         $operations = [];
-        foreach (self::applicationRoutes() as $route) {
+        foreach (self::publicRoutes() as $route) {
             $operations[$route->getPath()] = [...$operations[$route->getPath()] ?? [], ...array_values(array_map(strtolower(...), $route->getMethods()))];
         }
 
@@ -56,6 +58,23 @@ final class OpenApiCoverageTest extends KernelTestCase
     private static function documentedOperations(): array
     {
         return self::sorted(OpenApiDocument::instance()->operations());
+    }
+
+    /**
+     * @return array<string, Route>
+     */
+    private static function publicRoutes(): array
+    {
+        return array_filter(self::applicationRoutes(), static fn (Route $route): bool => self::isInThePublicContract($route->getPath()));
+    }
+
+    private static function isInThePublicContract(string $path): bool
+    {
+        if (\in_array($path, self::OUTSIDE_THE_PUBLIC_CONTRACT, true)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
