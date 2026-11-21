@@ -1,0 +1,24 @@
+tests/Briefing/Functional/PrefetchCommandTest.php
+  s_4da5374f6e605f::t_853fffa7135cc4 64
+  s_4da5374f6e605f::t_824483fbd78fa2 65-93,137-138
+tests/Briefing/Integration/PrefetcherTest.php
+  s_4da5374f6e605f::t_7f20bc7bda4b33 171
+tests/Briefing/Unit/Validator/BriefingDayTextTest.php
+  s_4da5374f6e605f::t_49ce7c9d21b7c2 38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0b89416c1e7510a02dd4a36680818105f6f8253c",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
