@@ -1,0 +1,23 @@
+src/Bookmark/Exception/InvalidPageRequestException.php
+  s_79485d0750c5ec::t_937bd3daa1eeb7 14-18
+src/Bookmark/PageRequest.php
+  s_79485d0750c5ec::t_6aacea21a36f4a 12,25-28
+tests/Bookmark/Unit/PageRequestTest.php
+  s_79485d0750c5ec::t_1c9478bd442db5 42,60-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "01a627d10e16b60c9b1b7ef622aa133fbd95b97f",
+  "prompts": {},
+  "sessions": {
+    "s_79485d0750c5ec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a02bf82-600a-499e-b66e-8863bae65409",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
