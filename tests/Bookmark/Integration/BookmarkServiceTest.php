@@ -126,18 +126,17 @@ final class BookmarkServiceTest extends KernelTestCase
         self::assertSame([$second, $first], self::idsOf($page));
     }
 
-    public function testLeavesOutABookmarkWhoseDiscoveryTheCatalogNoLongerKnows(): void
+    public function testTreatsABookmarkWhoseDiscoveryTheCatalogNoLongerKnowsAsABrokenInvariant(): void
     {
         // Given
         $owner = new UserId();
         $this->service()->add($owner, DiscoveryId::fromString(self::PICTURE));
         $this->discoveries = new InMemoryDiscoveryCatalog();
 
-        // When
-        $page = $this->service()->page($owner, new PageRequest());
-
-        // Then
-        self::assertSame([[], 1], [$page->entries, $page->total]);
+        // Then / When
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessageMatches('/points at discovery '.self::PICTURE.', which the catalog does not know/');
+        $this->service()->page($owner, new PageRequest());
     }
 
     public function testRemovesTheOwnersBookmark(): void

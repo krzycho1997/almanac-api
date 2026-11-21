@@ -13,7 +13,7 @@ A modular monolith with three modules and a shared kernel:
 | `Bookmark` | bookmarks | `bookmark` | none |
 | `Shared` | Problem Details, request id, logging, health, API document | none | `HealthCheck` port, uid base type |
 
-A module uses only its own classes, `Shared`, the `Contract` namespace of any module, and code outside `App`; `Shared` uses no module. `config/` is the composition root. Foreign keys exist only inside a module. `bookmark.user_id` and `bookmark.discovery_id` are plain `uuid` columns: `DiscoveryCatalog::find()` runs before the insert, and users and discoveries are never deleted. That is the cost of the boundaries. Account deletion would need an event from Identity that Bookmark handles. In return, `Briefing` could become a separate service by turning `DiscoveryCatalog` into an HTTP client, with no change in `Bookmark`.
+A module uses only its own classes, `Shared`, the `Contract` namespace of any module, and code outside `App`; `Shared` uses no module. `config/` is the composition root. Foreign keys exist only inside a module. `bookmark.user_id` and `bookmark.discovery_id` are plain `uuid` columns: `DiscoveryCatalog::find()` runs before the insert, and users and discoveries are never deleted. A bookmark whose discovery the catalog does not know therefore breaks an invariant: listing throws a `LogicException` (a logged 500) instead of leaving the entry out while `total` still counts it. That is the cost of the boundaries. Account deletion would need an event from Identity that Bookmark handles. In return, `Briefing` could become a separate service by turning `DiscoveryCatalog` into an HTTP client, with no change in `Bookmark`.
 
 Inside a module the layout is plain Symfony, with no separate domain layer:
 

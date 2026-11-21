@@ -87,13 +87,18 @@ final readonly class BookmarkService
         $entries = [];
 
         foreach ($bookmarks as $bookmark) {
-            $discovery = $discoveries[$bookmark->discoveryId->toRfc4122()] ?? null;
-
-            if ($discovery instanceof DiscoveryView) {
-                $entries[] = new BookmarkEntry($bookmark, $discovery);
-            }
+            $entries[] = new BookmarkEntry($bookmark, self::discoveryOf($bookmark, $discoveries));
         }
 
         return $entries;
+    }
+
+    /**
+     * @param array<non-empty-string, DiscoveryView> $discoveries
+     */
+    private static function discoveryOf(Bookmark $bookmark, array $discoveries): DiscoveryView
+    {
+        return $discoveries[$bookmark->discoveryId->toRfc4122()]
+            ?? throw new \LogicException("Bookmark {$bookmark->id->toRfc4122()} points at discovery {$bookmark->discoveryId->toRfc4122()}, which the catalog does not know; discoveries are never deleted.");
     }
 }
