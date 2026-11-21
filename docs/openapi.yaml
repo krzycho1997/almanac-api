@@ -394,7 +394,7 @@ paths:
     post:
       operationId: createBookmark
       summary: Bookmark a discovery from a briefing
-      description: Bookmarks a picture, event or person by the discoveryId a briefing gave it, and answers with the bookmark and its discovery; nginx adds the header Cache-Control no-store, so nothing is cached. 400 when the body is not valid JSON, 415 when it is not sent as application/json, 422 when discoveryId is missing or not a version 5 UUID, 404 when no briefing produced that id and 409 when the user has already bookmarked it.
+      description: Bookmarks a picture, event or person by the discoveryId a briefing gave it, and answers with the bookmark and its discovery; nginx adds the header Cache-Control no-store, so nothing is cached. 400 when the body is not valid JSON, 415 when it is not sent as application/json, 422 when discoveryId is missing or not a version 5 UUID or the body has any other field, 404 when no briefing produced that id and 409 when the user has already bookmarked it.
       tags: [bookmark]
       security:
         - bearerAuth: []
@@ -736,6 +736,7 @@ components:
   schemas:
     CreateBookmark:
       type: object
+      additionalProperties: false
       required: [discoveryId]
       properties:
         discoveryId:
@@ -1217,7 +1218,7 @@ components:
     Violation:
       type: object
       additionalProperties: false
-      required: [propertyPath, title, template, parameters, type]
+      required: [propertyPath, title, template, parameters]
       properties:
         propertyPath:
           type: string
@@ -1231,5 +1232,5 @@ components:
             type: string
         type:
           type: string
-          description: urn:uuid of the violated constraint's error code.
+          description: urn:uuid of the violated constraint's error code; absent when the body could not be read into the request at all, such as a field the request does not define.
           pattern: '^urn:uuid:[0-9a-f-]{36}$'

@@ -47,9 +47,9 @@ final readonly class HttpProbe
      */
     public function request(string $method, string $path, array $headers = [], string $content = ''): ProbedResponse
     {
-        file_get_contents($this->baseUrl.$path, false, self::context($method, $headers, $content));
+        $body = file_get_contents($this->baseUrl.$path, false, self::context($method, $headers, $content));
 
-        return ProbedResponse::fromRawHeaders(http_get_last_response_headers() ?? []);
+        return ProbedResponse::fromRawHeaders(http_get_last_response_headers() ?? [], \is_string($body) ? $body : '');
     }
 
     /**

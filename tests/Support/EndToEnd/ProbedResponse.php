@@ -15,17 +15,18 @@ final readonly class ProbedResponse
     private function __construct(
         public int $status,
         private array $headerLines,
+        public string $body,
     ) {
     }
 
     /**
      * @param list<string> $rawHeaders
      */
-    public static function fromRawHeaders(array $rawHeaders): self
+    public static function fromRawHeaders(array $rawHeaders, string $body = ''): self
     {
         $statusLine = array_shift($rawHeaders) ?? '';
 
-        return new self(self::statusFrom($statusLine), $rawHeaders);
+        return new self(self::statusFrom($statusLine), $rawHeaders, $body);
     }
 
     /**

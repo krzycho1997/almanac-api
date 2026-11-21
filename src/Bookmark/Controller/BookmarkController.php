@@ -21,11 +21,17 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final readonly class BookmarkController
 {
     private const string COLLECTION = '/api/bookmarks';
     private const string ITEM = self::COLLECTION.'/{id}';
+    private const array STRICT_PAYLOAD = [
+        AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
+        DenormalizerInterface::COLLECT_EXTRA_ATTRIBUTES_ERRORS => true,
+    ];
 
     public function __construct(
         private BookmarkService $bookmarks,
@@ -49,7 +55,7 @@ final readonly class BookmarkController
     public function create(
         #[CurrentUser]
         AuthenticatedUser $user,
-        #[MapRequestPayload(acceptFormat: JsonEncoder::FORMAT, mapWhenEmpty: true)]
+        #[MapRequestPayload(acceptFormat: JsonEncoder::FORMAT, serializationContext: self::STRICT_PAYLOAD, mapWhenEmpty: true)]
         CreateBookmarkRequest $request,
     ): BookmarkResponse {
         return $this->mapper->map($this->bookmarks->add($user->id, $request->discoveryId()));

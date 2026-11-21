@@ -2,6 +2,8 @@
 
 Symfony 8.1 API on PHP 8.5, PostgreSQL 18 and Redis 8, run with Docker Compose (Podman works too).
 
+The project description and design notes are in `docs/SPEC.md`; setup, endpoints and decisions for reviewers are in `README.md`.
+
 ## Commands
 
 Everything runs in the `php` container.
