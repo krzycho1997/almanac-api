@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Briefing\Source\Weather;
+namespace App\Briefing\Source\OpenMeteo;
 
 use App\Briefing\BriefingDay;
 use App\Briefing\Exception\InvalidUpstreamPayloadException;

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Briefing\Unit\Source\Weather;
+namespace App\Tests\Briefing\Unit\Source\OpenMeteo;
 
 use App\Briefing\Model\WeatherKind;
-use App\Briefing\Source\Weather\WeatherHorizon;
+use App\Briefing\Source\OpenMeteo\WeatherHorizon;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
