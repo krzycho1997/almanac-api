@@ -7,6 +7,8 @@ info:
     name: Proprietary
     url: https://github.com/krzycho1997/almanac-api
 servers:
+  - url: /
+    description: The host that serves this document
   - url: http://127.0.0.1:8080
     description: Local Docker Compose stack
 tags:
@@ -14,6 +16,8 @@ tags:
     description: Discoveries the user keeps, behind a Bearer token
   - name: briefing
     description: Daily briefing for a date
+  - name: docs
+    description: This API description
   - name: health
     description: Liveness of the application
 paths:
@@ -53,6 +57,30 @@ paths:
                         apod: closed
                         onThisDay: closed
                         weather: open
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/docs.json:
+    get:
+      operationId: getOpenApiDocument
+      summary: Serve this OpenAPI document as JSON
+      description: This document as JSON, converted from docs/openapi.yaml on each request so it never differs from the file the tests validate against. Clients may cache it for five minutes; only a failure of the application answers 500.
+      tags: [docs]
+      security: []
+      externalDocs:
+        description: JSON Schema of OpenAPI 3.0 documents
+        url: https://spec.openapis.org/oas/3.0/schema/2024-10-18
+      responses:
+        '200':
+          description: This document, converted from docs/openapi.yaml.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+            Cache-Control:
+              $ref: '#/components/headers/PublicCache'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenApiDocument'
         '500':
           $ref: '#/components/responses/InternalServerError'
   /api/briefings/{date}:
@@ -455,6 +483,12 @@ components:
       schema:
         type: string
         pattern: '^[A-Za-z0-9._-]{1,64}$'
+    PublicCache:
+      description: Shared caches may keep the document for five minutes.
+      required: true
+      schema:
+        type: string
+        enum: ['max-age=300, public']
     RetryAfter:
       description: Seconds to wait before the next request is accepted.
       required: true
@@ -1097,6 +1131,18 @@ components:
           nullable: true
           description: Further acknowledgement the original data requires.
           example: Generated using Copernicus Climate Change Service information
+    OpenApiDocument:
+      description: An OpenAPI 3.0 document; its full structure is defined by the JSON Schema in externalDocs.
+      type: object
+      required: [openapi, info, paths]
+      properties:
+        openapi:
+          type: string
+          pattern: '^3\.0\.\d+$'
+        info:
+          type: object
+        paths:
+          type: object
     Health:
       type: object
       additionalProperties: false
