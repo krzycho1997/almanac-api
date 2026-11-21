@@ -1,0 +1,23 @@
+tests/Briefing/Integration/Repository/DiscoveryRepositoryTest.php
+  s_4da5374f6e605f::t_f8dfe93fbf25a0 51-60
+src/Briefing/Repository/DiscoveryRepository.php
+  s_4da5374f6e605f::t_f8dfe93fbf25a0 55-71
+docs/SPEC.md
+  s_4da5374f6e605f::t_e3258b7bb34d51 47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "de9ea98a84e523e2acf583ae55666bc2457b3533",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
