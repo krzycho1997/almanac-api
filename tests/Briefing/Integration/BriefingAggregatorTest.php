@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Briefing\Integration;
 
 use App\Briefing\BriefingAggregator;
+use App\Briefing\BriefingMetrics;
 use App\Briefing\CircuitBreaker\CircuitBreaker;
 use App\Briefing\CircuitBreaker\CircuitLog;
 use App\Briefing\CircuitBreaker\CircuitPermit;
@@ -431,7 +432,7 @@ final class BriefingAggregatorTest extends KernelTestCase
      */
     private static function aggregator(array $sources, MockClock $clock, LoggerInterface $logger = new NullLogger(), ?CircuitBreaker $breaker = null): BriefingAggregator
     {
-        return new BriefingAggregator($sources, new ConcurrentFetcher(new MockHttpClient(), $clock, new NullLogger(), 3.5), $clock, new SourceFailureLog($logger), self::testService(SnapshotRefresher::class), new RefreshPolicy(), $breaker ?? self::breaker($clock));
+        return new BriefingAggregator($sources, new ConcurrentFetcher(new MockHttpClient(), $clock, new NullLogger(), 3.5), $clock, new SourceFailureLog($logger), self::testService(SnapshotRefresher::class), new RefreshPolicy(), $breaker ?? self::breaker($clock), self::testService(BriefingMetrics::class));
     }
 
     private static function refuseEveryWriteOfSnapshots(): void

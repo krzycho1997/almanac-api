@@ -64,14 +64,9 @@ final readonly class RefreshPolicy
     private static function isStoredPastDay(SnapshotState $state, \DateTimeImmutable $date, \DateTimeImmutable $now): bool
     {
         if ($state->hasPayload) {
-            return self::isBeforeToday($date, $now);
+            return BriefingDay::isBefore($date, $now);
         }
 
         return false;
-    }
-
-    private static function isBeforeToday(\DateTimeImmutable $date, \DateTimeImmutable $now): bool
-    {
-        return $date->format(BriefingDay::FORMAT) < $now->format(BriefingDay::FORMAT);
     }
 }

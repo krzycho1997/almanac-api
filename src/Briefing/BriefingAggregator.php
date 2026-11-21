@@ -32,6 +32,7 @@ final readonly class BriefingAggregator
         private SnapshotRefresher $refresher,
         private RefreshPolicy $policy,
         private CircuitBreaker $breaker,
+        private BriefingMetrics $metrics,
     ) {
         $this->sources = self::inNameOrder([...$sources]);
     }
@@ -63,6 +64,7 @@ final readonly class BriefingAggregator
         $due = self::dueForFetch($covering, $decisions);
         $permits = $this->permitsFor($due);
         $settled = $this->fetcher->settleAll(self::startAll(self::allowed($due, $permits), $date, $location));
+        $this->recordFetches($settled);
         $this->recordInCircuits($settled, $permits);
         $refused = $this->refusedResults($permits);
         $entries = $this->entriesFor($settled, $refused, $scopes, $stored, $decisions, $date, $now);
@@ -96,6 +98,16 @@ final readonly class BriefingAggregator
     private static function allowed(array $sources, array $permits): array
     {
         return array_values(array_filter($sources, static fn (Source $source): bool => $permits[$source->name()->value]->allowsCall()));
+    }
+
+    /**
+     * @param list<SettledFetch> $settled
+     */
+    private function recordFetches(array $settled): void
+    {
+        foreach ($settled as $fetch) {
+            $this->metrics->fetched($fetch);
+        }
     }
 
     /**
@@ -169,7 +181,9 @@ final readonly class BriefingAggregator
         $decisions = [];
 
         foreach ($sources as $source) {
-            $decisions[$source->name()->value] = $this->policy->decide(self::stateOf($source->name(), $stored), $source->refreshAfter(), $date, $now);
+            $decision = $this->policy->decide(self::stateOf($source->name(), $stored), $source->refreshAfter(), $date, $now);
+            $this->metrics->decided($source->name(), $decision, $date, $now);
+            $decisions[$source->name()->value] = $decision;
         }
 
         return $decisions;
