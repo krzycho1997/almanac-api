@@ -1,0 +1,24 @@
+README.md
+  s_4da5374f6e605f::t_611dfd8d3921f3 165,167,170,189
+docs/SPEC.md
+  s_4da5374f6e605f::t_611dfd8d3921f3 40,42-43,46-47
+  s_4da5374f6e605f::t_4f89287e60a7fe 45,82
+tests/Briefing/Integration/SnapshotRefresherTest.php
+  s_4da5374f6e605f::t_1cd98ab3474a36 95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b33d277ecc233afce2cc5730e3af9053ad503656",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
