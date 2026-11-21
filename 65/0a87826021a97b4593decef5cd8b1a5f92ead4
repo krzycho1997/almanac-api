@@ -1,0 +1,33 @@
+tests/Briefing/Unit/Mapper/BriefingResponseMapperTest.php
+  s_4da5374f6e605f::t_911665a185c54d 37,66,97,120,147,161,174,188,222,234,249,264
+src/Briefing/Discovery/DiscoveryExtractor.php
+  s_4da5374f6e605f::t_8ee128065ff547 31-35,43,61,74,78,89,91,121,123-126,129
+src/Briefing/Discovery/PersonIdentity.php
+  s_4da5374f6e605f::t_8ee128065ff547 1-15
+tests/Briefing/Unit/Discovery/DiscoveryExtractorTest.php
+  s_4da5374f6e605f::t_65d648cc0cba91 19,35,45,64,84,97,111,125,150,173,183,207,228,244,257,279,288,298
+src/Briefing/Discovery/PersonReference.php
+  s_4da5374f6e605f::t_8ee128065ff547 1-26
+tests/Briefing/Integration/BriefingResponseSchemaTest.php
+  s_4da5374f6e605f::t_911665a185c54d 17,43,58,77,109
+src/Briefing/Source/OnThisDay/WikipediaPersonIdentity.php
+  s_4da5374f6e605f::t_8ee128065ff547 1-88
+tests/Briefing/Unit/Source/OnThisDay/WikipediaPersonIdentityTest.php
+  s_4da5374f6e605f::t_65d648cc0cba91 1-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "650a87826021a97b4593decef5cd8b1a5f92ead4",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
