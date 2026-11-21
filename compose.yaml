@@ -1,3 +1,13 @@
+x-php: &php
+  security_opt:
+    - no-new-privileges:true
+  build:
+    context: .
+    target: dev
+  image: localhost/almanac-php:dev
+  volumes:
+    - .:/srv/app:z
+
 services:
   nginx:
     security_opt:
@@ -15,25 +25,27 @@ services:
       - ./public:/srv/app/public:ro,z
 
   php:
-    security_opt:
-      - no-new-privileges:true
-    build:
-      context: .
-      target: dev
-    image: localhost/almanac-php:dev
+    <<: *php
     depends_on:
       database:
         condition: service_healthy
       redis:
         condition: service_healthy
-    volumes:
-      - .:/srv/app:z
     healthcheck:
       test: ["CMD", "php", "-r", "exit(@fsockopen('127.0.0.1', 9000) ? 0 : 1);"]
       interval: 2s
       timeout: 3s
       retries: 3
       start_period: 300s
+
+  worker:
+    <<: *php
+    command: ["bin/console", "messenger:consume", "async", "--time-limit=3600", "--memory-limit=128M"]
+    depends_on:
+      php:
+        condition: service_healthy
+    restart: unless-stopped
+    stop_grace_period: 15s
 
   redocly:
     security_opt:

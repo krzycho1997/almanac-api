@@ -46,6 +46,37 @@ wait_for_database() {
     done
 }
 
+wait_for_vendor() {
+    attempt=1
+    until [ -f vendor/autoload_runtime.php ]; do
+        if [ "$attempt" -ge "$max_attempts" ]; then
+            echo "entrypoint: vendor/ not installed after $max_attempts attempts" >&2
+            exit 1
+        fi
+        echo "entrypoint: waiting for vendor/ ($attempt/$max_attempts)" >&2
+        attempt=$((attempt + 1))
+        sleep 1
+    done
+}
+
+wait_for_migrations() {
+    attempt=1
+    until output=$(bin/console doctrine:migrations:up-to-date 2>&1); do
+        if [ "$attempt" -ge "$max_attempts" ]; then
+            echo "entrypoint: migrations not applied after $max_attempts attempts:" >&2
+            echo "$output" >&2
+            exit 1
+        fi
+        echo "entrypoint: waiting for the migrations ($attempt/$max_attempts)" >&2
+        attempt=$((attempt + 1))
+        sleep 1
+    done
+}
+
+is_worker() {
+    [ "$1" = bin/console ] && [ "${2:-}" = messenger:consume ]
+}
+
 migrate() {
     if [ -d migrations ]; then
         bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --all-or-nothing
@@ -54,6 +85,14 @@ migrate() {
 
 if [ "$#" -eq 0 ] || [ "${1#-}" != "$1" ]; then
     set -- php-fpm "$@"
+fi
+
+if is_worker "$@"; then
+    trap 'exit 0' QUIT TERM INT
+    require_runtime_settings
+    wait_for_vendor
+    wait_for_migrations
+    exec "$@"
 fi
 
 if [ "$1" != php-fpm ]; then
