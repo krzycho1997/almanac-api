@@ -517,10 +517,10 @@ components:
             missingToken:
               summary: No Authorization header, or a token that is unknown, revoked or expired
               value:
-                type: 'https://tools.ietf.org/html/rfc2616#section-10'
-                title: An error occurred
+                type: 'about:blank'
+                title: Unauthorized
                 status: 401
-                detail: Unauthorized
+                detail: 'Send a valid access token as "Authorization: Bearer <token>".'
     MalformedBody:
       description: The body is not valid JSON.
       headers:
@@ -534,10 +534,10 @@ components:
             truncatedJson:
               summary: The body ends in the middle of a JSON object
               value:
-                type: 'https://tools.ietf.org/html/rfc2616#section-10'
-                title: An error occurred
+                type: 'about:blank'
+                title: Bad Request
                 status: 400
-                detail: Bad Request
+                detail: 'The request could not be read, for example a body that is not valid JSON.'
     UnsupportedMediaType:
       description: The body is not sent as application/json, for example as a form or XML.
       headers:
@@ -551,10 +551,10 @@ components:
             formBody:
               summary: The body is sent as a form
               value:
-                type: 'https://tools.ietf.org/html/rfc2616#section-10'
-                title: An error occurred
+                type: 'about:blank'
+                title: Unsupported Media Type
                 status: 415
-                detail: Unsupported Media Type
+                detail: 'Send the body as application/json.'
     NotFound:
       description: The resource the request points at does not exist, for example a discovery id no briefing produced, or a bookmark that is gone or belongs to another user.
       headers:
@@ -568,10 +568,10 @@ components:
             unknownDiscovery:
               summary: No briefing produced this discovery id
               value:
-                type: 'https://tools.ietf.org/html/rfc2616#section-10'
-                title: An error occurred
+                type: 'about:blank'
+                title: Not Found
                 status: 404
-                detail: Not Found
+                detail: 'No discovery has the id 0193a5b2-7c4d-5e6f-8a9b-0c1d2e3f4a5b.'
     Conflict:
       description: The user has already bookmarked this discovery.
       headers:
@@ -585,10 +585,10 @@ components:
             alreadyBookmarked:
               summary: The user bookmarks the same discovery a second time
               value:
-                type: 'https://tools.ietf.org/html/rfc2616#section-10'
-                title: An error occurred
+                type: 'about:blank'
+                title: Conflict
                 status: 409
-                detail: Conflict
+                detail: 'The discovery 0193a5b2-7c4d-5e6f-8a9b-0c1d2e3f4a5b is already bookmarked.'
     BadRequest:
       description: The request is malformed, for example the date is not a calendar date in Y-m-d.
       headers:
@@ -698,10 +698,10 @@ components:
             overTheLimit:
               summary: The 61st briefing request within a minute
               value:
-                type: 'https://tools.ietf.org/html/rfc2616#section-10'
-                title: An error occurred
+                type: 'about:blank'
+                title: Too Many Requests
                 status: 429
-                detail: Too Many Requests
+                detail: 'Too many requests from this network; try again after the number of seconds in Retry-After.'
     BadGateway:
       description: No source has data for this briefing.
       headers:
@@ -715,10 +715,10 @@ components:
             noSourceHasData:
               summary: Every source failed and none has stored data for the day
               value:
-                type: 'https://tools.ietf.org/html/rfc2616#section-10'
-                title: An error occurred
+                type: 'about:blank'
+                title: Bad Gateway
                 status: 502
-                detail: Bad Gateway
+                detail: 'No source has data for this briefing.'
     InternalServerError:
       description: The application failed; the details are only in the logs.
       headers:
