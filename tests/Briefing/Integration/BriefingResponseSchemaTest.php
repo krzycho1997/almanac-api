@@ -17,7 +17,7 @@ use App\Briefing\Model\WeatherKind;
 use App\Briefing\Source\OnThisDay\WikipediaPersonIdentity;
 use App\Briefing\SourceName;
 use App\Tests\Support\Briefing\BriefingResultBuilder;
-use App\Tests\Support\Briefing\SourcePayloads;
+use App\Tests\Support\Briefing\OpenMeteoPayloads;
 use App\Tests\Support\InteractsWithTestServices;
 use App\Tests\Support\OpenApi\OpenApiDocument;
 use League\OpenAPIValidation\Schema\SchemaValidator;
@@ -55,7 +55,7 @@ final class BriefingResponseSchemaTest extends KernelTestCase
     public function testDescribesStaleDataAsOpenApiSays(): void
     {
         // Given
-        $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create(BriefingResultBuilder::create()->stale(SourceName::Weather, SourcePayloads::dailyWeather(), '2026-11-18T09:00:00+01:00', FailureKind::RateLimited)->attemptedAt(self::CHECKED_AT)->build());
+        $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create(BriefingResultBuilder::create()->stale(SourceName::Weather, OpenMeteoPayloads::dailyWeather(), '2026-11-18T09:00:00+01:00', FailureKind::RateLimited)->attemptedAt(self::CHECKED_AT)->build());
 
         // When
         $briefing = self::serialized($response);

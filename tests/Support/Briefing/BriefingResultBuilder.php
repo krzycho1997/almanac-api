@@ -32,9 +32,9 @@ final readonly class BriefingResultBuilder
     public static function create(): self
     {
         return new self([], self::ATTEMPTED_AT)
-            ->ok(SourceName::Apod, SourcePayloads::apodPicture())
-            ->ok(SourceName::OnThisDay, SourcePayloads::onThisDayFeed())
-            ->ok(SourceName::Weather, SourcePayloads::dailyWeather());
+            ->ok(SourceName::Apod, ApodPayloads::picture())
+            ->ok(SourceName::OnThisDay, OnThisDayPayloads::feed())
+            ->ok(SourceName::Weather, OpenMeteoPayloads::dailyWeather());
     }
 
     public function ok(SourceName $source, SourcePayload $payload): self

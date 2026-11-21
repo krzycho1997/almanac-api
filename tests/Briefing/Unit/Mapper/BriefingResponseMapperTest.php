@@ -36,8 +36,9 @@ use App\Briefing\Model\PageRef;
 use App\Briefing\Model\WeatherKind;
 use App\Briefing\Source\OnThisDay\WikipediaPersonIdentity;
 use App\Briefing\SourceName;
+use App\Tests\Support\Briefing\ApodPayloads;
 use App\Tests\Support\Briefing\BriefingResultBuilder;
-use App\Tests\Support\Briefing\SourcePayloads;
+use App\Tests\Support\Briefing\OpenMeteoPayloads;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -91,7 +92,7 @@ final class BriefingResponseMapperTest extends TestCase
     public function testMapsEveryMediaType(MediaType $mediaType, ApodMediaType $expectedMediaType): void
     {
         // Given
-        $briefing = BriefingResultBuilder::create()->ok(SourceName::Apod, SourcePayloads::apodPicture($mediaType))->build();
+        $briefing = BriefingResultBuilder::create()->ok(SourceName::Apod, ApodPayloads::picture($mediaType))->build();
 
         // When
         $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create($briefing);
@@ -141,7 +142,7 @@ final class BriefingResponseMapperTest extends TestCase
     public function testMapsTheLastGoodDataOfAFailedRefreshAsStale(): void
     {
         // Given
-        $briefing = BriefingResultBuilder::create()->stale(SourceName::Weather, SourcePayloads::dailyWeather(), '2026-11-18T09:00:00Z', FailureKind::Unavailable)->attemptedAt(self::CHECKED_AT)->build();
+        $briefing = BriefingResultBuilder::create()->stale(SourceName::Weather, OpenMeteoPayloads::dailyWeather(), '2026-11-18T09:00:00Z', FailureKind::Unavailable)->attemptedAt(self::CHECKED_AT)->build();
 
         // When
         $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create($briefing);
@@ -155,7 +156,7 @@ final class BriefingResponseMapperTest extends TestCase
     public function testMapsTheLastGoodDataOfASourceRefusedByItsOpenCircuitAsStaleAndUnavailable(): void
     {
         // Given
-        $briefing = BriefingResultBuilder::create()->stale(SourceName::Weather, SourcePayloads::dailyWeather(), '2026-11-18T09:00:00Z', FailureKind::CircuitOpen)->attemptedAt(self::CHECKED_AT)->build();
+        $briefing = BriefingResultBuilder::create()->stale(SourceName::Weather, OpenMeteoPayloads::dailyWeather(), '2026-11-18T09:00:00Z', FailureKind::CircuitOpen)->attemptedAt(self::CHECKED_AT)->build();
 
         // When
         $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create($briefing);
@@ -182,7 +183,7 @@ final class BriefingResponseMapperTest extends TestCase
     public function testMapsEveryWeatherKind(WeatherKind $kind, WeatherKindValue $expected): void
     {
         // Given
-        $briefing = BriefingResultBuilder::create()->ok(SourceName::Weather, SourcePayloads::dailyWeather($kind))->build();
+        $briefing = BriefingResultBuilder::create()->ok(SourceName::Weather, OpenMeteoPayloads::dailyWeather($kind))->build();
 
         // When
         $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create($briefing);
@@ -216,7 +217,7 @@ final class BriefingResponseMapperTest extends TestCase
     public function testDescribesTheWeatherCode(?int $code, ?string $expected): void
     {
         // Given
-        $briefing = BriefingResultBuilder::create()->ok(SourceName::Weather, SourcePayloads::dailyWeather(weatherCode: $code))->build();
+        $briefing = BriefingResultBuilder::create()->ok(SourceName::Weather, OpenMeteoPayloads::dailyWeather(weatherCode: $code))->build();
 
         // When
         $response = new BriefingResponseMapper(new DiscoveryExtractor(new WikipediaPersonIdentity()))->create($briefing);

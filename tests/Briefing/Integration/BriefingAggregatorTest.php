@@ -28,6 +28,7 @@ use App\Briefing\SourceResult;
 use App\Tests\Support\Briefing\CallJournal;
 use App\Tests\Support\Briefing\CircuitBreaker\InMemoryCircuitBreakerStore;
 use App\Tests\Support\Briefing\JournalingSource;
+use App\Tests\Support\Briefing\OnThisDayPayloads;
 use App\Tests\Support\Briefing\SourcePayloads;
 use App\Tests\Support\Briefing\StubSource;
 use App\Tests\Support\InteractsWithTestServices;
@@ -85,7 +86,7 @@ final class BriefingAggregatorTest extends KernelTestCase
         // Then
         self::assertSame([SourceName::Apod, SourceName::Weather], $briefing->missing());
         self::assertEquals(SourceEntry::notApplicable(SourceName::Apod), $briefing->entryFor(SourceName::Apod));
-        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, SourcePayloads::onThisDayFeed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
+        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, OnThisDayPayloads::feed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
     }
 
     /**
@@ -145,7 +146,7 @@ final class BriefingAggregatorTest extends KernelTestCase
         $briefing = self::aggregator([new StubSource(SourceName::OnThisDay, self::unrequested())], $clock)->briefingFor(self::day(), self::warsaw());
 
         // Then
-        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, SourcePayloads::onThisDayFeed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
+        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, OnThisDayPayloads::feed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
     }
 
     #[DataProvider('laterRequests')]
@@ -193,7 +194,7 @@ final class BriefingAggregatorTest extends KernelTestCase
         $briefing = self::aggregator([new StubSource(SourceName::OnThisDay, static fn (): PendingFetch => self::pendingFetch())], $clock)->briefingFor(self::day(), self::warsaw());
 
         // Then
-        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, SourcePayloads::onThisDayFeed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
+        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, OnThisDayPayloads::feed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
     }
 
     public function testNeverRequestsAStoredPastDayAgain(): void
@@ -230,7 +231,7 @@ final class BriefingAggregatorTest extends KernelTestCase
         $clock = new MockClock(self::NOW);
         $logs = new TestHandler();
         $concurrentSuccessInTheSameSecond = static function () use ($clock): PendingFetch {
-            self::testService(SourceSnapshotRepository::class)->saveResult(SourceResult::ok(SourceName::OnThisDay, SourcePayloads::onThisDayFeed()), SnapshotScope::undated(SourceName::OnThisDay, '11-20'), $clock->now());
+            self::testService(SourceSnapshotRepository::class)->saveResult(SourceResult::ok(SourceName::OnThisDay, OnThisDayPayloads::feed()), SnapshotScope::undated(SourceName::OnThisDay, '11-20'), $clock->now());
 
             return self::failingFetch();
         };
@@ -239,7 +240,7 @@ final class BriefingAggregatorTest extends KernelTestCase
         $briefing = self::aggregator([new StubSource(SourceName::OnThisDay, $concurrentSuccessInTheSameSecond)], $clock, new Logger('briefing', [$logs]))->briefingFor(self::day(), self::warsaw());
 
         // Then
-        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, SourcePayloads::onThisDayFeed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
+        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, OnThisDayPayloads::feed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
         self::assertSame('stale', $logs->getRecords()[0]->context['outcome'] ?? null);
     }
 
@@ -283,7 +284,7 @@ final class BriefingAggregatorTest extends KernelTestCase
         $briefing = self::aggregator([new StubSource(SourceName::OnThisDay, self::unrequested())], $clock)->briefingFor(self::day(), self::warsaw());
 
         // Then
-        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, SourcePayloads::onThisDayFeed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
+        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, OnThisDayPayloads::feed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
     }
 
     public function testTellsTheFailuresOfThisRunFromThoseOfAnEarlierOne(): void
@@ -350,7 +351,7 @@ final class BriefingAggregatorTest extends KernelTestCase
         $briefing = self::aggregator([new StubSource(SourceName::OnThisDay, self::unrequested(), true, $interval)], $clock, breaker: $breaker)->briefingFor(self::day(), self::warsaw());
 
         // Then
-        self::assertEquals(SourceEntry::stale(SourceName::OnThisDay, SourcePayloads::onThisDayFeed(), $fetchedAt, new SourceFailure(FailureKind::CircuitOpen), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
+        self::assertEquals(SourceEntry::stale(SourceName::OnThisDay, OnThisDayPayloads::feed(), $fetchedAt, new SourceFailure(FailureKind::CircuitOpen), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
         self::assertTrue($briefing->hasAnyData());
         $stored = self::testService(SnapshotRefresher::class)->storedFor([SnapshotScope::undated(SourceName::OnThisDay, '11-20')]);
         $snapshot = $stored[SourceName::OnThisDay->value] ?? null;
@@ -372,7 +373,7 @@ final class BriefingAggregatorTest extends KernelTestCase
         // Then
         self::assertSame(1, $requests);
         self::assertSame(CircuitState::Closed, $breaker->state(SourceName::OnThisDay));
-        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, SourcePayloads::onThisDayFeed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
+        self::assertEquals(SourceEntry::fresh(SourceName::OnThisDay, OnThisDayPayloads::feed(), $clock->now()), $briefing->entryFor(SourceName::OnThisDay));
     }
 
     public function testAsksTheBreakerOnlyForTheSourcesThePolicyFetches(): void
@@ -476,7 +477,7 @@ final class BriefingAggregatorTest extends KernelTestCase
     {
         $response = new MockHttpClient(new MockResponse('{}', ['http_code' => Response::HTTP_SERVICE_UNAVAILABLE]))->request(Request::METHOD_GET, self::URL);
 
-        return new PendingFetch([$response], static fn (): SourcePayload => SourcePayloads::onThisDayFeed(), new MockClock(self::NOW));
+        return new PendingFetch([$response], static fn (): SourcePayload => OnThisDayPayloads::feed(), new MockClock(self::NOW));
     }
 
     /**

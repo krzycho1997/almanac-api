@@ -18,7 +18,7 @@ use App\Briefing\Model\OnThisDayFeed;
 use App\Briefing\Model\PageRef;
 use App\Briefing\Source\OnThisDay\WikipediaPersonIdentity;
 use App\Tests\Support\Briefing\FakePayload;
-use App\Tests\Support\Briefing\SourcePayloads;
+use App\Tests\Support\Briefing\OpenMeteoPayloads;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -285,7 +285,7 @@ final class DiscoveryExtractorTest extends TestCase
     public function testFindsNothingToDiscoverInTheWeather(): void
     {
         // When
-        $records = new DiscoveryExtractor(new WikipediaPersonIdentity())->extract(SourcePayloads::dailyWeather(), new \DateTimeImmutable(self::IDES));
+        $records = new DiscoveryExtractor(new WikipediaPersonIdentity())->extract(OpenMeteoPayloads::dailyWeather(), new \DateTimeImmutable(self::IDES));
 
         // Then
         self::assertSame([], $records);

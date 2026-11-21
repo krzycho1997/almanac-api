@@ -9,7 +9,7 @@ use App\Briefing\FailureOutcome;
 use App\Briefing\SourceEntry;
 use App\Briefing\SourceFailure;
 use App\Briefing\SourceName;
-use App\Tests\Support\Briefing\SourcePayloads;
+use App\Tests\Support\Briefing\OpenMeteoPayloads;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -38,8 +38,8 @@ final class SourceEntryTest extends TestCase
         $attemptedAt = new \DateTimeImmutable(self::ATTEMPTED_AT);
         $failure = new SourceFailure(FailureKind::Unavailable);
 
-        yield 'fresh' => [SourceEntry::fresh(SourceName::Weather, SourcePayloads::dailyWeather(), $fetchedAt), [true, false, '09:00', '09:00'], FailureOutcome::Stale];
-        yield 'stale' => [SourceEntry::stale(SourceName::Weather, SourcePayloads::dailyWeather(), $fetchedAt, $failure, $attemptedAt), [true, true, '09:00', '12:00'], FailureOutcome::Stale];
+        yield 'fresh' => [SourceEntry::fresh(SourceName::Weather, OpenMeteoPayloads::dailyWeather(), $fetchedAt), [true, false, '09:00', '09:00'], FailureOutcome::Stale];
+        yield 'stale' => [SourceEntry::stale(SourceName::Weather, OpenMeteoPayloads::dailyWeather(), $fetchedAt, $failure, $attemptedAt), [true, true, '09:00', '12:00'], FailureOutcome::Stale];
         yield 'missing' => [SourceEntry::missing(SourceName::Weather, $failure, $attemptedAt), [false, true, null, '12:00'], FailureOutcome::Missing];
         yield 'not applicable' => [SourceEntry::notApplicable(SourceName::Weather), [false, false, null, null], FailureOutcome::Missing];
     }
@@ -64,8 +64,8 @@ final class SourceEntryTest extends TestCase
         $circuitOpen = new SourceFailure(FailureKind::CircuitOpen);
         $earlier = new SourceFailure(FailureKind::Unavailable, 503);
 
-        yield 'fresh' => [SourceEntry::fresh(SourceName::Weather, SourcePayloads::dailyWeather(), $fetchedAt), SourceEntry::stale(SourceName::Weather, SourcePayloads::dailyWeather(), $fetchedAt, $circuitOpen, $refusedAt)];
-        yield 'stale' => [SourceEntry::stale(SourceName::Weather, SourcePayloads::dailyWeather(), $fetchedAt, $earlier, $fetchedAt), SourceEntry::stale(SourceName::Weather, SourcePayloads::dailyWeather(), $fetchedAt, $circuitOpen, $refusedAt)];
+        yield 'fresh' => [SourceEntry::fresh(SourceName::Weather, OpenMeteoPayloads::dailyWeather(), $fetchedAt), SourceEntry::stale(SourceName::Weather, OpenMeteoPayloads::dailyWeather(), $fetchedAt, $circuitOpen, $refusedAt)];
+        yield 'stale' => [SourceEntry::stale(SourceName::Weather, OpenMeteoPayloads::dailyWeather(), $fetchedAt, $earlier, $fetchedAt), SourceEntry::stale(SourceName::Weather, OpenMeteoPayloads::dailyWeather(), $fetchedAt, $circuitOpen, $refusedAt)];
         yield 'missing' => [SourceEntry::missing(SourceName::Weather, $earlier, $fetchedAt), SourceEntry::missing(SourceName::Weather, $circuitOpen, $refusedAt)];
         yield 'not stored' => [SourceEntry::notApplicable(SourceName::Weather), SourceEntry::missing(SourceName::Weather, $circuitOpen, $refusedAt)];
     }
