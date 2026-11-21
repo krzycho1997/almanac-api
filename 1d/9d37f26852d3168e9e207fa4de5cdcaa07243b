@@ -1,0 +1,26 @@
+src/Briefing/RefreshPolicy.php
+  s_4da5374f6e605f::t_0047eb549021a9 67
+src/Briefing/BriefingMetrics.php
+  s_4da5374f6e605f::t_edafb0e984b504 9,21-24,34-38,45-46,52,56,58-62,66-76
+  s_4da5374f6e605f::t_4d996d3aafa0fe 77-78
+src/Briefing/BriefingDay.php
+  s_4da5374f6e605f::t_edafb0e984b504 23-32
+src/Briefing/CircuitBreaker/CircuitLog.php
+  s_4da5374f6e605f::t_edafb0e984b504 11,53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1d9d37f26852d3168e9e207fa4de5cdcaa07243b",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
