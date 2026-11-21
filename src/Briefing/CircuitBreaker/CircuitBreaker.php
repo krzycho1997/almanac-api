@@ -70,7 +70,7 @@ final readonly class CircuitBreaker
     public function record(SourceResult $result, CircuitPermit $permit): void
     {
         if (CircuitPermit::Call === $permit) {
-            $this->afterCall($result->source, self::outageOf($result));
+            $this->afterCall($result);
 
             return;
         }
@@ -91,14 +91,25 @@ final readonly class CircuitBreaker
         return CircuitPermit::Refused;
     }
 
-    private function afterCall(SourceName $source, ?SourceFailure $outage): void
+    private function afterCall(SourceResult $result): void
     {
-        if (null === $outage) {
-            $this->store->forgetFailures($source->value);
+        $outage = self::outageOf($result);
+
+        if ($outage instanceof SourceFailure) {
+            $this->afterOutage($result->source, $outage);
 
             return;
         }
 
+        if ($result->hasFailed()) {
+            return;
+        }
+
+        $this->store->forgetFailures($result->source->value);
+    }
+
+    private function afterOutage(SourceName $source, SourceFailure $outage): void
+    {
         if (FailureKind::RateLimited === $outage->kind) {
             $this->openAtLeast($source, $outage, self::NOT_COUNTED);
 
