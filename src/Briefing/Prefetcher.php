@@ -13,7 +13,7 @@ use Symfony\Component\Clock\ClockInterface;
 final readonly class Prefetcher
 {
     private const string CHANNEL = 'briefing';
-    private const string SUMMARY = 'Prefetch finished: {dates} dates, {failures} failures';
+    private const string SUMMARY = 'Prefetch finished: {dates} dates, {failures} failures, {problems} problems';
 
     public function __construct(
         private BriefingAggregator $aggregator,
@@ -64,6 +64,7 @@ final readonly class Prefetcher
             LogContextKey::To->value => $range->to->format(BriefingDay::FORMAT),
             LogContextKey::Dates->value => $tally->dates,
             LogContextKey::Failures->value => $tally->failures,
+            LogContextKey::Problems->value => $tally->problems,
             LogContextKey::DurationMs->value => Elapsed::millisecondsBetween($tally->startedAt, $this->clock->now()),
         ]);
     }

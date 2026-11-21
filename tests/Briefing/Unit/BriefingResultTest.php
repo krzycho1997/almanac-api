@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Briefing\Unit;
 
+use App\Briefing\BriefingProblem;
 use App\Briefing\BriefingResult;
 use App\Briefing\FailureKind;
 use App\Briefing\Location;
+use App\Briefing\ProblemTiming;
 use App\Briefing\SourceEntry;
 use App\Briefing\SourceFailure;
 use App\Briefing\SourceName;
@@ -92,6 +94,26 @@ final class BriefingResultTest extends TestCase
         yield 'old data served stale, nothing fetched' => [[$stale], [], false];
         yield 'a fetch failed now' => [[$stale], [SourceResult::failed(SourceName::Apod, FailureKind::Unavailable)], true];
         yield 'no data while the source pauses' => [[$missing], [], true];
+    }
+
+    public function testListsTheFailuresOfThisRunThenTheSourcesStillInTheirPause(): void
+    {
+        // Given
+        $now = new \DateTimeImmutable(self::NOW);
+        $failure = new SourceFailure(FailureKind::Unavailable);
+        $inPause = SourceEntry::missing(SourceName::Apod, $failure, $now);
+        $failedNow = SourceEntry::missing(SourceName::OnThisDay, $failure, $now);
+        $stale = SourceEntry::stale(SourceName::Weather, new FakePayload([]), $now, $failure, $now);
+        $briefing = new BriefingResult($now, Location::fromCoordinates(52.23, 21.01), [$inPause, $failedNow, $stale], [SourceResult::failed(SourceName::OnThisDay, FailureKind::Unavailable, 503)]);
+
+        // When
+        $problems = $briefing->problems();
+
+        // Then
+        self::assertEquals([
+            new BriefingProblem(SourceName::OnThisDay, new SourceFailure(FailureKind::Unavailable, 503), ProblemTiming::FailedNow),
+            new BriefingProblem(SourceName::Apod, $failure, ProblemTiming::InPause),
+        ], $problems);
     }
 
     public function testFindsTheResultOfASource(): void

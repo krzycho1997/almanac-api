@@ -23,8 +23,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[AsTargetedValueResolver]
 final readonly class BriefingDateValueResolver implements ValueResolverInterface
 {
-    private const string MIDNIGHT_FORMAT = '!'.BriefingDay::FORMAT;
-
     public function __construct(
         private ValidatorInterface $validator,
         private ClockInterface $clock,
@@ -58,13 +56,8 @@ final readonly class BriefingDateValueResolver implements ValueResolverInterface
 
     private function startOf(string $value): \DateTimeImmutable
     {
-        $date = \DateTimeImmutable::createFromFormat(self::MIDNIGHT_FORMAT, $value, $this->clock->now()->getTimezone());
-
-        if ($date instanceof \DateTimeImmutable) {
-            return $date;
-        }
-
-        throw new \LogicException('A validated '.BriefingDay::FORMAT.' date could not be created.');
+        return BriefingDay::startOf($value, $this->clock->now()->getTimezone())
+            ?? throw new \LogicException('A validated '.BriefingDay::FORMAT.' date could not be created.');
     }
 
     private function assertWithinWindow(\DateTimeImmutable $date, string $path): void

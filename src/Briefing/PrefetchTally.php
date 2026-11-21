@@ -8,6 +8,7 @@ final class PrefetchTally
 {
     public private(set) int $dates = 0;
     public private(set) int $failures = 0;
+    public private(set) int $problems = 0;
     public private(set) bool $lastDateFetched = false;
 
     public function __construct(public readonly \DateTimeImmutable $startedAt)
@@ -18,6 +19,7 @@ final class PrefetchTally
     {
         ++$this->dates;
         $this->failures += \count($briefing->failures());
+        $this->problems += \count($briefing->problems());
         $this->lastDateFetched = $briefing->hasFetched();
     }
 }

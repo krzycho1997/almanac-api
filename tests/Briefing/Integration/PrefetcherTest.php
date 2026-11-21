@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Briefing\Integration;
 
-use App\Briefing\BriefingAggregator;
 use App\Briefing\BriefingResult;
 use App\Briefing\DateRange;
 use App\Briefing\FailureKind;
@@ -78,7 +77,7 @@ final class PrefetcherTest extends KernelTestCase
         $summaries = self::summaries();
         self::assertCount(1, $summaries);
         self::assertSame(Level::Info, $summaries[0]->level);
-        self::assertSame(['from' => '2024-03-15', 'to' => '2024-03-16', 'dates' => 2, 'failures' => 2, 'durationMs' => 1500], $summaries[0]->context);
+        self::assertSame(['from' => '2024-03-15', 'to' => '2024-03-16', 'dates' => 2, 'failures' => 2, 'problems' => 2, 'durationMs' => 1500], $summaries[0]->context);
     }
 
     public function testPausesOnlyBetweenDates(): void
@@ -132,7 +131,7 @@ final class PrefetcherTest extends KernelTestCase
         // Then
         $summaries = self::summaries();
         self::assertCount(1, $summaries);
-        self::assertSame(['from' => '2024-03-15', 'to' => '2024-03-16', 'dates' => 1, 'failures' => 1, 'durationMs' => 0], $summaries[0]->context);
+        self::assertSame(['from' => '2024-03-15', 'to' => '2024-03-16', 'dates' => 1, 'failures' => 1, 'problems' => 1, 'durationMs' => 0], $summaries[0]->context);
     }
 
     public function testCountsEveryFailedSourceInTheSummary(): void
@@ -164,11 +163,12 @@ final class PrefetcherTest extends KernelTestCase
         // Then
         self::assertSame([], $again[0]->failures());
         self::assertTrue($again[0]->hasProblems());
+        self::assertSame(['failures' => 0, 'problems' => 1], array_intersect_key(self::summaries()[1]->context, ['failures' => true, 'problems' => true]));
     }
 
     private static function prefetcher(): Prefetcher
     {
-        return new Prefetcher(self::testService(BriefingAggregator::class), new Clock(), self::getContainer()->get('monolog.logger.briefing'));
+        return self::testService(Prefetcher::class);
     }
 
     private static function upstream(): UpstreamMockResponseFactory
