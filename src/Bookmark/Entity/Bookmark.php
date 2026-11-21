@@ -14,7 +14,7 @@ use App\Identity\Contract\UserIdType;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: BookmarkRepository::class)]
+#[ORM\Entity(repositoryClass: BookmarkRepository::class, readOnly: true)]
 #[ORM\Table(name: 'bookmark')]
 #[ORM\UniqueConstraint(name: 'bookmark_user_discovery_unique', columns: ['user_id', 'discovery_id'])]
 #[ORM\Index(name: 'bookmark_user_created_idx', columns: ['user_id', 'created_at', 'id'])]
@@ -38,6 +38,6 @@ class Bookmark
         $this->id = new BookmarkId();
         $this->userId = $userId;
         $this->discoveryId = $discoveryId;
-        $this->createdAt = $createdAt->setTimestamp($createdAt->getTimestamp());
+        $this->createdAt = $createdAt->setMicrosecond(0);
     }
 }

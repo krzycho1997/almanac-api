@@ -145,7 +145,7 @@ docker compose exec php composer check:fast   # composer validate, env keys, YAM
 docker compose exec php composer check        # check:fast, then a fresh test database and every suite except live
 docker compose exec php composer test         # unit, integration, functional and e2e
 docker compose exec php composer test:unit    # also test:integration, test:functional (with e2e)
-docker compose exec php composer test:live    # calls the real APIs; not part of the other suites
+docker compose exec php composer test:live    # calls the real APIs; run by hand, not part of the other suites or CI
 docker compose exec php vendor/bin/phpunit --testsuite briefing   # one module: briefing, identity, bookmark, shared
 docker compose exec php vendor/bin/phpunit --testsuite phpstan    # the architecture rules against their fixtures
 docker compose run --rm --no-deps redocly lint docs/openapi.yaml  # OpenAPI lint, as in CI

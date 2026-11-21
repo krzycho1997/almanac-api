@@ -100,8 +100,7 @@
     },
     "scripts": {
         "auto-scripts": {
-            "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+            "cache:clear": "symfony-cmd"
         },
         "post-install-cmd": [
             "@auto-scripts"
@@ -137,6 +136,7 @@
         "test:functional": "phpunit --testsuite functional,e2e",
         "test:live": "phpunit --testsuite live --do-not-fail-on-empty-test-suite",
         "test:db": [
+            "bin/console cache:clear --env=test --no-warmup",
             "bin/console doctrine:database:drop --env=test --force --if-exists --no-interaction",
             "bin/console doctrine:database:create --env=test --no-interaction",
             "bin/console doctrine:migrations:migrate --env=test --no-interaction --allow-no-migration",

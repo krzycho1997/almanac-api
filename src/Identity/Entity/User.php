@@ -14,7 +14,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Entity(repositoryClass: UserRepository::class, readOnly: true)]
 #[ORM\Table(name: 'identity_user')]
 #[ORM\UniqueConstraint(name: 'uniq_identity_user_email', columns: ['email'])]
 class User implements UserInterface, AuthenticatedUser
@@ -35,7 +35,7 @@ class User implements UserInterface, AuthenticatedUser
     {
         $this->id = new UserId();
         $this->email = $email;
-        $this->createdAt = $createdAt->setTimestamp($createdAt->getTimestamp());
+        $this->createdAt = $createdAt->setMicrosecond(0);
     }
 
     /**

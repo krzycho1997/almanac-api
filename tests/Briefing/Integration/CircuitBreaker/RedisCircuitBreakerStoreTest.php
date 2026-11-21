@@ -24,6 +24,8 @@ final class RedisCircuitBreakerStoreTest extends CircuitBreakerStoreContract
     private const string CIRCUIT = 'apod';
     private const string CHANNEL = 'briefing';
     private const int CALLS = 4;
+    private const string EVERY_KEY = '*';
+    private const int NO_EXPIRY = -1;
 
     private \Redis $redis;
     private MockClock $clock;
@@ -48,7 +50,27 @@ final class RedisCircuitBreakerStoreTest extends CircuitBreakerStoreContract
     protected function elapse(int $milliseconds): void
     {
         $this->clock->sleep($milliseconds / Elapsed::MILLISECONDS_PER_SECOND);
-        usleep($milliseconds * Elapsed::MILLISECONDS_PER_SECOND);
+
+        foreach ($this->redis->keys(self::EVERY_KEY) as $key) {
+            $this->shortenTheTimeToLive($key, $milliseconds);
+        }
+    }
+
+    private function shortenTheTimeToLive(string $key, int $milliseconds): void
+    {
+        $left = $this->redis->pttl($key);
+
+        if (self::NO_EXPIRY === $left) {
+            return;
+        }
+
+        if ($left > $milliseconds) {
+            $this->redis->pexpire($key, $left - $milliseconds);
+
+            return;
+        }
+
+        $this->redis->del($key);
     }
 
     public function testFailsOpenWithOneWarningAndNoFurtherCallsWhileRedisIsDown(): void
