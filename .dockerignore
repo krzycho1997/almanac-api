@@ -23,5 +23,6 @@ tests
 var
 vendor
 tools
+.claude
 CLAUDE.md
 .env.local.php
