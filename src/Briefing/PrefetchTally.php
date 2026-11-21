@@ -18,7 +18,7 @@ final class PrefetchTally
     public function add(BriefingResult $briefing): void
     {
         ++$this->dates;
-        $this->failures += \count($briefing->failures());
+        $this->failures += \count(array_filter($briefing->failures(), static fn (SourceResult $result): bool => $result->calledUpstream()));
         $this->problems += \count($briefing->problems());
         $this->lastDateFetched = $briefing->hasFetched();
     }

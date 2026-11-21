@@ -162,7 +162,7 @@ final class SourceSnapshotRepositoryTest extends TestCase
      */
     public static function failureKinds(): iterable
     {
-        foreach (FailureKind::cases() as $kind) {
+        foreach (array_filter(FailureKind::cases(), static fn (FailureKind $kind): bool => FailureKind::CircuitOpen !== $kind) as $kind) {
             yield $kind->value => [$kind];
         }
     }
@@ -278,6 +278,7 @@ final class SourceSnapshotRepositoryTest extends TestCase
     {
         yield 'not applicable' => [SourceResult::notApplicable(SourceName::Weather)];
         yield 'result of another source' => [SourceResult::failed(SourceName::Apod, FailureKind::Unavailable)];
+        yield 'refused by an open circuit' => [SourceResult::circuitOpen(SourceName::Weather)];
     }
 
     private function repository(): SourceSnapshotRepository

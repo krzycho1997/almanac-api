@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Briefing\Functional;
 
+use App\Briefing\CircuitBreaker\CircuitBreakerStore;
+use App\Briefing\CircuitBreaker\RedisCircuitBreakerStore;
 use App\Shared\ErrorHandler\ProblemJsonErrorRenderer;
 use App\Tests\Support\Briefing\UpstreamMock;
 use App\Tests\Support\Briefing\UpstreamMockResponseFactory;
@@ -12,7 +14,11 @@ use App\Tests\Support\InteractsWithTestServices;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Monolog\Level;
+use Monolog\LogRecord;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Psr\Clock\ClockInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,6 +34,7 @@ final class BriefingControllerTest extends FunctionalTestCase
     use InteractsWithTestServices;
 
     private const string BRIEFING = '/api/briefings/';
+    private const string REFUSING_REDIS = 'redis://127.0.0.1:1?timeout=0.2&read_timeout=0.2';
     private const string PICTURE_DAY = '2024-03-15';
     private const string CONTENT_TYPE = 'Content-Type';
     private const string URN = 'urn:uuid:';
@@ -344,7 +351,6 @@ final class BriefingControllerTest extends FunctionalTestCase
         yield 'picture: server error twice' => [self::scenario()->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE)->apod()->status(Response::HTTP_SERVICE_UNAVAILABLE), 'apod', self::failed('unavailable'), 6, Level::Warning, 'Source apod fetch failed: unavailable', ['kind' => 'unavailable', 'httpStatus' => 503, 'durationMs' => 2]];
         yield 'picture: stalled until max duration' => [self::scenario()->apod()->stalled(), 'apod', self::failed('unavailable'), 5, Level::Warning, 'Source apod fetch failed: unavailable', ['kind' => 'unavailable', 'errorType' => 'TransportException', 'durationMs' => 2]];
         yield 'picture: connection refused twice' => [self::scenario()->apod()->networkError()->apod()->networkError(), 'apod', self::failed('unavailable'), 6, Level::Warning, 'Source apod fetch failed: unavailable', ['kind' => 'unavailable', 'errorType' => 'TransportException', 'durationMs' => 2]];
-        yield 'picture: rate limited' => [self::scenario()->apod()->status(Response::HTTP_TOO_MANY_REQUESTS)->retryAfter(3600), 'apod', self::failed('rate_limited'), 5, Level::Warning, 'Source apod fetch failed: rate_limited', ['kind' => 'rate_limited', 'httpStatus' => 429, 'retryAt' => new \DateTimeImmutable('2026-11-18 13:00:00 UTC'), 'durationMs' => 2]];
         yield 'picture: refused key' => [self::scenario()->apod()->status(Response::HTTP_FORBIDDEN), 'apod', self::failed('misconfigured'), 5, Level::Error, 'Source apod fetch failed: misconfigured', ['kind' => 'misconfigured', 'httpStatus' => 403, 'durationMs' => 2]];
         yield 'picture: rejected date' => [self::scenario()->apod()->fixture('apod/date-out-of-range.json')->status(Response::HTTP_BAD_REQUEST), 'apod', self::failed('rejected'), 5, Level::Notice, 'Source apod fetch failed: rejected', ['kind' => 'rejected', 'httpStatus' => 400, 'durationMs' => 2]];
         yield 'picture: NASA placeholder' => [self::scenario()->apod()->fixture('apod/placeholder-2026-11-18.json'), 'apod', self::failed('invalid_payload'), 5, Level::Error, 'Source apod fetch failed: invalid_payload', ['kind' => 'invalid_payload', 'httpStatus' => 200, 'errorType' => 'InvalidUpstreamPayloadException', 'fields' => ['title'], 'reason' => 'placeholder', 'durationMs' => 12]];
@@ -445,6 +451,117 @@ final class BriefingControllerTest extends FunctionalTestCase
         self::assertSame(['apod' => self::NOT_APPLICABLE, 'onThisDay' => self::FRESH, 'weather' => self::failed('rejected')], $briefing['sources']);
         self::assertSame([], self::upstream()->served());
         self::assertSame([], self::recordsOf(self::BRIEFING_CHANNEL));
+    }
+
+    public function testSkipsNasaWhileItsCircuitIsOpen(): void
+    {
+        // Given
+        self::openCircuit('apod', '2026-11-18 12:01:00');
+        self::upstream()->respondWith(self::scenario());
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        $briefing = self::json($this->client->getResponse()->getContent());
+        self::assertSame(['apod' => self::failed('unavailable'), 'onThisDay' => self::FRESH, 'weather' => self::FRESH], $briefing['sources']);
+        self::assertSame(['apod'], $briefing['missing']);
+        self::assertSame([], self::requestedHosts(self::NASA_HOST));
+        self::assertSame([], self::recordsOf(self::BRIEFING_CHANNEL));
+        self::assertSame([], self::testService(Connection::class)->fetchFirstColumn("SELECT scope_key FROM briefing_source_snapshot WHERE source = 'apod'"));
+    }
+
+    public function testServesTheLastGoodWeatherAsStaleWhileItsCircuitIsOpen(): void
+    {
+        // Given
+        self::upstream()->respondWith(UpstreamMock::create()->onThisDayFrom(self::HISTORY_DAY)->forecastOn(self::UNPUBLISHED_DAY));
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::UNPUBLISHED_DAY);
+        $weather = self::json($this->client->getResponse()->getContent())['weather'];
+        self::mockTime(new \DateTimeImmutable('2026-11-18 13:00:00', new \DateTimeZone(self::TIMEZONE)));
+        self::openCircuit('weather', '2026-11-18 13:01:00');
+        self::upstream()->respondWith(UpstreamMock::create());
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::UNPUBLISHED_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        $briefing = self::json($this->client->getResponse()->getContent());
+        self::assertSame(['apod' => self::NOT_APPLICABLE, 'onThisDay' => self::FRESH, 'weather' => ['status' => 'ok', 'fetchedAt' => '2026-11-18T12:00:00Z', 'stale' => true, 'error' => 'unavailable', 'lastAttemptAt' => '2026-11-18T13:00:00Z']], $briefing['sources']);
+        self::assertSame($weather, $briefing['weather']);
+        self::assertSame([], self::upstream()->served());
+    }
+
+    public function testAsksNasaAgainOnceTheOpeningIsOver(): void
+    {
+        // Given
+        self::openCircuit('apod', '2026-11-18 11:59:00');
+        self::upstream()->respondWith(self::scenario()->apod()->fixture(self::PICTURE));
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        self::assertSame(self::ALL_FRESH, self::json($this->client->getResponse()->getContent())['sources']);
+        self::assertNull(self::testService(CircuitBreakerStore::class)->openUntil('apod'));
+    }
+
+    public function testLogsARateLimitedPictureAndTheOpeningOfItsCircuit(): void
+    {
+        // Given
+        self::upstream()->respondWith(self::scenario()->apod()->status(Response::HTTP_TOO_MANY_REQUESTS)->retryAfter(3600));
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        $briefing = self::json($this->client->getResponse()->getContent());
+        self::assertSame(array_replace(self::ALL_FRESH, ['apod' => self::failed('rate_limited')]), $briefing['sources']);
+        self::assertSame(['apod'], $briefing['missing']);
+        self::assertSame(self::EMPTY_SECTIONS['apod'], array_intersect_key($briefing, self::EMPTY_SECTIONS['apod']));
+        self::assertSame(self::othersThan(['apod']), self::attributedSources($briefing));
+        self::assertCount(5, self::upstream()->served());
+        self::assertEquals([
+            [Level::Warning, 'Circuit apod opened for 3600s', ['source' => 'apod', 'kind' => 'rate_limited', 'openSeconds' => 3600, 'trial' => false]],
+            [Level::Warning, 'Source apod fetch failed: rate_limited', ['source' => 'apod', 'date' => self::PICTURE_DAY, 'kind' => 'rate_limited', 'httpStatus' => 429, 'retryAt' => new \DateTimeImmutable('2026-11-18 13:00:00 UTC'), 'outcome' => 'missing', 'durationMs' => 2]],
+        ], self::briefingLog());
+    }
+
+    public function testLogsTheTrialOfAnOpenedCircuitAndItsClosing(): void
+    {
+        // Given
+        self::openCircuit('apod', '2026-11-18 11:59:00');
+        self::upstream()->respondWith(self::scenario()->apod()->fixture(self::PICTURE));
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        self::assertSame([
+            [Level::Info, 'Circuit apod half-open, trial allowed', ['source' => 'apod']],
+            [Level::Info, 'Circuit apod closed after its trial', ['source' => 'apod']],
+        ], self::briefingLog());
+    }
+
+    public function testLogsOnlyTheStoreWarningAndTheFailureWhileRedisRefusesConnections(): void
+    {
+        // Given
+        self::getContainer()->set(CircuitBreakerStore::class, new RedisCircuitBreakerStore(self::refusingRedis(), self::testService(ClockInterface::class), self::briefingLogger()));
+        self::upstream()->respondWith(self::scenario()->apod()->status(Response::HTTP_TOO_MANY_REQUESTS)->retryAfter(3600));
+
+        // When
+        $this->client->request(Request::METHOD_GET, self::BRIEFING.self::PICTURE_DAY);
+
+        // Then
+        self::assertResponseIsSuccessful();
+        self::assertSame([
+            [Level::Warning, 'Circuit store unavailable, failing open'],
+            [Level::Warning, 'Source apod fetch failed: rate_limited'],
+        ], array_map(static fn (array $entry): array => [$entry[0], $entry[1]], self::briefingLog()));
     }
 
     public function testMarksThePictureNotApplicableWithoutAskingNasa(): void
@@ -675,6 +792,32 @@ final class BriefingControllerTest extends FunctionalTestCase
     private static function failed(string $error): array
     {
         return ['status' => 'failed', 'error' => $error, 'lastAttemptAt' => self::LAST_ATTEMPT];
+    }
+
+    /**
+     * @return list<array{Level, string, array<string, mixed>}>
+     */
+    private static function briefingLog(): array
+    {
+        return array_map(static fn (LogRecord $record): array => [$record->level, $record->message, $record->context], self::recordsOf(self::BRIEFING_CHANNEL));
+    }
+
+    private static function briefingLogger(): LoggerInterface
+    {
+        return self::getContainer()->get('monolog.logger.briefing');
+    }
+
+    private static function refusingRedis(): \Redis
+    {
+        $connection = RedisAdapter::createConnection(self::REFUSING_REDIS, ['lazy' => true]);
+        self::assertInstanceOf(\Redis::class, $connection);
+
+        return $connection;
+    }
+
+    private static function openCircuit(string $circuit, string $until): void
+    {
+        self::testService(CircuitBreakerStore::class)->open($circuit, new \DateTimeImmutable($until, new \DateTimeZone(self::TIMEZONE)));
     }
 
     private static function onThisDayRejected(): UpstreamMock

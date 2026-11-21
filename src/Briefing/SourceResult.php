@@ -26,6 +26,11 @@ final readonly class SourceResult
         return new self($source, SourceStatus::NotApplicable, null, null);
     }
 
+    public static function circuitOpen(SourceName $source): self
+    {
+        return self::failed($source, FailureKind::CircuitOpen);
+    }
+
     /**
      * @phpstan-assert-if-true !null $this->payload
      */
@@ -40,6 +45,11 @@ final readonly class SourceResult
     public function hasFailed(): bool
     {
         return $this->failure instanceof SourceFailure;
+    }
+
+    public function calledUpstream(): bool
+    {
+        return FailureKind::CircuitOpen !== $this->failure?->kind;
     }
 
     public static function failed(SourceName $source, FailureKind $kind, ?int $httpStatus = null, ?\DateTimeImmutable $retryAt = null, ?FailureCause $cause = null): self

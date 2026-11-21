@@ -37,6 +37,17 @@ final readonly class SourceEntry
         return new self($source, null, null, null, null);
     }
 
+    public function refusedAt(\DateTimeImmutable $refusedAt): self
+    {
+        $failure = new SourceFailure(FailureKind::CircuitOpen);
+
+        if ($this->hasData()) {
+            return self::stale($this->source, $this->payload, $this->fetchedAt, $failure, $refusedAt);
+        }
+
+        return self::missing($this->source, $failure, $refusedAt);
+    }
+
     /**
      * @phpstan-assert-if-true !null $this->payload
      * @phpstan-assert-if-true !null $this->fetchedAt

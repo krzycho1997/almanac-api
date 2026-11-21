@@ -504,7 +504,7 @@ components:
           type: string
           format: date-time
           pattern: 'Z$'
-          description: When the failed refresh was attempted; present only when stale.
+          description: When the failed refresh was attempted, or skipped while the source was unavailable; present only when stale.
     SourceFailed:
       type: object
       additionalProperties: false
@@ -521,6 +521,7 @@ components:
           type: string
           format: date-time
           pattern: 'Z$'
+          description: When the failed refresh was attempted, or skipped while the source was unavailable.
     SourceNotApplicable:
       type: object
       additionalProperties: false
@@ -713,11 +714,35 @@ components:
     Health:
       type: object
       additionalProperties: false
-      required: [status]
+      required: [status, checks]
       properties:
         status:
+          description: Always ok while the application answers; the checks describe its dependencies and never change the status code.
           type: string
           enum: [ok]
+        checks:
+          description: The state each module reports, keyed by the name of its check.
+          type: object
+          additionalProperties: false
+          required: [circuits]
+          properties:
+            circuits:
+              $ref: '#/components/schemas/Circuits'
+    Circuits:
+      description: The circuit breaker of each source. An open circuit skips the source and serves its last good data; once the opening is over, the circuit is half-open and the first request tries the source once.
+      type: object
+      additionalProperties: false
+      required: [apod, onThisDay, weather]
+      properties:
+        apod:
+          $ref: '#/components/schemas/CircuitState'
+        onThisDay:
+          $ref: '#/components/schemas/CircuitState'
+        weather:
+          $ref: '#/components/schemas/CircuitState'
+    CircuitState:
+      type: string
+      enum: [closed, open, half_open]
     Problem:
       description: Problem Details (RFC 9457) without internals.
       type: object

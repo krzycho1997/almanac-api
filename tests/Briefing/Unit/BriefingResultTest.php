@@ -116,6 +116,45 @@ final class BriefingResultTest extends TestCase
         ], $problems);
     }
 
+    public function testCountsASourceRefusedByAnOpenCircuitAsASkippedProblem(): void
+    {
+        // Given
+        $now = new \DateTimeImmutable(self::NOW);
+        $refused = SourceEntry::missing(SourceName::Apod, new SourceFailure(FailureKind::CircuitOpen), $now);
+        $briefing = new BriefingResult($now, Location::fromCoordinates(52.23, 21.01), [$refused], [SourceResult::circuitOpen(SourceName::Apod)]);
+
+        // When
+        $problems = $briefing->problems();
+
+        // Then
+        self::assertEquals([new BriefingProblem(SourceName::Apod, new SourceFailure(FailureKind::CircuitOpen), ProblemTiming::Skipped)], $problems);
+        self::assertEquals([SourceResult::circuitOpen(SourceName::Apod)], $briefing->failures());
+    }
+
+    /**
+     * @param list<SourceResult> $results
+     */
+    #[DataProvider('fetches')]
+    public function testTellsWhetherItCalledAnUpstream(array $results, bool $expected): void
+    {
+        // Given
+        $briefing = new BriefingResult(new \DateTimeImmutable(self::NOW), Location::fromCoordinates(52.23, 21.01), [], $results);
+
+        // When / Then
+        self::assertSame($expected, $briefing->hasFetched());
+    }
+
+    /**
+     * @return iterable<string, array{list<SourceResult>, bool}>
+     */
+    public static function fetches(): iterable
+    {
+        yield 'nothing fetched' => [[], false];
+        yield 'only refused by open circuits' => [[SourceResult::circuitOpen(SourceName::Apod), SourceResult::circuitOpen(SourceName::Weather)], false];
+        yield 'one failed fetch' => [[SourceResult::failed(SourceName::Apod, FailureKind::Unavailable)], true];
+        yield 'a fetch next to a refusal' => [[SourceResult::circuitOpen(SourceName::Apod), SourceResult::failed(SourceName::Weather, FailureKind::Rejected)], true];
+    }
+
     public function testFindsTheResultOfASource(): void
     {
         // Given

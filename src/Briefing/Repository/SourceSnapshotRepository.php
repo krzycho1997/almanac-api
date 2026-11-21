@@ -106,6 +106,7 @@ final readonly class SourceSnapshotRepository
     public function saveResult(SourceResult $result, SnapshotScope $scope, \DateTimeImmutable $attemptedAt): SnapshotWrite
     {
         self::assertSameSource($result, $scope);
+        self::assertCalledUpstream($result);
 
         if ($result->hasData()) {
             return $this->saveSuccess($result->payload, $scope, $attemptedAt);
@@ -222,5 +223,14 @@ final readonly class SourceSnapshotRepository
         }
 
         throw new \InvalidArgumentException("A result of {$result->source->value} cannot be stored under a {$scope->source->value} scope.");
+    }
+
+    private static function assertCalledUpstream(SourceResult $result): void
+    {
+        if ($result->calledUpstream()) {
+            return;
+        }
+
+        throw new \InvalidArgumentException("A result of {$result->source->value} refused by its circuit has nothing to store.");
     }
 }
