@@ -1,17 +1,29 @@
 docker/nginx/default.conf
   s_4da5374f6e605f::t_42be4defda8815 56-60,81-109
+  s_4da5374f6e605f::t_3aef1bc2658226 56-60,81-106,108
+  s_4da5374f6e605f::t_3857df04f10ff0 107,109
 src/Shared/Controller/MetricsController.php
   s_4da5374f6e605f::t_b79a3bb3ced0c5 1-34
+  s_4da5374f6e605f::t_3aef1bc2658226 1-34
 tests/EndToEnd/NginxMetricsTest.php
   s_4da5374f6e605f::t_cc85bb0c38bb7f 1-75
+  s_4da5374f6e605f::t_466318952013d1 1-18,20-37,39-75
+  s_4da5374f6e605f::t_4cb55a235e52d6 38
 tests/Shared/Functional/MetricsEndpointTest.php
   s_4da5374f6e605f::t_0b28529256d5b6 1-22
+  s_4da5374f6e605f::t_bcc4cc246d483a 1-22
 tests/Shared/Integration/OpenApi/OpenApiCoverageTest.php
   s_4da5374f6e605f::t_2016119866ba9b 7,18,48,63-79
+  s_4da5374f6e605f::t_161746a56bcccf 7,18,48,63-78
+  s_4da5374f6e605f::t_d844f32e73b73d 79
 tests/Shared/Unit/MetricsControllerTest.php
   s_4da5374f6e605f::t_8cd3be8eade854 1-44
+  s_4da5374f6e605f::t_bcc4cc246d483a 1-30,33-44
+  s_4da5374f6e605f::t_4cb55a235e52d6 31
 tests/Support/EndToEnd/HttpProbe.php
   s_4da5374f6e605f::t_6cb2ff73b1b4e7 29-35
+  s_4da5374f6e605f::t_6a859abdf43a5e 29-30,32,34-35
+  s_4da5374f6e605f::t_466318952013d1 31,33
 ---
 {
   "schema_version": "authorship/3.0.0",

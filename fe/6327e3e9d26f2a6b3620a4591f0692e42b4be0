@@ -1,13 +1,51 @@
 config/services.yaml
   s_4da5374f6e605f::t_c8e178656e404d 92-94
+  s_4da5374f6e605f::t_14b5ed4ebf70ee 95-96,100-104,167-168
+  s_4da5374f6e605f::t_b611c83a46bff9 169
+  s_4da5374f6e605f::t_16b957db3e8ab3 99
+  s_4da5374f6e605f::t_3bf595679f5b04 97-98
+  s_4da5374f6e605f::t_e824ded8ae5abe 92-94
 src/Shared/Metrics/HttpMetricsListener.php
   s_4da5374f6e605f::t_086d383a03b399 1-121
+  s_4da5374f6e605f::t_e824ded8ae5abe 1-19,22-64,65,80-111,113-116,118-121
+  s_4da5374f6e605f::t_85c3a7dcfc2e06 117
 tests/Shared/Functional/HttpMetricsTest.php
   s_4da5374f6e605f::t_700466fd106002 1-53
+  s_4da5374f6e605f::t_85c3a7dcfc2e06 1-18,20-27,29-36,38-45,47-50,52-53
+  s_4da5374f6e605f::t_d75104f33989be 51
 tests/Shared/Unit/HttpMetricsListenerTest.php
   s_4da5374f6e605f::t_68c5e3e8555a78 1-66
 tests/Support/Metrics/RecordingMetrics.php
   s_4da5374f6e605f::t_35953469e184d7 1-31
+tests/Support/Metrics/FailingMetricsStorage.php
+  s_4da5374f6e605f::t_a121b4a2aee515 1-13,19-20,22-51,53-54
+tools/phpstan/tests/Architecture/ArchitectureRulesTest.php
+  s_4da5374f6e605f::t_6049b49230c320 44-45
+tests/Architecture/LayerTest.php
+  s_4da5374f6e605f::t_6049b49230c320 191-198,201
+  s_4da5374f6e605f::t_181efec2e30b9b 202-204
+src/Shared/Metrics/Metric.php
+  s_4da5374f6e605f::t_eab8136992bd0e 1-23,25-33,35-38,46-48,57-68
+src/Shared/Metrics/PrometheusMetrics.php
+  s_4da5374f6e605f::t_6fdbeaaa68e709 1-8,9-34,36-41,43-60,62-87,89-91,93-94
+src/Shared/Logging/LogContextKey.php
+  s_4da5374f6e605f::t_14b5ed4ebf70ee 21
+tests/Shared/Unit/Metrics/PrometheusMetricsTest.php
+  s_4da5374f6e605f::t_2800f698da4907 1-12,14,16-18,20-35,37-48,52-81,111-131
+tools/phpstan/tests/Architecture/Fixtures/Briefing/ProbeUsesPrometheus.php
+  s_4da5374f6e605f::t_6049b49230c320 1-14
+composer.json
+  s_4da5374f6e605f::t_52552d31c8101c 22
+src/Shared/Metrics/Metrics.php
+  s_4da5374f6e605f::t_eab8136992bd0e 1-18
+src/Shared/Metrics/MetricsExporter.php
+  s_4da5374f6e605f::t_eab8136992bd0e 1-6,9-10,12-14
+tools/phpstan/tests/Architecture/Fixtures/Briefing/ProbeUsesMetricsAdapter.php
+  s_4da5374f6e605f::t_6049b49230c320 1-14
+tools/phpstan/tests/Architecture/Fixtures/Briefing/ProbeUsesMetricsPort.php
+  s_4da5374f6e605f::t_6049b49230c320 1-15
+composer.lock
+  s_4da5374f6e605f::t_782f405a39b2d1 7,1417-1487
 ---
 {
   "schema_version": "authorship/3.0.0",

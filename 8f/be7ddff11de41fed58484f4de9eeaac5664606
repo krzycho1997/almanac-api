@@ -1,19 +1,28 @@
 .github/workflows/ci.yaml
   s_4da5374f6e605f::t_eb932f44c05b15 38-41
+  s_4da5374f6e605f::t_411068cea4495a 38-41
 compose.yaml
   s_4da5374f6e605f::t_406ff02bb59aa0 87-122,125
+  s_4da5374f6e605f::t_878a6276681c79 87-91,93-97,99-122,125
+  s_4da5374f6e605f::t_7fe5844645aa7c 98
 docker/grafana/dashboards/almanac.json
   s_4da5374f6e605f::t_990656b2285ad8 1-488
+  s_4da5374f6e605f::t_d008ffd523c4fd 1-419,423-474,478-488
 docker/grafana/provisioning/dashboards/almanac.yml
   s_4da5374f6e605f::t_2998f531af5ead 1-9
+  s_4da5374f6e605f::t_d9b3aee8f699b8 1-9
 docker/grafana/provisioning/datasources/prometheus.yml
   s_4da5374f6e605f::t_09b484dc3160ff 1-10
+  s_4da5374f6e605f::t_d9b3aee8f699b8 1-10
 docker/prometheus/alerts.test.yml
   s_4da5374f6e605f::t_76a64e27b7c414 1-151
+  s_4da5374f6e605f::t_904573152708e3 1-6,26-41,55-56,59,61-65,67-69,71-81,102-104,106-115,126-141
 docker/prometheus/alerts.yml
   s_4da5374f6e605f::t_d1a42944f85e74 1-64
+  s_4da5374f6e605f::t_d9b3aee8f699b8 1-3,12-23,25-30,39-44,53-64
 docker/prometheus/prometheus.yml
   s_4da5374f6e605f::t_51ff9046b37522 1-12
+  s_4da5374f6e605f::t_d9b3aee8f699b8 1-12
 ---
 {
   "schema_version": "authorship/3.0.0",

@@ -1,7 +1,60 @@
 README.md
   s_4da5374f6e605f::t_7920e61653d971 34,129-138,159
+  s_4da5374f6e605f::t_22b1f8817165c8 34,129-136,138,159
+  s_4da5374f6e605f::t_52b8aa2882d067 137
 docs/SPEC.md
   s_4da5374f6e605f::t_3c2bd72478c72f 103-153
+  s_4da5374f6e605f::t_22b1f8817165c8 103-131,133-140,149-153
+  s_4da5374f6e605f::t_2dc2618c3208b5 132,141-148
+src/Shared/Metrics/MetricsExporter.php
+  s_4da5374f6e605f::t_d9914ff8e25684 7-8,11
+tests/Architecture/LayerTest.php
+  s_4da5374f6e605f::t_bb7a2dd18c210c 11-14,199-200
+tools/phpstan/tests/Architecture/ArchitectureRulesTest.php
+  s_4da5374f6e605f::t_703d283dd8dabe 46
+src/Shared/Metrics/PrometheusMetrics.php
+  s_4da5374f6e605f::t_d9914ff8e25684 35,42,52,98,102
+  s_4da5374f6e605f::t_76be9f57181494 71
+src/Shared/Metrics/MetricLabel.php
+  s_4da5374f6e605f::t_d9914ff8e25684 1-18
+src/Shared/Metrics/Metric.php
+  s_4da5374f6e605f::t_d9914ff8e25684 25,36,41-47,52-57
+  s_4da5374f6e605f::t_edbdd7b07b56b5 58-59
+tools/phpstan/tests/Architecture/Fixtures/Briefing/ProbeUsesScrapedMetrics.php
+  s_4da5374f6e605f::t_bb7a2dd18c210c 1-14
+tests/Shared/Unit/Metrics/PrometheusMetricsTest.php
+  s_4da5374f6e605f::t_5658de0b9164b2 13,15,19,36,49-51,82-110
+tests/Support/Metrics/FailingMetricsStorage.php
+  s_4da5374f6e605f::t_775008722990dc 14-18,21,52
+tests/Shared/Functional/HttpMetricsTest.php
+  s_4da5374f6e605f::t_751dd1df80ade8 19,28,37,46
+tests/Shared/Unit/MetricsControllerTest.php
+  s_4da5374f6e605f::t_751dd1df80ade8 34
+src/Shared/Metrics/HttpMetricsListener.php
+  s_4da5374f6e605f::t_bab2c988571b7d 20-21,66-79,112
+tests/Shared/Unit/Metrics/ScrapedMetricsTest.php
+  s_4da5374f6e605f::t_9bec91c5d18af2 1-46
+tests/EndToEnd/NginxMetricsTest.php
+  s_4da5374f6e605f::t_7c6e9a7709928c 19
+tests/Shared/Unit/HttpMetricsListenerTest.php
+  s_4da5374f6e605f::t_7c6e9a7709928c 1-66
+src/Briefing/RefreshPolicy.php
+  s_4da5374f6e605f::t_0047eb549021a9 67
+src/Briefing/BriefingMetrics.php
+  s_4da5374f6e605f::t_edafb0e984b504 9,21-24,34-38,45-46,52,56,58-62,66-76
+  s_4da5374f6e605f::t_4d996d3aafa0fe 77-78
+src/Briefing/BriefingDay.php
+  s_4da5374f6e605f::t_edafb0e984b504 23-32
+src/Briefing/CircuitBreaker/CircuitLog.php
+  s_4da5374f6e605f::t_edafb0e984b504 11,53
+docker/grafana/dashboards/almanac.json
+  s_4da5374f6e605f::t_f090b177938a63 420-422,475-477
+compose.yaml
+  s_4da5374f6e605f::t_f090b177938a63 92
+docker/prometheus/alerts.yml
+  s_4da5374f6e605f::t_a62819cbec888c 4-11,24,31-38,45-52
+docker/prometheus/alerts.test.yml
+  s_4da5374f6e605f::t_a62819cbec888c 7-25,42-54,57-58,60,66,70,82-101,105,116-125,142-151
 ---
 {
   "schema_version": "authorship/3.0.0",

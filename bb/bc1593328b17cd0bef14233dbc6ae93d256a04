@@ -1,9 +1,15 @@
 src/Briefing/CircuitBreaker/CircuitLog.php
   s_4da5374f6e605f::t_0c8a9f0b05187c 10-12,23-25,29,36,42,48-53
+  s_4da5374f6e605f::t_27991a326adaba 10,12,23-25,29,36,42,48-52
 tests/Briefing/Integration/BriefingAggregatorTest.php
   s_4da5374f6e605f::t_c0e020f343feac 34,446
+  s_4da5374f6e605f::t_27991a326adaba 446
+  s_4da5374f6e605f::t_74adc4d28785e4 34
 tests/Briefing/Unit/CircuitBreaker/CircuitBreakerTest.php
   s_4da5374f6e605f::t_d1a5f26a93cb32 15,18,41,49-50,399-416
+  s_4da5374f6e605f::t_27991a326adaba 50
+  s_4da5374f6e605f::t_74adc4d28785e4 15,18,41,49,399-414
+  s_4da5374f6e605f::t_7fc682bbfef40b 415-416
 ---
 {
   "schema_version": "authorship/3.0.0",

@@ -1,7 +1,9 @@
 compose.yaml
   s_4da5374f6e605f::t_87b8dc9fa4e9b5 80
+  s_4da5374f6e605f::t_4c433a00aac52f 80
 tests/EndToEnd/RedisServerTest.php
   s_4da5374f6e605f::t_77c76195c8aa44 39
+  s_4da5374f6e605f::t_4c433a00aac52f 39
 ---
 {
   "schema_version": "authorship/3.0.0",

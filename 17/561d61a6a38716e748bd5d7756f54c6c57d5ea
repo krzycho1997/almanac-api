@@ -1,17 +1,24 @@
 src/Shared/Metrics/Metric.php
   s_4da5374f6e605f::t_a695e5e14eae2d 16,31,48
+  s_4da5374f6e605f::t_6561bfb39995db 16,31,48
 src/Shared/Metrics/PrometheusMetrics.php
   s_4da5374f6e605f::t_381c89c4afffe2 14,45-54
+  s_4da5374f6e605f::t_6561bfb39995db 14,45-51
+  s_4da5374f6e605f::t_4f06f13790257e 53-54
 src/Shared/Metrics/ScrapedMetrics.php
   s_4da5374f6e605f::t_bf2337f215ae56 1-33
+  s_4da5374f6e605f::t_6561bfb39995db 1-33
 tests/Shared/Unit/Metrics/PrometheusMetricsTest.php
   s_4da5374f6e605f::t_7f1eac2d1a1064 108
 tests/Shared/Unit/Metrics/ScrapedMetricsTest.php
   s_4da5374f6e605f::t_f298706face0dc 1-46
 tests/Shared/Unit/MetricsControllerTest.php
   s_4da5374f6e605f::t_64671d652135f8 10-11,24,29,35,41,47-51
+  s_4da5374f6e605f::t_f25d659343f581 10-11,24,29,35,41,47-50
+  s_4da5374f6e605f::t_d25e11b30534de 51
 tests/Support/Metrics/CountedTransport.php
   s_4da5374f6e605f::t_c3c4584af5729e 1-40
+  s_4da5374f6e605f::t_f25d659343f581 1-40
 tools/phpstan/tests/Architecture/ArchitectureRulesTest.php
   s_4da5374f6e605f::t_6e2ec672852c08 46
 tools/phpstan/tests/Architecture/Fixtures/Briefing/ProbeUsesScrapedMetrics.php

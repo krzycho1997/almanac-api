@@ -1,19 +1,30 @@
 src/Briefing/BriefingAggregator.php
   s_4da5374f6e605f::t_e62feb3da41b13 35,67,103-112,184-186
+  s_4da5374f6e605f::t_720de21e2a5974 35,67,103-112,184-186
 src/Briefing/BriefingDay.php
   s_4da5374f6e605f::t_eedea7da436000 23-32
 src/Briefing/BriefingMetrics.php
   s_4da5374f6e605f::t_0fea225d165685 1-105
+  s_4da5374f6e605f::t_43adccc428a32a 1-8,10-20,25-33,39-44,47-51,53-55,57,63-65,79-86,88-89,104-105
+  s_4da5374f6e605f::t_720de21e2a5974 87,90-103
 src/Briefing/Controller/BriefingController.php
   s_4da5374f6e605f::t_a336f397bc2f3e 8,33,47
+  s_4da5374f6e605f::t_720de21e2a5974 8,33,47
 src/Briefing/RefreshPolicy.php
   s_4da5374f6e605f::t_0b01e39f2eddd2 67
 tests/Briefing/Functional/BriefingMetricsTest.php
   s_4da5374f6e605f::t_4d212427f50bf0 1-56
+  s_4da5374f6e605f::t_c353de40eddbc7 33-37
+  s_4da5374f6e605f::t_e82fc9e504d08c 1-32,38-56
 tests/Briefing/Integration/BriefingAggregatorTest.php
   s_4da5374f6e605f::t_c2b5f0923ca911 8,435
+  s_4da5374f6e605f::t_5808d57986da57 8,435
 tests/Briefing/Unit/BriefingMetricsTest.php
   s_4da5374f6e605f::t_faf91d64a25959 1-92
+  s_4da5374f6e605f::t_eb6504b0267ac4 1-76,78-92
+  s_4da5374f6e605f::t_369243897b3e88 77
+tests/Support/Metrics/RecordingMetrics.php
+  s_4da5374f6e605f::t_c353de40eddbc7 1-31
 ---
 {
   "schema_version": "authorship/3.0.0",
