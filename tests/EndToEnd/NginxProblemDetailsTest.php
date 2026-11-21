@@ -34,7 +34,7 @@ final class NginxProblemDetailsTest extends TestCase
         $problem = json_decode($response->body, true, flags: \JSON_THROW_ON_ERROR);
         self::assertIsArray($problem);
         self::assertSame(['type', 'title', 'status', 'detail'], array_keys($problem));
-        self::assertSame($status, $problem['status']);
+        self::assertSame(['about:blank', Response::$statusTexts[$status], $status], [$problem['type'], $problem['title'], $problem['status']]);
     }
 
     /**

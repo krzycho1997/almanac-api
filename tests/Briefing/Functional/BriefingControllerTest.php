@@ -595,7 +595,7 @@ final class BriefingControllerTest extends FunctionalTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_GATEWAY);
         self::assertResponseHeaderSame(self::CONTENT_TYPE, ProblemJsonErrorRenderer::PROBLEM_JSON);
         $problem = self::json($this->client->getResponse()->getContent());
-        self::assertSame([Response::HTTP_BAD_GATEWAY, 'Bad Gateway'], [$problem['status'], $problem['detail']]);
+        self::assertSame([Response::HTTP_BAD_GATEWAY, 'Bad Gateway', 'No source has data for this briefing.'], [$problem['status'], $problem['title'], $problem['detail']]);
         self::assertArrayNotHasKey('sources', $problem);
         self::assertSame([Level::Warning], self::loggedExceptionLevels());
         self::assertCount($failures, self::recordsOf(self::BRIEFING_CHANNEL));

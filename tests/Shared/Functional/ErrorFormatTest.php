@@ -16,14 +16,13 @@ final class ErrorFormatTest extends FunctionalTestCase
 {
     private const string CONTENT_TYPE = 'Content-Type';
     private const string HEALTH = '/api/health';
-    private const string PROBLEM_TYPE = 'https://tools.ietf.org/html/rfc2616#section-10';
-    private const string PROBLEM_TITLE = 'An error occurred';
+    private const string PROBLEM_TYPE = 'about:blank';
 
     /**
      * @param array<string, string> $server
      */
     #[DataProvider('errors')]
-    public function testRendersErrorsAsProblemDetailsWithoutInternals(string $method, string $uri, array $server, ?string $content, int $status, string $detail): void
+    public function testRendersErrorsAsProblemDetailsWithoutInternals(string $method, string $uri, array $server, ?string $content, int $status, string $title, string $detail): void
     {
         // Given
         self::ensureKernelShutdown();
@@ -38,7 +37,7 @@ final class ErrorFormatTest extends FunctionalTestCase
         self::assertJsonStringEqualsJsonString(
             (string) json_encode([
                 'type' => self::PROBLEM_TYPE,
-                'title' => self::PROBLEM_TITLE,
+                'title' => $title,
                 'status' => $status,
                 'detail' => $detail,
             ]),
@@ -47,17 +46,17 @@ final class ErrorFormatTest extends FunctionalTestCase
     }
 
     /**
-     * @return iterable<string, array{string, string, array<string, string>, ?string, int, string}>
+     * @return iterable<string, array{string, string, array<string, string>, ?string, int, string, string}>
      */
     public static function errors(): iterable
     {
-        yield 'unknown route' => [Request::METHOD_GET, '/api/unknown', [], null, Response::HTTP_NOT_FOUND, 'Not Found'];
-        yield 'unknown route asked for as HTML' => [Request::METHOD_GET, '/api/unknown', ['HTTP_ACCEPT' => 'text/html'], null, Response::HTTP_NOT_FOUND, 'Not Found'];
-        yield 'method not allowed' => [Request::METHOD_POST, self::HEALTH, [], null, Response::HTTP_METHOD_NOT_ALLOWED, 'Method Not Allowed'];
-        yield 'malformed JSON' => [Request::METHOD_POST, '/_test/payload', ['CONTENT_TYPE' => 'application/json'], '{"name":', Response::HTTP_BAD_REQUEST, 'Bad Request'];
-        yield 'unsupported content type' => [Request::METHOD_POST, '/_test/payload', ['CONTENT_TYPE' => 'text/plain'], 'name', Response::HTTP_UNSUPPORTED_MEDIA_TYPE, 'Unsupported Media Type'];
-        yield 'missing Bearer token' => [Request::METHOD_GET, AuthenticatedUserProbeController::PATH, [], null, Response::HTTP_UNAUTHORIZED, 'Unauthorized'];
-        yield 'unknown Bearer token' => [Request::METHOD_GET, AuthenticatedUserProbeController::PATH, ['HTTP_AUTHORIZATION' => 'Bearer 0000000000000000000000000000000000000000000000000000000000000000'], null, Response::HTTP_UNAUTHORIZED, 'Unauthorized'];
+        yield 'unknown route' => [Request::METHOD_GET, '/api/unknown', [], null, Response::HTTP_NOT_FOUND, 'Not Found', 'Nothing exists at this address.'];
+        yield 'unknown route asked for as HTML' => [Request::METHOD_GET, '/api/unknown', ['HTTP_ACCEPT' => 'text/html'], null, Response::HTTP_NOT_FOUND, 'Not Found', 'Nothing exists at this address.'];
+        yield 'method not allowed' => [Request::METHOD_POST, self::HEALTH, [], null, Response::HTTP_METHOD_NOT_ALLOWED, 'Method Not Allowed', 'This address does not accept the method; the Allow header lists the ones it does.'];
+        yield 'malformed JSON' => [Request::METHOD_POST, '/_test/payload', ['CONTENT_TYPE' => 'application/json'], '{"name":', Response::HTTP_BAD_REQUEST, 'Bad Request', 'The request could not be read, for example a body that is not valid JSON.'];
+        yield 'unsupported content type' => [Request::METHOD_POST, '/_test/payload', ['CONTENT_TYPE' => 'text/plain'], 'name', Response::HTTP_UNSUPPORTED_MEDIA_TYPE, 'Unsupported Media Type', 'Send the body as application/json.'];
+        yield 'missing Bearer token' => [Request::METHOD_GET, AuthenticatedUserProbeController::PATH, [], null, Response::HTTP_UNAUTHORIZED, 'Unauthorized', 'Send a valid access token as "Authorization: Bearer <token>".'];
+        yield 'unknown Bearer token' => [Request::METHOD_GET, AuthenticatedUserProbeController::PATH, ['HTTP_AUTHORIZATION' => 'Bearer 0000000000000000000000000000000000000000000000000000000000000000'], null, Response::HTTP_UNAUTHORIZED, 'Unauthorized', 'Send a valid access token as "Authorization: Bearer <token>".'];
     }
 
     /**
@@ -122,10 +121,10 @@ final class ErrorFormatTest extends FunctionalTestCase
     public function testSendsProblemDetailsWithoutEscapedSlashes(): void
     {
         // When
-        $this->client->request(Request::METHOD_GET, '/_test/http-error/'.Response::HTTP_NOT_FOUND);
+        $this->client->request(Request::METHOD_GET, '/api/briefings/not-a-date');
 
         // Then
-        self::assertStringContainsString('"type":"https://tools.ietf.org/html/rfc2616#section-10"', (string) $this->client->getResponse()->getContent());
+        self::assertStringContainsString('"type":"https://symfony.com/errors/validation"', (string) $this->client->getResponse()->getContent());
     }
 
     public function testKeepsJsonForSuccessfulResponses(): void
