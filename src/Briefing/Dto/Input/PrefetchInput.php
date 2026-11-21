@@ -53,12 +53,15 @@ final class PrefetchInput
     }, constraints: new Assert\NotNull(message: InvalidLocationException::ONLY_ONE_COORDINATE))]
     public ?string $lon = null;
 
-    #[Option(description: 'Pause between two dates, in milliseconds')]
+    #[Option(description: 'Pause after a date that called upstream, in milliseconds; with --async, the spacing of the queued dates')]
     #[Assert\Sequentially([
         new Assert\Regex(self::WHOLE_NUMBER, message: self::NOT_WHOLE_MILLISECONDS),
         new Assert\Range(min: 0, max: self::MAX_DELAY_MS),
     ])]
     public string $delay = '0';
+
+    #[Option(description: 'Queue one message per date for the worker instead of fetching now')]
+    public bool $async = false;
 
     #[Assert\Callback]
     public function validateRange(ExecutionContextInterface $context): void

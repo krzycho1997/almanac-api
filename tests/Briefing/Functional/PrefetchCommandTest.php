@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Briefing\Functional;
 
+use App\Briefing\Message\PrefetchDateMessage;
 use App\Tests\Support\Briefing\UpstreamMock;
 use App\Tests\Support\Briefing\UpstreamMockResponseFactory;
 use App\Tests\Support\InteractsWithTestServices;
@@ -13,6 +14,9 @@ use Symfony\Component\Clock\Clock;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\Console\Exception\InputValidationFailedException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
 final class PrefetchCommandTest extends KernelTestCase
 {
@@ -184,6 +188,30 @@ final class PrefetchCommandTest extends KernelTestCase
         }
 
         return null;
+    }
+
+    public function testQueuesTheDatesWithAsyncAndExitsAtOnce(): void
+    {
+        // Given
+        self::upstream()->respondWith(UpstreamMock::create());
+
+        // When
+        $result = self::runCommand(self::COMMAND, ['from' => '2024-03-15', 'to' => '2024-03-16', '--async' => true, '--delay' => '2000', '--lat' => '50.06', '--lon' => '19.94']);
+
+        // Then
+        $this->assertCommandIsSuccessful($result, $result->getDisplay());
+        self::assertStringContainsString('Queued dates: 2.', $result->getDisplay());
+        self::assertEquals([[new PrefetchDateMessage('2024-03-15', 50.06, 19.94), 0], [new PrefetchDateMessage('2024-03-16', 50.06, 19.94), 2000]], array_map(static fn (Envelope $envelope): array => [$envelope->getMessage(), $envelope->last(DelayStamp::class)?->getDelay()], self::queue()->getSent()));
+        self::assertSame([], self::upstream()->served());
+        self::assertEquals(new \DateTimeImmutable(self::NOW), Clock::get()->now());
+    }
+
+    private static function queue(): InMemoryTransport
+    {
+        $transport = self::getContainer()->get('messenger.transport.async');
+        self::assertInstanceOf(InMemoryTransport::class, $transport);
+
+        return $transport;
     }
 
     private static function upstream(): UpstreamMockResponseFactory

@@ -9,6 +9,7 @@ use App\Briefing\CircuitBreaker\CircuitBreakerStore;
 use App\Briefing\DateRange;
 use App\Briefing\FailureKind;
 use App\Briefing\Location;
+use App\Briefing\Message\PrefetchDateMessage;
 use App\Briefing\Prefetcher;
 use App\Briefing\SourceName;
 use App\Briefing\SourceResult;
@@ -22,6 +23,9 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Clock\Clock;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 
 final class PrefetcherTest extends KernelTestCase
 {
@@ -183,6 +187,49 @@ final class PrefetcherTest extends KernelTestCase
         self::assertSame([], $again[0]->failures());
         self::assertTrue($again[0]->hasProblems());
         self::assertSame(['failures' => 0, 'problems' => 1], array_intersect_key(self::summaries()[1]->context, ['failures' => true, 'problems' => true]));
+    }
+
+    public function testQueuesOneMessagePerDateSpacedByTheDelay(): void
+    {
+        // When
+        $queued = self::prefetcher()->enqueue(self::range('2024-03-15', '2024-03-17'), self::warsaw(), 1500);
+
+        // Then
+        self::assertSame(3, $queued);
+        self::assertEquals([
+            [new PrefetchDateMessage('2024-03-15', 52.23, 21.01), 0],
+            [new PrefetchDateMessage('2024-03-16', 52.23, 21.01), 1500],
+            [new PrefetchDateMessage('2024-03-17', 52.23, 21.01), 3000],
+        ], array_map(static fn (Envelope $envelope): array => [$envelope->getMessage(), $envelope->last(DelayStamp::class)?->getDelay()], self::queue()->getSent()));
+        self::assertSame([], self::upstream()->served());
+    }
+
+    public function testLeavesTheDefaultPlaceOfAQueuedDateToTheWorker(): void
+    {
+        // When
+        self::prefetcher()->enqueue(self::range('2024-03-15', '2024-03-15'), Location::defaultAt(52.23, 21.01, 'Warsaw'));
+
+        // Then
+        self::assertEquals([new PrefetchDateMessage('2024-03-15', null, null)], array_map(static fn (Envelope $envelope): object => $envelope->getMessage(), self::queue()->getSent()));
+    }
+
+    public function testLogsHowManyDatesItQueuedAndNoSummary(): void
+    {
+        // When
+        self::prefetcher()->enqueue(self::range('2024-03-15', '2024-03-16'), self::warsaw());
+
+        // Then
+        $queued = array_values(array_filter(self::recordsOf('briefing'), static fn (LogRecord $record): bool => str_starts_with($record->message, 'Prefetch queued')));
+        self::assertSame([[Level::Info, 'Prefetch queued 2 dates', ['from' => '2024-03-15', 'to' => '2024-03-16', 'count' => 2]]], array_map(static fn (LogRecord $record): array => [$record->level, $record->message, $record->context], $queued));
+        self::assertSame([], self::summaries());
+    }
+
+    private static function queue(): InMemoryTransport
+    {
+        $transport = self::getContainer()->get('messenger.transport.async');
+        self::assertInstanceOf(InMemoryTransport::class, $transport);
+
+        return $transport;
     }
 
     private static function prefetcher(): Prefetcher
