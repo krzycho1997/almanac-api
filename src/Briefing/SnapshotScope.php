@@ -8,17 +8,11 @@ final readonly class SnapshotScope
 {
     public const int LONGEST_KEY = 64;
 
-    public function __construct(
+    private function __construct(
         public SourceName $source,
         public string $key,
         public ?\DateTimeImmutable $date,
     ) {
-        self::assertKeyFits($key);
-        self::assertDatedLike($source, $date);
-    }
-
-    private static function assertKeyFits(string $key): void
-    {
         if ('' === $key) {
             throw new \InvalidArgumentException('A snapshot key cannot be empty.');
         }
@@ -28,28 +22,13 @@ final readonly class SnapshotScope
         }
     }
 
-    private static function assertDatedLike(SourceName $source, ?\DateTimeImmutable $date): void
+    public static function dated(SourceName $source, string $key, \DateTimeImmutable $date): self
     {
-        if (SourceName::OnThisDay === $source) {
-            self::assertUndated($source, $date);
-
-            return;
-        }
-
-        self::assertDated($source, $date);
+        return new self($source, $key, $date);
     }
 
-    private static function assertUndated(SourceName $source, ?\DateTimeImmutable $date): void
+    public static function undated(SourceName $source, string $key): self
     {
-        if ($date instanceof \DateTimeImmutable) {
-            throw new \InvalidArgumentException(\sprintf('Snapshots of %s have no date.', $source->value));
-        }
-    }
-
-    private static function assertDated(SourceName $source, ?\DateTimeImmutable $date): void
-    {
-        if (null === $date) {
-            throw new \InvalidArgumentException(\sprintf('Snapshots of %s need a date.', $source->value));
-        }
+        return new self($source, $key, null);
     }
 }

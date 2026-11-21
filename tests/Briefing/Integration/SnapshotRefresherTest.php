@@ -45,7 +45,7 @@ final class SnapshotRefresherTest extends KernelTestCase
         $feed = new OnThisDayFeed([new HistoricalEvent(-44, 'Julius Caesar is assassinated.', [])], [], [], SourcePayloads::onThisDayFeed()->attribution);
 
         // When
-        self::refresher()->saveAndReread([SourceResult::ok(SourceName::OnThisDay, $feed)], [SourceName::OnThisDay->value => new SnapshotScope(SourceName::OnThisDay, '03-15', null)], new \DateTimeImmutable(self::DAY), new \DateTimeImmutable(self::TEN));
+        self::refresher()->saveAndReread([SourceResult::ok(SourceName::OnThisDay, $feed)], [SourceName::OnThisDay->value => SnapshotScope::undated(SourceName::OnThisDay, '03-15')], new \DateTimeImmutable(self::DAY), new \DateTimeImmutable(self::TEN));
 
         // Then
         $discovery = self::discoveries()[0];
@@ -144,16 +144,16 @@ final class SnapshotRefresherTest extends KernelTestCase
 
     private static function apod(): SnapshotScope
     {
-        return new SnapshotScope(SourceName::Apod, self::DAY, new \DateTimeImmutable(self::DAY));
+        return SnapshotScope::dated(SourceName::Apod, self::DAY, new \DateTimeImmutable(self::DAY));
     }
 
     private static function onThisDay(): SnapshotScope
     {
-        return new SnapshotScope(SourceName::OnThisDay, '03-15', null);
+        return SnapshotScope::undated(SourceName::OnThisDay, '03-15');
     }
 
     private static function weather(): SnapshotScope
     {
-        return new SnapshotScope(SourceName::Weather, self::DAY.'@52.23,21.01', new \DateTimeImmutable(self::DAY));
+        return SnapshotScope::dated(SourceName::Weather, self::DAY.'@52.23,21.01', new \DateTimeImmutable(self::DAY));
     }
 }

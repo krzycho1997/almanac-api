@@ -78,6 +78,49 @@ final class SourceDefinitionsTest extends KernelTestCase
         yield 'weather on the date line' => [WeatherSource::class, Location::fromCoordinates(90.0, -180.0), SourceName::Weather, '2026-11-17@90.00,180.00', '2026-11-17 00:00 Europe/Warsaw'];
     }
 
+    #[DataProvider('everySource')]
+    public function testDatesTheScopeOfEverySourceThatDependsOnTheDay(SourceName $source, bool $dated): void
+    {
+        // Given
+        $day = new \DateTimeImmutable(self::DAY, new \DateTimeZone(self::WARSAW));
+
+        // When
+        $scope = self::testService(self::definitionOf($source))->scopeFor($day, Location::fromCoordinates(52.23, 21.01));
+
+        // Then
+        self::assertSame($dated, $scope->date instanceof \DateTimeImmutable);
+    }
+
+    /**
+     * @return iterable<string, array{SourceName, bool}>
+     */
+    public static function everySource(): iterable
+    {
+        foreach (SourceName::cases() as $source) {
+            yield $source->value => [$source, self::isDated($source)];
+        }
+    }
+
+    private static function isDated(SourceName $source): bool
+    {
+        return match ($source) {
+            SourceName::Apod, SourceName::Weather => true,
+            SourceName::OnThisDay => false,
+        };
+    }
+
+    /**
+     * @return class-string<Source>
+     */
+    private static function definitionOf(SourceName $source): string
+    {
+        return match ($source) {
+            SourceName::Apod => ApodSource::class,
+            SourceName::OnThisDay => OnThisDaySource::class,
+            SourceName::Weather => WeatherSource::class,
+        };
+    }
+
     /**
      * @param class-string<Source> $definition
      */

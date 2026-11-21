@@ -135,11 +135,11 @@ final class SnapshotReadingTest extends TestCase
     public function testReadsOnlyTheRequestedScopes(): void
     {
         // Given
-        $weather = new SnapshotScope(SourceName::Weather, '2024-03-15@52.23,21.01', new \DateTimeImmutable('2024-03-15'));
-        $otherDay = new SnapshotScope(SourceName::Apod, '2024-03-16', new \DateTimeImmutable('2024-03-16'));
+        $weather = SnapshotScope::dated(SourceName::Weather, '2024-03-15@52.23,21.01', new \DateTimeImmutable('2024-03-15'));
+        $otherDay = SnapshotScope::dated(SourceName::Apod, '2024-03-16', new \DateTimeImmutable('2024-03-16'));
         $this->repository()->saveResult(SourceResult::ok(SourceName::Apod, SourcePayloads::apodPicture()), $otherDay, self::at(self::TEN));
         $this->repository()->saveResult(SourceResult::ok(SourceName::Weather, SourcePayloads::dailyWeather()), $weather, self::at(self::TEN));
-        $this->repository()->saveResult(SourceResult::ok(SourceName::Apod, SourcePayloads::apodPicture()), new SnapshotScope(SourceName::Apod, '2024-03-15@52.23,21.01', new \DateTimeImmutable('2024-03-15')), self::at(self::TEN));
+        $this->repository()->saveResult(SourceResult::ok(SourceName::Apod, SourcePayloads::apodPicture()), SnapshotScope::dated(SourceName::Apod, '2024-03-15@52.23,21.01', new \DateTimeImmutable('2024-03-15')), self::at(self::TEN));
 
         // When
         $stored = $this->repository()->findForScopes([self::apod(), $weather]);
@@ -152,7 +152,7 @@ final class SnapshotReadingTest extends TestCase
     public function testSavesSeveralResultsTogether(): void
     {
         // Given
-        $weather = new SnapshotScope(SourceName::Weather, '2024-03-15@52.23,21.01', new \DateTimeImmutable('2024-03-15'));
+        $weather = SnapshotScope::dated(SourceName::Weather, '2024-03-15@52.23,21.01', new \DateTimeImmutable('2024-03-15'));
         $results = [SourceResult::ok(SourceName::Apod, SourcePayloads::apodPicture()), SourceResult::failed(SourceName::Weather, FailureKind::Rejected)];
 
         // When
@@ -240,7 +240,7 @@ final class SnapshotReadingTest extends TestCase
 
     private static function apod(): SnapshotScope
     {
-        return new SnapshotScope(SourceName::Apod, '2024-03-15', new \DateTimeImmutable('2024-03-15'));
+        return SnapshotScope::dated(SourceName::Apod, '2024-03-15', new \DateTimeImmutable('2024-03-15'));
     }
 
     private static function at(string $moment): \DateTimeImmutable

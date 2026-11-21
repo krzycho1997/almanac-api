@@ -18,7 +18,7 @@ final class SnapshotScopeTest extends TestCase
     public function testAcceptsAKeyThatFitsTheColumn(string $key): void
     {
         // When
-        $scope = new SnapshotScope(SourceName::OnThisDay, $key, null);
+        $scope = SnapshotScope::undated(SourceName::OnThisDay, $key);
 
         // Then
         self::assertSame($key, $scope->key);
@@ -39,7 +39,7 @@ final class SnapshotScopeTest extends TestCase
     {
         // Then / When
         $this->expectException(\InvalidArgumentException::class);
-        new SnapshotScope(SourceName::OnThisDay, $key, null);
+        SnapshotScope::undated(SourceName::OnThisDay, $key);
     }
 
     /**
@@ -51,41 +51,24 @@ final class SnapshotScopeTest extends TestCase
         yield 'one character too long' => [str_repeat('ż', SnapshotScope::LONGEST_KEY + 1)];
     }
 
-    #[DataProvider('datedScopes')]
-    public function testAcceptsADateExactlyWhenTheSourceIsDated(SourceName $source, ?\DateTimeImmutable $date): void
+    public function testKeepsTheDateOfADatedScope(): void
     {
+        // Given
+        $date = new \DateTimeImmutable(self::DATE);
+
         // When
-        $scope = new SnapshotScope($source, self::KEY, $date);
+        $scope = SnapshotScope::dated(SourceName::Weather, self::KEY, $date);
 
         // Then
-        self::assertSame($date, $scope->date);
+        self::assertSame([SourceName::Weather, self::KEY, $date], [$scope->source, $scope->key, $scope->date]);
     }
 
-    /**
-     * @return iterable<string, array{SourceName, ?\DateTimeImmutable}>
-     */
-    public static function datedScopes(): iterable
+    public function testGivesAnUndatedScopeNoDate(): void
     {
-        yield 'picture of the day with its date' => [SourceName::Apod, new \DateTimeImmutable(self::DATE)];
-        yield 'weather with its date' => [SourceName::Weather, new \DateTimeImmutable(self::DATE)];
-        yield 'day in history without a date' => [SourceName::OnThisDay, null];
-    }
+        // When
+        $scope = SnapshotScope::undated(SourceName::OnThisDay, self::KEY);
 
-    #[DataProvider('misdatedScopes')]
-    public function testRejectsADateThatDoesNotMatchTheSource(SourceName $source, ?\DateTimeImmutable $date, string $reason): void
-    {
-        // Then / When
-        $this->expectExceptionObject(new \InvalidArgumentException($reason));
-        new SnapshotScope($source, self::KEY, $date);
-    }
-
-    /**
-     * @return iterable<string, array{SourceName, ?\DateTimeImmutable, string}>
-     */
-    public static function misdatedScopes(): iterable
-    {
-        yield 'picture of the day without a date' => [SourceName::Apod, null, 'Snapshots of apod need a date.'];
-        yield 'weather without a date' => [SourceName::Weather, null, 'Snapshots of weather need a date.'];
-        yield 'day in history with a date' => [SourceName::OnThisDay, new \DateTimeImmutable(self::DATE), 'Snapshots of on_this_day have no date.'];
+        // Then
+        self::assertNull($scope->date);
     }
 }

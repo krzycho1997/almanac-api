@@ -15,7 +15,7 @@ final readonly class WeatherSource implements Source
 {
     public const SourceName NAME = SourceName::Weather;
     private const string REFRESH_AFTER = 'PT1H';
-    private const string KEY = '%s@'.OpenMeteoClient::COORDINATE.','.OpenMeteoClient::COORDINATE;
+    private const string KEY = '%s@%s';
 
     public function __construct(
         private OpenMeteoClient $client,
@@ -34,7 +34,7 @@ final readonly class WeatherSource implements Source
 
     public function scopeFor(\DateTimeImmutable $date, Location $location): SnapshotScope
     {
-        return new SnapshotScope(self::NAME, \sprintf(self::KEY, $date->format(BriefingDay::FORMAT), $location->latitude, $location->longitude), $date);
+        return SnapshotScope::dated(self::NAME, \sprintf(self::KEY, $date->format(BriefingDay::FORMAT), $location->key()), $date);
     }
 
     public function client(): SourceClient
