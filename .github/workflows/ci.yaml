@@ -90,3 +90,37 @@ jobs:
       - name: Lint the Dockerfile
         if: ${{ !cancelled() }}
         run: docker run --rm -v "$PWD:/repo" -w /repo ghcr.io/hadolint/hadolint:v2.15.1 hadolint Dockerfile
+
+  podman:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 20
+    env:
+      PODMAN_COMPOSE_PROVIDER: podman-compose
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install podman-compose
+        run: pipx install podman-compose==1.6.0
+      - name: Show the Podman versions
+        run: |
+          podman version
+          podman info --format '{{.Host.NetworkBackend}} {{.Host.CgroupsVersion}} rootless={{.Host.Security.Rootless}}'
+          podman compose version
+      - name: Start the stack from a clean checkout
+        run: podman compose up --build --detach
+      - name: Wait for the app
+        run: curl --fail-with-body --silent --show-error --retry 60 --retry-delay 5 --retry-all-errors http://127.0.0.1:8080/api/health
+      - name: Run the smoke test
+        env:
+          COMPOSE: podman compose
+        run: bin/smoke-test http://127.0.0.1:8080
+      - name: Show container state and logs
+        if: ${{ !success() }}
+        run: |
+          podman ps --all
+          podman compose logs
+      - name: Stop the stack and remove its volumes
+        if: ${{ always() }}
+        run: podman compose down --volumes

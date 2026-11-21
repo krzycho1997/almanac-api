@@ -1,0 +1,62 @@
+#!/bin/sh
+set -eu
+
+base_url=${1:?usage: bin/smoke-test BASE_URL}
+compose=${COMPOSE:-docker compose}
+past_date=2024-03-15
+discovery_id=0e33df66-c6e0-5d8e-8ca5-90356a4d0e57
+discovery_sql="INSERT INTO briefing_discovery (id, key, type, date, title, data, created_at)
+    VALUES ('$discovery_id', 'event:2024-03-15:smoke-test', 'event', '2024-03-15', 'Smoke test event',
+        '{\"url\": \"https://en.wikipedia.org/wiki/Smoke_testing_(software)\", \"summary\": null}', now())
+    ON CONFLICT DO NOTHING"
+email=smoke-test@example.com
+body=$(mktemp)
+trap 'rm -f "$body"' EXIT INT TERM
+
+fail() {
+    echo "smoke-test: $*" >&2
+    if [ -s "$body" ]; then
+        cat "$body" >&2
+        echo >&2
+    fi
+    exit 1
+}
+
+request() {
+    expected=$1
+    label=$2
+    shift 2
+    status=$(curl --silent --show-error --max-time 30 --output "$body" --write-out '%{http_code}' "$@") || status=000
+    case " $expected " in
+        *" $status "*) ;;
+        *) fail "$label: expected $expected, got $status" ;;
+    esac
+}
+
+request 200 "GET /api/health" "$base_url/api/health"
+echo "smoke-test: health answers 200"
+
+request "200 502" "GET /api/briefings/$past_date" "$base_url/api/briefings/$past_date"
+echo "smoke-test: the briefing for $past_date answers $status"
+
+$compose exec -T php bin/console dbal:run-sql --quiet "$discovery_sql"
+echo "smoke-test: a discovery to bookmark is in the database"
+
+created=$($compose exec -T php bin/console almanac:user:create "$email" -q) || fail "almanac:user:create failed"
+token=$(printf '%s\n' "$created" | tail -n 1)
+[ -n "$token" ] || fail "almanac:user:create printed no token"
+echo "smoke-test: almanac:user:create printed a token"
+
+request 201 "POST /api/bookmarks" -X POST "$base_url/api/bookmarks" \
+    -H "Authorization: Bearer $token" -H 'Content-Type: application/json' \
+    --data "{\"discoveryId\": \"$discovery_id\"}"
+bookmark_id=$(jq -r '.id' "$body")
+echo "smoke-test: the bookmark is created"
+
+request 200 "GET /api/bookmarks" "$base_url/api/bookmarks" -H "Authorization: Bearer $token"
+jq -e --arg id "$bookmark_id" 'any(.data[]; .id == $id)' "$body" > /dev/null \
+    || fail "the bookmark list does not contain $bookmark_id"
+echo "smoke-test: the bookmark list contains it"
+
+request 204 "DELETE /api/bookmarks/{id}" -X DELETE "$base_url/api/bookmarks/$bookmark_id" -H "Authorization: Bearer $token"
+echo "smoke-test: the bookmark is deleted"
