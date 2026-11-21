@@ -28,7 +28,7 @@ final class DiscoveryCatalogTest extends DiscoveryCatalogContractTestCase
 
     protected function setUp(): void
     {
-        $this->container = ExposingKernel::booted('test', [DiscoveryCatalog::class, DiscoveryRepository::class, Connection::class, self::DEBUG_DATA]);
+        $this->container = ExposingKernel::booted('test', [DoctrineDiscoveryCatalog::class, DiscoveryRepository::class, Connection::class, self::DEBUG_DATA]);
     }
 
     public function testFindsManyDiscoveriesInOneQuery(): void
@@ -93,7 +93,7 @@ final class DiscoveryCatalogTest extends DiscoveryCatalogContractTestCase
 
     private function catalog(): DiscoveryCatalog
     {
-        $catalog = $this->service(DiscoveryCatalog::class);
+        $catalog = $this->service(DoctrineDiscoveryCatalog::class);
         self::assertInstanceOf(DoctrineDiscoveryCatalog::class, $catalog);
 
         return $catalog;

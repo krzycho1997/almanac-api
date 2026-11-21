@@ -132,6 +132,11 @@ when@test:
         App\Tests\Support\Command\FailingCommand:
             autoconfigure: true
 
+        App\Tests\Support\Bookmark\InMemoryDiscoveryCatalog:
+            decorates: App\Briefing\Contract\DiscoveryCatalog
+            public: true
+            arguments: ['@.inner']
+
         test.identity.access_token_handler:
             alias: App\Identity\Security\AccessTokenHandler
             public: true
