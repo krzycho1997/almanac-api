@@ -44,6 +44,17 @@ final readonly class BriefingResult
         return array_any($this->entries, static fn (SourceEntry $entry): bool => $entry->hasData());
     }
 
+    public function refusedUntil(): ?\DateTimeImmutable
+    {
+        $untils = array_filter(array_map(static fn (SourceResult $result): ?\DateTimeImmutable => $result->refusedUntil(), $this->results));
+
+        if ([] === $untils) {
+            return null;
+        }
+
+        return max($untils);
+    }
+
     public function hasFetched(): bool
     {
         return array_any($this->results, static fn (SourceResult $result): bool => $result->calledUpstream());

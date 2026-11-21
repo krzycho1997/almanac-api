@@ -116,19 +116,37 @@ final class BriefingResultTest extends TestCase
         ], $problems);
     }
 
+    public function testTellsUntilWhenTheLatestRefusalLasts(): void
+    {
+        // Given
+        $now = new \DateTimeImmutable(self::NOW);
+        $results = [
+            SourceResult::circuitOpen(SourceName::Apod, $now->modify('+1 minute')),
+            SourceResult::failed(SourceName::OnThisDay, FailureKind::RateLimited, 429, $now->modify('+2 hours')),
+            SourceResult::circuitOpen(SourceName::Weather, $now->modify('+15 minutes')),
+        ];
+
+        // When
+        $until = new BriefingResult($now, Location::fromCoordinates(52.23, 21.01), [], $results)->refusedUntil();
+
+        // Then
+        self::assertEquals($now->modify('+15 minutes'), $until);
+        self::assertNull(new BriefingResult($now, Location::fromCoordinates(52.23, 21.01), [], [$results[1]])->refusedUntil());
+    }
+
     public function testCountsASourceRefusedByAnOpenCircuitAsASkippedProblem(): void
     {
         // Given
         $now = new \DateTimeImmutable(self::NOW);
         $refused = SourceEntry::missing(SourceName::Apod, new SourceFailure(FailureKind::CircuitOpen), $now);
-        $briefing = new BriefingResult($now, Location::fromCoordinates(52.23, 21.01), [$refused], [SourceResult::circuitOpen(SourceName::Apod)]);
+        $briefing = new BriefingResult($now, Location::fromCoordinates(52.23, 21.01), [$refused], [SourceResult::circuitOpen(SourceName::Apod, new \DateTimeImmutable(self::NOW))]);
 
         // When
         $problems = $briefing->problems();
 
         // Then
-        self::assertEquals([new BriefingProblem(SourceName::Apod, new SourceFailure(FailureKind::CircuitOpen), ProblemTiming::Skipped)], $problems);
-        self::assertEquals([SourceResult::circuitOpen(SourceName::Apod)], $briefing->failures());
+        self::assertEquals([new BriefingProblem(SourceName::Apod, new SourceFailure(FailureKind::CircuitOpen, retryAt: $now), ProblemTiming::Skipped)], $problems);
+        self::assertEquals([SourceResult::circuitOpen(SourceName::Apod, new \DateTimeImmutable(self::NOW))], $briefing->failures());
     }
 
     /**
@@ -150,9 +168,9 @@ final class BriefingResultTest extends TestCase
     public static function fetches(): iterable
     {
         yield 'nothing fetched' => [[], false];
-        yield 'only refused by open circuits' => [[SourceResult::circuitOpen(SourceName::Apod), SourceResult::circuitOpen(SourceName::Weather)], false];
+        yield 'only refused by open circuits' => [[SourceResult::circuitOpen(SourceName::Apod, new \DateTimeImmutable(self::NOW)), SourceResult::circuitOpen(SourceName::Weather, new \DateTimeImmutable(self::NOW))], false];
         yield 'one failed fetch' => [[SourceResult::failed(SourceName::Apod, FailureKind::Unavailable)], true];
-        yield 'a fetch next to a refusal' => [[SourceResult::circuitOpen(SourceName::Apod), SourceResult::failed(SourceName::Weather, FailureKind::Rejected)], true];
+        yield 'a fetch next to a refusal' => [[SourceResult::circuitOpen(SourceName::Apod, new \DateTimeImmutable(self::NOW)), SourceResult::failed(SourceName::Weather, FailureKind::Rejected)], true];
     }
 
     public function testFindsTheResultOfASource(): void

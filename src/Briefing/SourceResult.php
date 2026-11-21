@@ -26,9 +26,9 @@ final readonly class SourceResult
         return new self($source, SourceStatus::NotApplicable, null, null);
     }
 
-    public static function circuitOpen(SourceName $source): self
+    public static function circuitOpen(SourceName $source, \DateTimeImmutable $until): self
     {
-        return self::failed($source, FailureKind::CircuitOpen);
+        return self::failed($source, FailureKind::CircuitOpen, retryAt: $until);
     }
 
     /**
@@ -45,6 +45,15 @@ final readonly class SourceResult
     public function hasFailed(): bool
     {
         return $this->failure instanceof SourceFailure;
+    }
+
+    public function refusedUntil(): ?\DateTimeImmutable
+    {
+        if ($this->calledUpstream()) {
+            return null;
+        }
+
+        return $this->failure?->retryAt;
     }
 
     public function calledUpstream(): bool

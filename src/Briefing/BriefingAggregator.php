@@ -64,7 +64,7 @@ final readonly class BriefingAggregator
         $permits = $this->permitsFor($due);
         $settled = $this->fetcher->settleAll(self::startAll(self::allowed($due, $permits), $date, $location));
         $this->recordInCircuits($settled, $permits);
-        $refused = self::refusedResults($permits);
+        $refused = $this->refusedResults($permits);
         $entries = $this->entriesFor($settled, $refused, $scopes, $stored, $decisions, $date, $now);
         $this->recordFailures($settled, $entries, $date);
 
@@ -114,13 +114,13 @@ final readonly class BriefingAggregator
      *
      * @return list<SourceResult>
      */
-    private static function refusedResults(array $permits): array
+    private function refusedResults(array $permits): array
     {
         $refused = [];
 
         foreach ($permits as $source => $permit) {
             if (CircuitPermit::Refused === $permit) {
-                $refused[] = SourceResult::circuitOpen(SourceName::from($source));
+                $refused[] = SourceResult::circuitOpen(SourceName::from($source), $this->breaker->refusedUntil(SourceName::from($source)));
             }
         }
 
