@@ -1,0 +1,25 @@
+src/Shared/Metrics/HttpMetricsListener.php
+  s_4da5374f6e605f::t_e824ded8ae5abe 1-103,105-108
+  s_4da5374f6e605f::t_85c3a7dcfc2e06 104
+tests/Shared/Functional/HttpMetricsTest.php
+  s_4da5374f6e605f::t_85c3a7dcfc2e06 1-50,52-53
+  s_4da5374f6e605f::t_d75104f33989be 51
+config/services.yaml
+  s_4da5374f6e605f::t_e824ded8ae5abe 92-94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6fc849c61374b7e3d62161161984428e9019dde3",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
