@@ -33,7 +33,7 @@ The first start builds the image, runs `composer install`, waits for PostgreSQL 
 | `database` | PostgreSQL 18 |
 | `redis` | Redis 8: circuit breaker state, rate-limit counters, `cache.app`; no persistence |
 
-`compose.yaml` uses full image names and SELinux volume labels, so it is meant to run with `podman compose` too. The Podman run on a clean machine is still to be done.
+`compose.yaml` uses full image names and SELinux volume labels, so it also runs with `podman compose`. CI starts it from a clean checkout with rootless Podman 5 (5.7 at the time of writing) and podman-compose 1.6 on Ubuntu 26.04 and runs `bin/smoke-test` (health, a briefing, a new user's token, and a bookmark created, listed and deleted). Podman 4.x, as on Ubuntu 24.04, ships an aardvark-dns that loses DNS between containers at random ([containers/aardvark-dns#389](https://github.com/containers/aardvark-dns/issues/389)), so use Podman 5.
 
 ### Environment and the NASA key
 
@@ -139,13 +139,14 @@ docker compose exec php composer test:live    # calls the real APIs; not part of
 docker compose exec php vendor/bin/phpunit --testsuite briefing   # one module: briefing, identity, bookmark, shared
 docker compose exec php vendor/bin/phpunit --testsuite phpstan    # the architecture rules against their fixtures
 docker compose run --rm --no-deps redocly lint docs/openapi.yaml  # OpenAPI lint, as in CI
+bin/smoke-test http://127.0.0.1:8080                               # on the host, needs curl and jq; COMPOSE='podman compose' for Podman; leaves a smoke-test user and discovery
 ```
 
 `composer cs-fix` fixes the style. After the first start has installed `vendor/`, `composer test:unit` also runs without the database: `docker compose run --rm --no-deps php composer test:unit`.
 
 Git hooks, once per clone: `git config core.hooksPath .githooks`. `commit-msg` checks the Conventional Commits format and length; `pre-push` runs `check:fast` in the container (Docker only).
 
-CI (`.github/workflows/ci.yaml`) runs `check:fast`, the Redocly lint, a build and check of the prod image, a clean `docker compose up --wait` with all tests, a check of the commit subjects, gitleaks on the history and hadolint. A tag such as `v1.0.0` (matching `v[0-9]+.[0-9]+.[0-9]+`) runs `release.yaml`, which publishes the prod image to GHCR with an SBOM.
+CI (`.github/workflows/ci.yaml`) runs `check:fast`, the Redocly lint, a build and check of the prod image, a clean `docker compose up --wait` with all tests, the same stack under Podman with `bin/smoke-test`, a check of the commit subjects, gitleaks on the history and hadolint. A tag such as `v1.0.0` (matching `v[0-9]+.[0-9]+.[0-9]+`) runs `release.yaml`, which publishes the prod image to GHCR with an SBOM.
 
 ## Decisions and trade-offs
 
