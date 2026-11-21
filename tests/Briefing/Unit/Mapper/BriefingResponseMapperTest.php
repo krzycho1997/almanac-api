@@ -134,6 +134,7 @@ final class BriefingResponseMapperTest extends TestCase
         yield 'rejected' => [FailureKind::Rejected, SourceError::Rejected];
         yield 'misconfigured' => [FailureKind::Misconfigured, SourceError::Misconfigured];
         yield 'invalid payload' => [FailureKind::InvalidPayload, SourceError::InvalidPayload];
+        yield 'circuit open' => [FailureKind::CircuitOpen, SourceError::Unavailable];
     }
 
     public function testMapsTheLastGoodDataOfAFailedRefreshAsStale(): void
@@ -148,6 +149,19 @@ final class BriefingResponseMapperTest extends TestCase
         self::assertEquals(new SourceStaleDto(new \DateTimeImmutable('2026-11-18T09:00:00Z'), SourceError::Unavailable, new \DateTimeImmutable(self::CHECKED_AT)), $response->sources->weather);
         self::assertSame([], $response->missing);
         self::assertSame(WeatherKindValue::Final, $response->weather?->kind);
+    }
+
+    public function testMapsTheLastGoodDataOfASourceRefusedByItsOpenCircuitAsStaleAndUnavailable(): void
+    {
+        // Given
+        $briefing = BriefingResultBuilder::create()->stale(SourceName::Weather, SourcePayloads::dailyWeather(), '2026-11-18T09:00:00Z', FailureKind::CircuitOpen)->attemptedAt(self::CHECKED_AT)->build();
+
+        // When
+        $response = new BriefingResponseMapper(new DiscoveryExtractor())->create($briefing);
+
+        // Then
+        self::assertEquals(new SourceStaleDto(new \DateTimeImmutable('2026-11-18T09:00:00Z'), SourceError::Unavailable, new \DateTimeImmutable(self::CHECKED_AT)), $response->sources->weather);
+        self::assertSame([], $response->missing);
     }
 
     public function testMapsASourceThatDoesNotCoverTheDate(): void
