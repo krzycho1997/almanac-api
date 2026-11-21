@@ -1,0 +1,24 @@
+docker/php/entrypoint.sh
+  s_4da5374f6e605f::t_8674f99aa77c3c 49-79,90-93
+  s_4da5374f6e605f::t_3f1120d7512a10 94-95
+Dockerfile
+  s_4da5374f6e605f::t_8674f99aa77c3c 7
+compose.yaml
+  s_4da5374f6e605f::t_8674f99aa77c3c 38-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c8d725baadd4cd31dd95972030f309a63c0acca6",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
