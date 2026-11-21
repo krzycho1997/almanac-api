@@ -52,7 +52,23 @@ final class DiscoveryRepository extends ServiceEntityRepository
             return 0;
         }
 
-        return (int) $this->connection()->executeStatement(self::UPSERT, ['records' => self::rows($records), 'createdAt' => $createdAt], self::UPSERT_TYPES);
+        return (int) $this->connection()->executeStatement(self::UPSERT, ['records' => self::rows(self::firstOfEachKey($records)), 'createdAt' => $createdAt], self::UPSERT_TYPES);
+    }
+
+    /**
+     * @param list<DiscoveryRecord> $records
+     *
+     * @return list<DiscoveryRecord>
+     */
+    private static function firstOfEachKey(array $records): array
+    {
+        $first = [];
+
+        foreach ($records as $record) {
+            $first[$record->key] ??= $record;
+        }
+
+        return array_values($first);
     }
 
     private function connection(): Connection
