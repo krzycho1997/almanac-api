@@ -1,0 +1,31 @@
+docker/nginx/default.conf
+  s_4da5374f6e605f::t_42be4defda8815 56-60,81-109
+src/Shared/Controller/MetricsController.php
+  s_4da5374f6e605f::t_b79a3bb3ced0c5 1-34
+tests/EndToEnd/NginxMetricsTest.php
+  s_4da5374f6e605f::t_cc85bb0c38bb7f 1-75
+tests/Shared/Functional/MetricsEndpointTest.php
+  s_4da5374f6e605f::t_0b28529256d5b6 1-22
+tests/Shared/Integration/OpenApi/OpenApiCoverageTest.php
+  s_4da5374f6e605f::t_2016119866ba9b 7,18,48,63-79
+tests/Shared/Unit/MetricsControllerTest.php
+  s_4da5374f6e605f::t_8cd3be8eade854 1-44
+tests/Support/EndToEnd/HttpProbe.php
+  s_4da5374f6e605f::t_6cb2ff73b1b4e7 29-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cf0f4b1d3c26641264ba65bd1afec4a394f251b2",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
