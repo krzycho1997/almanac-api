@@ -10,6 +10,7 @@ use App\Briefing\Dto\Request\BriefingQuery;
 use App\Briefing\Dto\Response\BriefingResponse;
 use App\Briefing\Exception\NoSourceDataException;
 use App\Briefing\Location;
+use App\Briefing\Mapper\BriefingQueryMapper;
 use App\Briefing\Mapper\BriefingResponseMapper;
 use App\Briefing\ValueResolver\BriefingDateValueResolver;
 use Symfony\Component\DependencyInjection\Attribute\Target;
@@ -27,6 +28,7 @@ final readonly class BriefingController
 
     public function __construct(
         private BriefingAggregator $aggregator,
+        private BriefingQueryMapper $queryMapper,
         private BriefingResponseMapper $mapper,
         #[Target('defaultLocation')]
         private Location $defaultLocation,
@@ -43,7 +45,7 @@ final readonly class BriefingController
         #[MapQueryString(validationFailedStatusCode: Response::HTTP_UNPROCESSABLE_ENTITY)]
         BriefingQuery $query = new BriefingQuery(),
     ): BriefingResponse {
-        $briefing = $this->aggregator->briefingFor($date, $query->locationOr($this->defaultLocation));
+        $briefing = $this->aggregator->briefingFor($date, $this->queryMapper->convertToLocation($query, $this->defaultLocation));
         $this->metrics->served($briefing);
 
         if ($briefing->hasAnyData()) {
