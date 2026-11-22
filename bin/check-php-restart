@@ -2,109 +2,36 @@
 set -eu
 
 base_url=${1:?usage: bin/check-php-restart BASE_URL}
-compose=${COMPOSE:-docker compose}
 engine=${ENGINE:-docker}
 project=${COMPOSE_PROJECT_NAME:-$(basename "$PWD")}
-attempts=${ATTEMPTS:-30}
-placeholder_image=docker.io/library/nginx:1.30-alpine
-max_placeholders=16
-placeholders=
-php_stopped=
-
-fail() {
-    echo "check-php-restart: $*" >&2
-    exit 1
-}
-
-cleanup() {
-    for placeholder in $placeholders; do
-        $engine rm --force "$placeholder" > /dev/null 2>&1 || true
+fail() { echo "check-php-restart: $*" >&2; exit 1; }
+container() { $engine ps -q --filter "label=com.docker.compose.project=$project" --filter "label=com.docker.compose.service=$1" | head -n 1; }
+addresses() { $engine inspect -f '{{range $name, $n := .NetworkSettings.Networks}}{{$name}} {{$n.IPAddress}} {{end}}' "$@"; }
+free_address() {
+    for host in $(seq 250 -1 200); do
+        case " $2 " in *" $1.$host "*) continue ;; esac
+        echo "$1.$host" && return
     done
-    if [ -n "$php_stopped" ]; then
-        $compose start php > /dev/null 2>&1 || true
-    fi
 }
-trap cleanup EXIT
-trap 'exit 130' INT TERM
-
-container_of() {
-    id=$($engine ps --quiet --filter "label=com.docker.compose.project=$project" --filter "label=com.docker.compose.service=$1" | head -n 1)
-    [ -n "$id" ] || fail "no running $1 container"
-    printf '%s\n' "$id"
-}
-
-address_of() {
-    $engine inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' "$1" | awk '{print $1}'
-}
-
-network_of() {
-    $engine inspect --format '{{range $name, $network := .NetworkSettings.Networks}}{{$name}} {{end}}' "$1" | awk '{print $1}'
-}
-
-started_at() {
-    $engine inspect --format '{{.State.StartedAt}}' "$1"
-}
-
-php=$(container_of php)
-nginx=$(container_of nginx)
-nginx_started=$(started_at "$nginx")
-old_address=$(address_of "$php")
-network=$(network_of "$php")
-echo "check-php-restart: php is at $old_address on $network"
-echo "check-php-restart: nginx uses $($compose exec -T nginx grep -m 1 '^resolver' /etc/nginx/conf.d/default.conf)"
-
-take_the_old_address() {
-    count=0
-    while [ "$count" -lt "$max_placeholders" ]; do
-        placeholder=$($engine run --detach --rm --network "$network" --entrypoint sleep "$placeholder_image" 300)
-        placeholders="$placeholders $placeholder"
-        count=$((count + 1))
-        if [ "$(address_of "$placeholder")" = "$old_address" ]; then
-            echo "check-php-restart: placeholder $count holds $old_address, so php must move"
-            return 0
-        fi
-    done
-    echo "check-php-restart: no placeholder got $old_address; the network hands out addresses in order"
-}
-
-$compose stop php > /dev/null 2>&1 || fail "could not stop php"
-php_stopped=yes
-take_the_old_address
-$compose start php > /dev/null 2>&1 || fail "could not start php"
-php_stopped=
-
-php=$(container_of php)
-new_address=$(address_of "$php")
-[ "$new_address" != "$old_address" ] || fail "php kept $old_address, so the check proves nothing"
-echo "check-php-restart: php restarted at $new_address"
-
-health_status() {
-    curl --silent --output /dev/null --max-time 5 --write-out '%{http_code}' "$base_url/api/health" || true
-}
-
-metrics_status() {
-    $compose exec -T nginx curl --silent --output /dev/null --max-time 5 --write-out '%{http_code}' http://127.0.0.1:9100/metrics || true
-}
-
+status() { "$@" -s -o /dev/null -m 5 -w '%{http_code}' || true; }
 wait_for_200() {
-    label=$1
-    probe=$2
-    attempt=1
-    until [ "$($probe)" = 200 ]; do
-        [ "$attempt" -lt "$attempts" ] || fail "$label did not answer 200 within $attempts attempts"
-        attempt=$((attempt + 1))
-        sleep 2
-    done
-    echo "check-php-restart: $label answers 200 after $attempt attempts"
+    tries=0
+    until [ "$(status "$@")" = 200 ]; do tries=$((tries + 1)) && [ "$tries" -lt 30 ] || fail "no 200 from $* after php moved"; sleep 2; done
 }
 
-wait_for_200 health health_status
-wait_for_200 /metrics metrics_status
+php=$(container php) nginx=$(container nginx)
+set -- $(addresses "$php")
+network=$1 old=$2 new=$(free_address "${2%.*}" "$(addresses $($engine ps -q))")
+started=$($engine inspect -f '{{.State.StartedAt}}' "$nginx")
 
-for request in 1 2 3 4 5 6 7 8; do
-    [ "$(health_status)" = 200 ] || fail "health request $request after recovery did not answer 200"
-done
-echo "check-php-restart: eight more health requests answer 200"
+trap '$engine network connect --alias php "$network" "$php" 2> /dev/null || true' EXIT
+$engine network disconnect "$network" "$php"
+$engine network connect --ip "$new" --alias php "$network" "$php"
+trap - EXIT
+echo "check-php-restart: php moved from $old to $new"
 
-[ "$(started_at "$nginx")" = "$nginx_started" ] || fail "nginx was restarted"
-echo "check-php-restart: nginx kept running"
+wait_for_200 curl "$base_url/api/health"
+wait_for_200 $engine exec "$nginx" curl http://127.0.0.1:9100/metrics
+for request in 1 2 3 4 5 6 7 8; do [ "$(status curl "$base_url/api/health")" = 200 ] || fail "health request $request failed"; done
+[ "$($engine inspect -f '{{.State.StartedAt}}' "$nginx")" = "$started" ] || fail "nginx was restarted"
+echo "check-php-restart: nginx reaches php at $new without a restart"
