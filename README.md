@@ -2,67 +2,68 @@
 
 [![CI](https://github.com/krzycho1997/almanac-api/actions/workflows/ci.yaml/badge.svg)](https://github.com/krzycho1997/almanac-api/actions/workflows/ci.yaml)
 
-A REST API that builds a briefing for any date from 1995-06-16 to 15 days after today, from three public sources: NASA's Astronomy Picture of the Day (APOD), Wikipedia's On This Day and Open-Meteo weather. Each source is normalised into one JSON format and stored in PostgreSQL, and a briefing still answers when a source fails, naming what is missing. Users get a Bearer token from a console command and bookmark single discoveries: a picture, an event or a person.
+Almanac API builds a briefing for any date from 1995-06-16 to 15 days after today. It draws on three public sources: NASA's Astronomy Picture of the Day (APOD), Wikipedia's On This Day and Open-Meteo weather. I normalise each one into a single JSON format and store it in PostgreSQL, and when a source fails, the briefing still answers and says what is missing. Users get a Bearer token from a console command and can bookmark single discoveries: a picture, an event or a person.
 
-At the time of writing NASA's APOD API answers every date with a "NASA Science" stand-in; the app reports APOD as a failed source, so every briefing shows partial data at work.
-
-Stack: PHP 8.5, Symfony 8.1, Doctrine ORM 3 with Migrations, PostgreSQL 18, Redis 8, nginx and php-fpm, Docker Compose.
+It runs on PHP 8.5, Symfony 8.1, Doctrine ORM 3, PostgreSQL 18, Redis 8 and nginx with php-fpm, all started by Docker Compose.
 
 ## Quick start
 
-Requirements: Docker with Compose v2, or Podman 5 with podman-compose.
+You need Docker with Compose v2, or Podman 5 with podman-compose, and `curl` and `jq` on the host for the examples.
 
 ```sh
 git clone https://github.com/krzycho1997/almanac-api.git && cd almanac-api
-docker compose up --wait          # Podman 5: podman compose up --build --detach, then wait for health
+docker compose up --wait
 curl http://127.0.0.1:8080/api/health
 ```
 
-Health answers `{"status":"ok","checks":{"circuits":{"apod":"closed","onThisDay":"closed","weather":"closed"}}}`. The first start builds the image, installs dependencies and runs the migrations: about a minute on a recent laptop once the base images are pulled, plus the time to pull them on a new machine.
+With Podman 5, run `podman compose up --build --detach` instead and wait until the health URL answers. The first start builds the image, installs the dependencies and runs the migrations; on my laptop that took about a minute with the base images already pulled. Health should answer:
 
-The dev stack uses NASA's shared `DEMO_KEY`, which is often used up. A free key (email only, https://api.nasa.gov) goes into `.env.dev.local`, which git ignores; then restart the worker:
+```json
+{"status":"ok","checks":{"circuits":{"apod":"closed","onThisDay":"closed","weather":"closed"}}}
+```
+
+The dev stack uses NASA's shared `DEMO_KEY`, which is often used up. A free key needs only an email address at [api.nasa.gov](https://api.nasa.gov). Put it in `.env.dev.local` (git ignores it; this command overwrites the file) and restart Redis and the worker, so a circuit that `DEMO_KEY` opened is closed too:
 
 ```sh
 echo 'NASA_API_KEY=your-key' > .env.dev.local
-docker compose restart worker
+docker compose restart redis worker
 ```
 
-The API contract is [docs/openapi.yaml](docs/openapi.yaml), also served at http://127.0.0.1:8080/api/docs.json. Ready-made requests for JetBrains IDEs and httpYac are in [http/](http/).
-
-## Brief: done
-
-| Requirement | Where |
-|---|---|
-| Briefing from 3+ sources in our own format | APOD, On This Day, Open-Meteo, mapped to an internal model |
-| A failing source is reported, the rest still answers | `sources` and `missing`; 502 only when nothing has data |
-| Invalid or out-of-range dates | 400 malformed, 422 outside the window |
-| PostgreSQL, past dates never refetched, refresh policy | snapshot table (JSONB), `RefreshPolicy` |
-| Doctrine Migrations only | run by `php` on start |
-| Bearer token from a console command | `almanac:user:create` |
-| Bookmarks: create, paginated list, delete, own only, no duplicates | unique `(user_id, discovery_id)`; others' bookmarks are 404 |
-| `almanac:prefetch <from> <to>` with progress and failures | progress bar, problem table, exit code 1 |
-| JSON, Problem Details, Validator, status codes | RFC 9457, checked against OpenAPI in every functional test |
-| Stack, `strict_types`, Docker and Podman | PHP 8.5, Symfony 8.1, PostgreSQL 18; CI runs Docker and Podman |
-| PHPUnit for aggregation (failing source, mocked) and bookmarks, against PostgreSQL | unit, integration, functional, e2e |
-| PHPStan 6+, PHP-CS-Fixer | level 9, no baseline |
-| Bonus: Messenger prefetch, RateLimiter, OpenAPI | all three |
-
-### Beyond the brief
-
-- **Circuit breaker (Redis):** stops calling a provider that is down or out of quota; it stays closed while providers answer and fails open without Redis.
-- **Architecture rules (phpat, custom PHPStan rules):** keep modules, layers and provider code apart; PHPStan only.
-- **OpenAPI validation in tests:** the contract cannot drift; tests only.
-- **Monitoring profile:** Prometheus, Grafana, SLOs, alerts; off unless `--profile monitoring`.
-- **Release and deploy workflows:** a scanned prod image on tags and `main`; never run locally.
+The API contract is [docs/openapi.yaml](docs/openapi.yaml), also served at `http://127.0.0.1:8080/api/docs.json`. For PhpStorm or httpYac there are ready-made requests in [http/](http/).
 
 ## Try it
+
+Ask for a briefing at the default place (Warsaw, from `ALMANAC_DEFAULT_*` in `.env`) or at given coordinates, which are rounded to two decimals:
 
 ```sh
 curl -s http://127.0.0.1:8080/api/briefings/2024-03-15
 curl -s 'http://127.0.0.1:8080/api/briefings/2024-03-15?lat=48.86&lon=2.35'
 ```
 
-Without coordinates the place is Warsaw; coordinates are rounded to two decimals. Every item has a `discoveryId`. Create a user, then add, list and delete a bookmark (with `jq`):
+A shortened answer looks like this. Every item carries the `discoveryId` you bookmark, and `sources` and `missing` say what each source did:
+
+```json
+{
+  "date": "2024-03-15",
+  "location": {"latitude": 52.23, "longitude": 21.01, "name": "Warsaw", "isDefault": true},
+  "apod": null,
+  "events": [{"discoveryId": "e9b46a81-debf-5313-adf4-562da5ece32d", "year": 1990,
+              "text": "Iraqi authorities hanged Iranian freelance reporter Farzad Bazoft on charges of spying for Israel.",
+              "pages": [{"title": "Farzad Bazoft", "url": "https://en.wikipedia.org/wiki/Farzad_Bazoft", "thumbnail": "…"}]}],
+  "births": [{"discoveryId": "071bcebd-7021-5cb1-b2a8-c571ae75aa8f", "year": 2005, "name": "Rodri Mendoza", "description": "Spanish footballer", "…": "…"}],
+  "weather": {"kind": "final", "temperatureMin": 1.7, "temperatureMax": 10.0, "description": "Overcast", "…": "…"},
+  "sources": {
+    "apod": {"status": "failed", "error": "invalid_payload", "lastAttemptAt": "2026-11-22T17:09:04Z"},
+    "onThisDay": {"status": "ok", "fetchedAt": "2026-11-21T16:26:50Z", "stale": false},
+    "weather": {"status": "ok", "fetchedAt": "2026-11-21T16:26:50Z", "stale": false}
+  },
+  "missing": ["apod"]
+}
+```
+
+APOD is missing on purpose here. As of 22.11.2026, NASA's APOD API answers every date, with a valid key too, with a "NASA Science" stand-in instead of the picture. The app recognises it as an invalid payload, so every briefing currently shows the partial-data path at work.
+
+Create a user (with `-q` the command prints only the token), then add, list and delete a bookmark. The add answers 201 and the delete 204:
 
 ```sh
 TOKEN=$(docker compose exec -T php bin/console almanac:user:create you@example.com -q)
@@ -73,95 +74,142 @@ curl -s 'http://127.0.0.1:8080/api/bookmarks?page=1&limit=20' -H "Authorization:
 curl -s -i -X DELETE "http://127.0.0.1:8080/api/bookmarks/$BOOKMARK" -H "Authorization: Bearer $TOKEN"
 ```
 
-A failing source: add `OPEN_METEO_ARCHIVE_BASE_URI=http://127.0.0.1:9` to `.env.dev.local`, ask for a date and place not stored yet, then remove the line. A stored past day never calls upstream again, so it would answer from storage.
+To break a source yourself, add `OPEN_METEO_ARCHIVE_BASE_URI=http://127.0.0.1:9` to `.env.dev.local` and ask for a date and place that are not stored yet. It has to be a new one, because a stored past day never calls upstream again. Remove the line afterwards.
 
 ```sh
 curl -s 'http://127.0.0.1:8080/api/briefings/2023-07-05?lat=12.35&lon=56.79' | jq -c '.sources.weather, .missing'
-# {"status":"failed","error":"unavailable",...}  ["apod","weather"]
 ```
 
-In PhpStorm or httpYac: copy `http/http-client.private.env.json.dist` to `http-client.private.env.json`, paste a token, choose `dev`, run `01-public.http`, then `02-bookmarks.http`.
+```text
+{"status":"failed","error":"unavailable","lastAttemptAt":"…"}
+["apod","weather"]
+```
+
+To click through the same requests in PhpStorm or httpYac, copy `http/http-client.private.env.json.dist` to `http/http-client.private.env.json`, paste a token, pick the `dev` environment, and run `01-public.http`, then `02-bookmarks.http`.
 
 ## Endpoints
 
 | Method and path | Auth | What it does |
 |---|---|---|
-| `GET /api/briefings/{date}?lat=&lon=` | public, 60 a minute per client | briefing for a date; `lat` and `lon` go together |
+| `GET /api/briefings/{date}?lat=&lon=` | public, 60 requests a minute per client | the briefing for a date; `lat` and `lon` go together |
 | `GET /api/bookmarks?page=&limit=` | Bearer | the user's bookmarks, newest first (`limit` up to 100, default 20) |
-| `POST /api/bookmarks` | Bearer | bookmark a discovery: `{"discoveryId": "…"}` |
-| `DELETE /api/bookmarks/{id}` | Bearer | remove one of the user's bookmarks |
+| `POST /api/bookmarks` | Bearer | bookmark a discovery: `{"discoveryId": "…"}`; answers 201 |
+| `DELETE /api/bookmarks/{id}` | Bearer | remove one of the user's bookmarks; answers 204 |
 | `GET /api/health` | public | liveness and the state of each source's circuit |
 | `GET /api/docs.json` | public | the OpenAPI 3.0.3 document |
 
-Every error is `application/problem+json` with a `detail` that says what to change; validation errors list each invalid field in `violations[]`. The status codes are in [Details](#details).
+Every error comes back as `application/problem+json` with a `detail` that tells the client what to change, and validation errors list each invalid field in `violations[]`.
+
+| Status | When |
+|---|---|
+| 400 | a date that is not `YYYY-MM-DD`, a malformed JSON body, or headers nginx cannot read |
+| 401 | no valid token |
+| 404 | an unknown discovery or bookmark, or someone else's bookmark |
+| 409 | a discovery already bookmarked |
+| 413 | a body over 16 KB |
+| 415 | a body that is not JSON |
+| 422 | a date outside the window, bad coordinates, a bad `page` or `limit`, a missing or invalid `discoveryId`, or a body field the request does not define |
+| 429 | over the rate limit, with `Retry-After` |
+| 502 | no source has data |
+| 503 | php-fpm does not answer |
 
 ## Tests
 
-Everything runs in the `php` container, against PostgreSQL.
+Everything runs in the `php` container against a real PostgreSQL, and the e2e suite calls nginx, so the stack must be running.
 
-```sh
-docker compose exec php composer check      # lint, CS-Fixer, PHPStan, composer audit, unit tests, then a fresh test database and every suite
-docker compose exec php composer test       # a fresh test database, then the unit, integration, functional and e2e suites
-docker compose exec php composer test:unit  # unit tests only; no database needed
-docker compose exec php composer test:db    # creates the test database; run it once before a single suite or module
-docker compose exec php vendor/bin/phpunit --testsuite bookmark   # one module: briefing, identity, bookmark or shared
-bin/smoke-test http://127.0.0.1:8080        # on the host, with curl and jq: health, a briefing, a user and a bookmark
-```
+| Command | What it runs |
+|---|---|
+| `docker compose exec php composer check` | `check:fast` (validation, CS-Fixer, PHPStan level 9, `composer audit`, unit tests), then a fresh test database and the integration, functional and e2e suites |
+| `docker compose exec php composer test` | the unit tests, then a fresh test database and the integration, functional and e2e suites |
+| `docker compose exec php composer test:unit` | the unit tests only; no database needed |
+| `docker compose exec php composer test:db` | recreates and migrates the test database; run it once before a single suite or module |
+| `docker compose exec php vendor/bin/phpunit --testsuite bookmark` | one module: `briefing`, `identity`, `bookmark` or `shared` |
+| `bin/smoke-test http://127.0.0.1:8080` | on the host: health, a briefing, a new user's token, a bookmark added, listed and deleted |
 
-Briefing tests with a failing, mocked source: `tests/Briefing/Functional/BriefingControllerTest.php`; bookmark endpoints: `tests/Bookmark/Functional/`.
+If you want one place to start, the briefing tests with a failing, mocked source are in [tests/Briefing/Functional/BriefingControllerTest.php](tests/Briefing/Functional/BriefingControllerTest.php), and the bookmark endpoint tests are in [tests/Bookmark/Functional/](tests/Bookmark/Functional/).
 
 ## Decisions
 
-**APIs.** APOD, On This Day and Open-Meteo, because together they give a picture, history and weather for any date. On This Day is three calls (`selected`, `births`, `deaths`) instead of `/all/`, which for 15 March is 1.4 MB, a third of it data the briefing never shows. Page Summary is left out: On This Day already carries each page's summary.
+**Which APIs.** I picked APOD, On This Day and Open-Meteo because together they give a picture, a piece of history and the weather for any date. For On This Day I make three calls (`selected`, `births`, `deaths`) instead of one to `/all/`: for 15 March `/all/` is 1.4 MB, and a third of it is data the briefing never shows. I left out Page Summary, because On This Day already carries each page's summary.
 
-**Code structure.** A modular monolith: `Briefing`, `Identity` and `Bookmark` talk only through their `Contract` namespaces, checked by phpat inside PHPStan. Each provider lives in `src/Briefing/Source/<Provider>/` with its client, response, mapper and definition, so swapping one touches one directory. DTOs only carry fields; mappers turn them into domain objects and back. The cost is no foreign keys between modules: a bookmark keeps the user and discovery ids as plain `uuid` columns.
+**Structure.** It is a modular monolith. `Briefing`, `Identity` and `Bookmark` talk to each other only through their `Contract` namespaces, and phpat checks that inside PHPStan. Each provider has its own directory, `src/Briefing/Source/<Provider>/`, with its client, response, mapper and definition, so swapping a provider touches one directory. DTOs only carry fields, and mappers turn them into domain objects and back. The price is that there are no foreign keys between modules: a bookmark keeps the user and discovery ids as plain `uuid` columns.
 
-**Schema.** One snapshot row per source and scope, the internal model as JSONB, since a payload is always read whole: `2024-03-15` for APOD, `03-15` for On This Day, `2024-03-15@52.23,21.01` for weather. Discoveries get a UUIDv5 of a stable key, so a briefing knows every bookmarkable id without a query. Bookmarks have a unique `(user_id, discovery_id)`.
+**Schema.** There is one snapshot row per source and scope, holding the internal model as JSONB, since a payload is always read whole. The scope is `2024-03-15` for APOD, `03-15` for On This Day and `2024-03-15@52.23,21.01` for weather. A discovery id is a UUIDv5 of a stable key, so a briefing knows every bookmarkable id without a query, and bookmarks are unique on `(user_id, discovery_id)`.
 
-**Cache and refresh.** A stored past day is final and never calls upstream. For today and later, APOD and On This Day are final once fetched and weather is refreshed after an hour. Weather is stored per 0.01° cell (about 1 km): a coarser grid stored less but described another place, because Open-Meteo fits its data to the point's elevation, and 0.1° put Tromsø 690 m higher, in polar day, on a night the sun set at 00:22.
+**Caching and refresh.** A stored past day is final and never calls upstream again. For today and later, APOD and On This Day are final once fetched, and weather is refreshed after an hour. I store weather per 0.01° cell, about 1 km. A coarser grid would store less, but it would describe another place, because Open-Meteo fits its data to the point's elevation: at 0.1°, Tromsø ended up 690 m higher and in polar day, on a night the sun set at 00:22.
 
-**Upstream errors.** The sources are fetched in parallel in one stream, 3 seconds each (8 for Wikipedia's uncached days) and 8.5 seconds in all. A network error or a 5xx is retried once; a 429 never. A failure is stored and waits 10 minutes, the last good data is served as `stale` meanwhile, and a circuit breaker stops calling a provider after repeated outages or until `Retry-After`.
+**Upstream errors.** The sources are fetched in parallel, with a hard deadline of 8.5 seconds. A timeout, network error or 5xx is retried once; a 429 never is. A failure is stored and the source waits 10 minutes before the next try, while the last good data is served as `stale`. On top of that, a circuit breaker stops calling a provider after repeated outages, or until its `Retry-After`.
 
-**Trade-offs.** Three writes use native `INSERT … ON CONFLICT`, because the API and the worker write the same rows and Doctrine has no atomic upsert. Two parallel first requests for one date still both call upstream; a lock would need a new dependency. OpenAPI is written by hand and enforced by tests rather than generated.
+**Trade-offs I accepted.** Three writes use native `INSERT … ON CONFLICT`, because the API and the worker write the same rows and Doctrine has no atomic upsert. Two parallel first requests for one date still both call upstream, since a lock would mean a new dependency. I write the OpenAPI document by hand and let every functional test enforce it, rather than generating it from annotations.
 
 ## Assumptions
 
-- On This Day is fetched as three lists instead of `/all/`, and Page Summary is not used.
-- The default place is Warsaw; `lat` and `lon` pick another one.
-- Dates run from the first APOD picture (1995-06-16) to 15 days after today; weather covers up to 14 days ahead and is `not_applicable` beyond.
-- Versioning: the paths follow the brief. A breaking change would go under `/api/v2`, with `Deprecation` and `Sunset` headers on the old paths, and `info.version` in OpenAPI follows SemVer.
-
-## Code map
-
-- **Briefing flow:** `BriefingController` → `BriefingAggregator` → `SnapshotRefresher` and `SourceSnapshotRepository` → `Source/ConcurrentFetcher` → `Mapper/BriefingResponseMapper`.
-- **Refresh rule:** `RefreshPolicy::decide()` with each source's `refreshAfter()`; the upserts in `SourceSnapshotRepository` keep the newer data.
-- **A new source:** implement `Source/Source.php` in `Source/<Name>/`, like `Source/OpenMeteo/`.
-- **Bookmark ownership:** `BookmarkService` and `BookmarkRepository`, which always filter by the owner.
-- **Model, Contract, Dto, Entity:** stored source data, what other modules may use, API request and response shapes, Doctrine rows.
+- Warsaw is the default place; `lat` and `lon` pick another one.
+- Dates run from the first APOD picture (1995-06-16) to 15 days after today. Weather only reaches 14 days ahead, so beyond that it is `not_applicable`.
+- I kept the paths the brief gave. A breaking change would go under `/api/v2`, with `Deprecation` and `Sunset` headers on the old paths, and `info.version` in the OpenAPI document follows SemVer.
 
 ## With more time
 
-- A global budget for cold fetches, so new dates and places cannot use up a provider's quota, and clean-up of old weather rows.
-- A lock per scope, so parallel first requests call upstream once, and `Cache-Control` from the refresh policy.
-- Splitting the root of `src/Briefing` into `Snapshot/`, `Failure/` and `Messenger/`.
-- A stable event key, so a Wikipedia edit does not create a new discovery.
-- Short-lived tokens with refresh, or an OIDC provider.
-- Wikipedia Page Summary as a fourth source.
+- A global budget for cold fetches, shared by the API and the worker, so many new dates and places cannot use up a provider's daily quota; and clean-up of weather rows for places other than the default.
+- A lock per scope, so parallel first requests call upstream once, and `Cache-Control` derived from the refresh policy, so clients can cache final days.
+- Splitting the root of `src/Briefing` (28 files) into `Snapshot/`, `Failure/` and `Messenger/`, because `MessageHandler/` also holds a stamp, a listener and a retry strategy that are not handlers.
+- A stable event key (the year and linked pages instead of a text hash), because a Wikipedia edit now creates a new discovery and old bookmarks keep pointing at the old text.
+- Short-lived tokens with refresh, or an OIDC provider through Symfony's `access_token` handlers, because a 30-day Bearer token is a long-lived secret.
+- Redis and PostgreSQL probes in `/api/health`, so an outage shows up before users report it.
+
+## What the brief asked for
+
+Everything the brief requires is in place, including the three bonuses (Messenger prefetch, RateLimiter and OpenAPI).
+
+<details>
+<summary><strong>Requirement by requirement</strong></summary>
+
+| Requirement | How it is met |
+|---|---|
+| A briefing from 3+ sources in our own format | APOD, On This Day and Open-Meteo, mapped to an internal model |
+| A failing source is reported and the rest still answers | `sources` and `missing`; 502 only when no source has data |
+| Invalid or out-of-range dates | 400 if malformed, 422 if outside the window |
+| PostgreSQL, past dates never refetched, a refresh policy | a snapshot table (JSONB) and `RefreshPolicy` |
+| Doctrine Migrations only | the `php` container runs them on start |
+| A Bearer token from a console command | `almanac:user:create` |
+| Bookmarks: create, paginated list, delete, own only, no duplicates | unique `(user_id, discovery_id)`; someone else's bookmark is a 404 |
+| `almanac:prefetch <from> <to>` with progress and failures | a progress bar, a table of problems and exit code 1 |
+| JSON, Problem Details, Validator, status codes | RFC 9457, checked against OpenAPI in every functional test |
+| Stack, `strict_types`, Docker and Podman | PHP 8.5, Symfony 8.1, PostgreSQL 18; CI runs both Docker and Podman |
+| PHPUnit for the aggregation (failing source, mocked) and bookmarks, against PostgreSQL | unit, integration, functional and e2e suites |
+| PHPStan 6+, PHP-CS-Fixer | level 9, no baseline |
+| Bonus: Messenger prefetch, RateLimiter, OpenAPI | all three |
+
+</details>
+
+I added a few things the brief did not ask for. The one that matters at runtime is a circuit breaker in Redis: without it, `DEMO_KEY`'s limit or a provider outage is hit again by every new date and queued message. The rest stays out of your way when you evaluate the core: architecture rules that run only inside PHPStan, OpenAPI validation that runs only in the tests, a monitoring profile (Prometheus and Grafana) that is off unless started with `--profile monitoring`, and release and deploy workflows that run only in GitHub Actions.
+
+## Code map
+
+If you want to read the code, these are good places to start:
+
+- A briefing request goes `BriefingController` → `BriefingAggregator` → `SnapshotRefresher` and `SourceSnapshotRepository` → `Source/ConcurrentFetcher` → `Mapper/BriefingResponseMapper`.
+- The refresh rule is `RefreshPolicy::decide()` with each source's `refreshAfter()`; the upserts in `SourceSnapshotRepository` make sure the newer data wins.
+- A circuit's state lives in `CircuitBreaker/RedisCircuitBreakerStore`.
+- Bookmark ownership is enforced in `BookmarkService` and `BookmarkRepository`, which always filter by the owner.
+- On naming: `Model` is a source's stored data, `Contract` is what other modules may use, `Dto` holds the API's request and response shapes, and `Entity` holds the Doctrine rows.
+
+Adding a fourth source is described under Design notes, in "Modules, layers and providers".
 
 ## Use of AI
 
-I planned, designed and reviewed every change; Claude Code wrote most of the code. One mistake I caught in review was a snapshot query that matched sources and keys as a cross product instead of exact pairs, so a briefing could read another day's row. I'm happy to go through any line of it, or change it, live.
+I planned, designed and reviewed every change, and Claude Code wrote most of the code. Review mattered: one bug I caught was a snapshot query that matched sources and keys as a cross product instead of exact pairs, so a briefing could read another day's row. I'm happy to walk through any line of it, or change it, live.
 
-## Details
+## Running and operating
 
 <details>
 <summary><strong>Configuration and the NASA key</strong></summary>
 
 `.env` is committed and holds only non-secret defaults; `.env.example` lists the same keys (`bin/check-env-keys` keeps them in sync). Local overrides go in files that git ignores.
 
-`NASA_API_KEY` is empty in `.env`; the dev environment uses `DEMO_KEY` from `.env.dev`, which allows about 30 requests an hour and 50 a day per IP. When NASA answers 429, the APOD circuit opens until `Retry-After`, or for 15 minutes without it; until then the briefing shows APOD as missing (or serves stored data as stale), and `/api/health` shows `"apod": "open"`.
+`NASA_API_KEY` is empty in `.env`; the dev environment uses `DEMO_KEY` from `.env.dev`, which allows about 30 requests an hour and 50 a day per IP. When NASA answers 429, the APOD circuit opens until `Retry-After` (at least 60 seconds), or for 15 minutes without it; until then the briefing shows APOD as missing (or serves stored data as stale), and `/api/health` shows `"apod": "open"`.
 
-An own key must go into `.env.dev.local`, not `.env.local`, because `.env.dev` is loaded after `.env.local` and would override it. php-fpm reads the `.env` files on every request in dev, so only the long-running worker needs a restart. Redis keeps no data on disk, so `docker compose restart redis` also closes an APOD circuit that `DEMO_KEY` opened.
+Your own key must go into `.env.dev.local`, not `.env.local`, because `.env.dev` is loaded after `.env.local` and would override it. php-fpm reads the `.env` files on every request in dev, so only the long-running worker needs a restart. Redis keeps no data on disk, so restarting it also closes an APOD circuit that `DEMO_KEY` opened.
 
 In dev, error bodies also carry `class` and `trace`, because debug is on; add `| jq 'del(.trace,.class)'` to a curl to read them. The prod image and the tests send Problem Details without them.
 
@@ -178,22 +226,114 @@ In dev, error bodies also carry `class` and `trace`, because debug is on; add `|
 | `database` | PostgreSQL 18 |
 | `redis` | Redis 8: circuit breaker state, rate-limit counters, `cache.app` and the metrics; no persistence, and only keys with a TTL are evicted |
 
-`compose.yaml` uses full image names and SELinux volume labels, so it also runs with `podman compose`. CI starts it from a clean checkout with rootless Podman 5 and podman-compose on Ubuntu 26.04 and runs `bin/smoke-test`. Podman 4.x, as on Ubuntu 24.04, ships an aardvark-dns that loses DNS between containers at random ([containers/aardvark-dns#389](https://github.com/containers/aardvark-dns/issues/389)), so use Podman 5. podman-compose has no `--wait`, so after `podman compose up --build --detach` wait until `/api/health` answers.
+`compose.yaml` uses full image names and SELinux volume labels, so it also runs with `podman compose`. CI starts it from a clean checkout with rootless Podman 5 (5.7 at the time of writing) and podman-compose 1.6.0 on Ubuntu 26.04 and runs `bin/smoke-test`. Podman 4.x, as on Ubuntu 24.04, ships an aardvark-dns that loses DNS between containers at random ([containers/aardvark-dns#389](https://github.com/containers/aardvark-dns/issues/389)), so use Podman 5. podman-compose has no `--wait`, so after `podman compose up --build --detach` wait until `/api/health` answers.
 
 </details>
 
 <details>
-<summary><strong>Status codes and errors</strong></summary>
+<summary><strong>Prefetch and Messenger</strong></summary>
 
-400 for a date that is not `YYYY-MM-DD` or a malformed JSON body, 401 without a valid token, 404 for an unknown discovery or someone else's bookmark, 409 for a discovery already bookmarked, 415 for a body that is not JSON, 422 for a date outside the window, bad coordinates, a missing or invalid `discoveryId` or a body field the request does not define, 429 over the rate limit (with `Retry-After`), 502 only when no source has data. Every response has an `X-Request-Id` header.
+```sh
+docker compose exec php bin/console almanac:prefetch 2024-03-01 2024-03-07
+docker compose exec php bin/console almanac:prefetch 2024-03-01 2024-03-07 --lat=48.86 --lon=2.35
+docker compose exec php bin/console almanac:prefetch 2024-03-01 2024-03-31 --async
+docker compose logs -f worker
+docker compose exec php bin/console messenger:failed:show
+```
 
-Every error from the app is `application/problem+json` from Symfony's `ProblemNormalizer`, whatever the `Accept` header: 404 and 405 from routing, 401 from the firewall, and `violations[]` for validation. A validation error (400 or 422) keeps Symfony's `type: https://symfony.com/errors/validation` and `title: Validation Failed` with one entry in `violations[]` per invalid field. For every other error a decorator sets `type: about:blank` with the status name as `title` (RFC 9457 §4.2.1) instead of the obsolete RFC 2616 link and "An error occurred". `detail` is the message of our own exceptions, written for the client; framework errors get one fixed sentence per status, and a 500 only asks to quote `X-Request-Id`, so no internal message reaches the client, in dev either. Someone else's bookmark is a 404, so the API does not reveal that it exists. Client errors are logged at `notice`.
+The synchronous run shows a progress bar and a table of problems at the end, and exits with 1 if any date had a problem. Its input is validated with `#[MapInput]`: strict `Y-m-d`, the same window as the API, `to >= from`, at most 366 days. `Prefetcher` calls the same aggregator as the controller, one transaction per date. `--delay=120000` (milliseconds) waits after each date that called upstream, which keeps `DEMO_KEY` under its hourly limit; it sleeps through `ClockInterface`, so tests do not wait.
 
-nginx answers its own errors in the same format from named locations: 413 for a body over 16 KB, 400 for headers it cannot read, 503 when php-fpm does not answer. Only a URL nginx cannot parse, such as `/api/%`, still gets its HTML 400.
+`--async` sends one scalar-only message per date to `doctrine://default` and returns; with `--delay`, date number n becomes available n × delay after queueing. The table comes from a migration, and LISTEN/NOTIFY wakes the `worker` service. Upstream failures are stored as snapshots, as in the synchronous run. A date that waits for a 10-minute pause, a `Retry-After` or an open circuit is redelivered at that moment, plus up to 30 seconds of jitter, for up to a day. Failures that waiting cannot fix are acknowledged with the source missing. Bugs and database errors are retried after 1, 4 and 16 seconds, then go to the `failed` queue.
 
-Input goes through the Validator: value resolvers and `#[MapQueryString]` for URLs, `#[MapRequestPayload]` DTOs for bodies (unknown fields rejected), `#[MapInput]` for the console. DTOs and queued messages only carry fields: a rule across fields is a class constraint with its own validator in the module's `Validator` directory (`ValidPrefetchRange`, `ValidTokenLifetime`), and an input mapper turns the validated fields into domain objects with `convertTo…()` methods (`BookmarkRequestMapper`, `BriefingQueryMapper` and `PrefetchInputMapper`, which read coordinates through `CoordinateMapper`, and `CreateUserInputMapper`). Value objects keep their own rules: `TokenLifetime` parses only 1 h to 365 days. Responses are separate DTOs built by a mapper per module and serialized by Symfony's `#[Serialize]` attribute, so an entity never reaches the serializer. The PHPStan rule `DataCarrierRule` rejects, in a class under `Dto\` or `Message\`, any method but the constructor and console `#[Interact]` methods, any property hook, any trait, and any constructor statement other than assigning a parameter, a constant or a literal to a property.
+`Prefetcher` queues dates through the `PrefetchQueue` port; `Messenger\MessengerPrefetchQueue` and `Messenger\PrefetchDateMessageMapper` hold both directions of the queue format, and `MessageHandler` keeps the handler, the retry strategy and its listener next to `CodeFailureStamp`, whose class name is stored with queued envelopes.
 
 </details>
+
+<details>
+<summary><strong>Monitoring and metrics</strong></summary>
+
+```sh
+docker compose --profile monitoring up -d
+```
+
+Grafana opens at `http://127.0.0.1:3000` with one dashboard and no login (viewer only), and Prometheus at `http://127.0.0.1:9090` with five alerts.
+
+The metrics answer questions that lead to a decision; a metric with no such question is left out.
+
+| Question | Decision |
+|---|---|
+| How many upstream calls do snapshots save, per source, for past days and for today and later? | Whether the weather `refreshAfter` (1 h) fits and whether prefetch pays off. Past days should be 100% from storage. |
+| How fast do we use the providers' limits? | When to move from `DEMO_KEY` to your own NASA key, and which `--delay` to give prefetch. |
+| How often do we serve `stale` or `missing`? | Whether the 10-minute pause and the breaker thresholds fit. |
+| Does the breaker open again and again, or not at all? | The 60 s and 15 min openings; how reliable a provider is. |
+| How long does each source take against its limit and the 8.5 s deadline? | Whether `max_duration` (3 s, Wikipedia 8 s) and the deadline fit. |
+
+Prefix `almanac_`, the unit in the name, `_total` for counters. Every label has a fixed, short list of values, well under 300 series in all.
+
+| Metric | Type | Labels | Recorded in |
+|---|---|---|---|
+| `http_requests_total` | counter | `route` (or `unmatched`), `method`, `code` (unknown ones as `other`) | a `kernel.terminate` listener, after the response is sent |
+| `http_request_duration_seconds` | histogram | `route` | the same listener, from `REQUEST_TIME_FLOAT` |
+| `snapshot_decisions_total` | counter | `source`, `decision` (`final`, `fresh`, `wait`, `fetch`), `day` (`past`, `today`, `future`) | the aggregator, for each refresh decision |
+| `upstream_fetches_total` | counter | `source`, `result` (`ok` or the failure kind) | the aggregator, for each settled fetch |
+| `upstream_fetch_duration_seconds` | histogram | `source` | the same place, retries included |
+| `briefing_source_status_total` | counter | `source`, `status` (`ok`, `stale`, `missing`, `not_applicable`) | the briefing controller, also before a 502 |
+| `circuit_transitions_total` | counter | `source`, `to` (`open`, `half_open`, `closed`) | `CircuitLog`, next to the log line |
+| `messenger_failed_messages` | gauge | none | read from the `failed` transport at scrape time |
+
+Upstream buckets are `0.1, 0.25, 0.5, 1, 1.5, 2, 3, 5, 8, 8.5` seconds: 1 s is the connect limit, 3 s `max_duration`, 5 s splits Wikipedia's uncached answers, 8 s its `max_duration` and 8.5 s the deadline, so a fetch above 8.5 s means the deadline did not work. HTTP buckets run from 25 ms to 30 s, with 1 s and 9 s for the SLO and 30 s for `request_terminate_timeout`. There are no summaries, because they cannot be added up across processes.
+
+Dates, coordinates, `scope_key`, user and token ids, IP addresses, request ids, bookmark ids, raw paths, the upstream HTTP status and exception messages never become labels: each would add a series per value, and coordinates and addresses are personal data the logs already mask. Those details are in the JSON logs. An e2e test sends requests with dates, coordinates, UUIDs and a request id, then checks that every label on `/metrics` is a catalogue name with a bounded value.
+
+Modules record through the `App\Shared\Metrics\Metrics` port (`increment`, `observe`); a phpat rule keeps `promphp/prometheus_client_php` and its adapter inside `Shared\Metrics`. The values live in Redis, which `php` and the worker share; APCu would not be shared across containers. The store uses the app's connection and database under the library's `PROMETHEUS_` prefix: a second persistent connection that selected another database came back from phpredis's pool to the app on a later request, and the breaker then wrote into the metrics database. Any failure of the store drops the write and logs one warning; metrics then rest for 30 seconds, which under php-fpm means the rest of the request and in the worker half a minute. Redis evicts only keys with a TTL (`volatile-lru`), so a full Redis drops cache entries and rate-limit windows, never an open circuit or a metric.
+
+`/metrics` is served by a second nginx server on port 9100, which compose does not publish and which allows only private networks. It passes the FastCGI parameter `ALMANAC_METRICS_SCRAPE`, which no HTTP header can set; without it the controller answers 404, and the public port answers 404 before reaching PHP. The route is not part of the public API, so `openapi.yaml` leaves it out.
+
+#### SLOs, over 28 days
+
+- Availability of briefings: responses other than 5xx among all except 4xx, target 99.5% (an error budget of about 3.4 hours). The three providers have no SLA, and stale data and partial 200s hide outages, so 99.9% would be fiction.
+- Response time: 95% under 1 s, the stored path, and 99% under 9 s, which shows whether the 8.5 s deadline really cuts the wait; only a day not yet stored can take that long, and prefetch keeps those out of the user's way.
+- Completeness: `ok` and `stale` among `ok`, `stale` and `missing`, target 99%. It is the only SLI that sees one source failing behind a 200.
+
+#### Alerts
+
+Each alert in `docker/prometheus/alerts.yml` has `promtool` tests for when it fires and when it stays quiet:
+
+1. The scrape of `nginx:9100` fails for 2 minutes: nginx or php-fpm is down, and then the app counts nothing.
+2. The briefing error budget burns 14.4 times too fast in both the last hour and the last 5 minutes, with at least 20 requests an hour that are not 4xx.
+3. Any `misconfigured` or `invalid_payload` answer within 15 minutes: a bad key or User-Agent, or a changed format.
+4. A circuit opens at least three times in an hour.
+5. Failed prefetch messages wait for 15 minutes.
+
+The library creates a series at its first count, with no zero before it, and Redis restarts with none, so the counter alerts compare with the value 15 minutes or an hour ago, or with 0 when the series did not exist then, instead of `increase()`, which would miss the first event. Status codes outside the known list are labelled by class (`5xx`), so they still count as errors. Prometheus keeps 30 days, which covers the 28-day window. Refresh decisions and fetches include prefetch, which runs the same aggregator; the served status counts only briefing responses. There is no alert on an open circuit: without traffic a circuit stays half-open until the next request, so it would ring all night.
+
+Not chosen: a Prometheus bundle (a second dependency with its own names), the OpenTelemetry SDK (about ten packages, a PECL extension and a collector; the way forward once there is tracing), statsd (an exporter container).
+
+</details>
+
+<details>
+<summary><strong>Checks, CI, release and deploy</strong></summary>
+
+```sh
+docker compose exec php composer check:fast   # composer validate, env keys, YAML lint, CS-Fixer, container lint, schema mapping, PHPStan level 9 with the phpat rules, composer audit, unit tests
+docker compose exec php composer cs-fix       # fixes the style
+docker compose exec php composer test:live    # calls the real APIs; run by hand, not part of the other suites or CI
+docker compose exec php vendor/bin/phpunit --testsuite phpstan    # the custom PHPStan and architecture rules against their fixtures
+docker compose run --rm --no-deps redocly lint docs/openapi.yaml  # OpenAPI lint, as in CI
+docker compose run --rm --no-deps php composer test:unit          # unit tests without the database, once vendor/ exists
+```
+
+`bin/smoke-test` takes `COMPOSE='podman compose'` for Podman and leaves a smoke-test user and discovery behind. Git hooks, once per clone: `git config core.hooksPath .githooks`; `commit-msg` checks the Conventional Commits format and length, and `pre-push` runs `check:fast` in the container (Docker only).
+
+CI (`.github/workflows/ci.yaml`) runs `check:fast`, the Redocly lint, a build and check of the prod image, a clean `docker compose up --wait` with all tests and `bin/check-php-restart`, `promtool` checks and alert tests for the monitoring profile, the same stack under Podman with `bin/smoke-test`, a check of the commit subjects, gitleaks on the history and hadolint. A tag such as `v1.0.0` runs `release.yaml`, which publishes the prod image to GHCR with an SBOM. After CI passes on `main`, `deploy.yaml` builds the prod image of that commit, checks it, gates it on Trivy, attests it, pushes it to GHCR and deploys it by digest to a test server over SSH, with a key the server restricts to that one deploy command.
+
+Each slice of work has its own branch (`type/NN-description`) and PR, merged with a merge commit, and each commit is one green step, so the history shows how the project grew. Commits follow Conventional Commits with a fixed list of scopes; the `commit-msg` hook and CI check them.
+
+Symfony is used as a set of components: only what the code calls is required, one package at a time, without packs, so there is no Twig, forms, profiler or maker. `composer show --direct` lists the whole dependency surface.
+
+</details>
+
+## Design notes
 
 <details>
 <summary><strong>Modules, layers and providers</strong></summary>
@@ -222,7 +362,13 @@ These are phpat rules in `tests/Architecture/`. They run inside PHPStan and cann
 - Its scoped HTTP clients, with their time limits and headers, sit in `config/packages/framework.yaml`; they share one set of options through YAML anchors and get the retry from `http_client.default_options`. That retry also covers every other consumer of the base `http_client`, so a new caller that must not retry needs its own scoped client with `retry_failed: false`.
 - Where shared code needs a provider's view of something, a port lies outside the provider: `Discovery\PersonIdentity` says how a provider names a person, and `Source/OnThisDay/WikipediaPersonIdentity`, bound with `#[AsAlias]`, reads Wikipedia's page titles and Wikidata items from the fields already stored. `Discovery\PersonReference` owns the person key formats (catalogued, page, unlinked), and `StoredDiscoveryKeysTest` pins the keys and ids of stored payloads. The model calls the item `catalogueId`; `#[SerializedName('wikidataId')]` keeps the key that stored snapshots use.
 
-Two checks keep it so. The PHPStan rule `ProviderLiteralRule` rejects, anywhere in `src/` outside a provider directory, a `/wiki/` path, a Wikipedia, Wikimedia, Wikidata, NASA or Open-Meteo host, and any `http(s)` address except the hosts allowed in `phpstan.dist.neon`; it reads plain and interpolated strings and refuses a source root that does not exist. `ProviderClientsConfigTest` checks that the upstream stream is an alias of the base `http_client` and that no config file other than `framework.yaml` names a provider client outside its test section.
+Two checks keep it so. The PHPStan rule `ProviderLiteralRule` rejects, anywhere in `src/` outside a provider directory, a `/wiki/` path, a Wikipedia, Wikimedia, Wikidata, NASA or Open-Meteo host, and any `http(s)` address except the hosts allowed in `phpstan.dist.neon` (IETF, RFC Editor, Symfony's error types, Creative Commons). It reads plain and interpolated strings, cannot be ignored or baselined, and refuses a source root that does not exist. `ProviderClientsConfigTest` checks that the upstream stream is an alias of the base `http_client` and that no config file other than `framework.yaml` names a provider client outside its test section.
+
+
+**Input and output.** Input goes through the Validator: value resolvers and `#[MapQueryString]` for URLs, `#[MapRequestPayload]` DTOs for bodies (unknown fields rejected), `#[MapInput]` for the console. DTOs and queued messages only carry fields: a rule across fields is a class constraint with its own validator in the module's `Validator` directory (`ValidPrefetchRange`, `ValidTokenLifetime`), and an input mapper turns the validated fields into domain objects with `convertTo…()` methods (`BookmarkRequestMapper`, `BriefingQueryMapper` and `PrefetchInputMapper`, which read coordinates through `CoordinateMapper`, and `CreateUserInputMapper`). Value objects keep their own rules: `TokenLifetime` parses only 1 h to 365 days. Responses are separate DTOs built by a mapper per module and serialized by Symfony's `#[Serialize]` attribute, so an entity never reaches the serializer. The PHPStan rule `DataCarrierRule` rejects, in a class under `Dto\` or `Message\`, any method but the constructor and console `#[Interact]` methods, any property hook, any trait, and any constructor statement other than assigning a parameter, a constant or a literal to a property.
+
+
+**Adding a source.** A fourth source, such as Wikipedia Page Summary, touches about a dozen places: a `Source/<Name>/` directory (client, response DTO, mapper and definition), a payload model, cases in `SourceName`, `SourceKey` and `SourcePayloadCodec`, a scoped client in `framework.yaml`, the briefing's response DTOs and mappers, the discovery extractor if its items can be bookmarked, `openapi.yaml`, and fixtures with tests. The schema does not change, and the breaker, the health check and the metrics pick the source up from `SourceName`.
 
 </details>
 
@@ -232,31 +378,13 @@ Two checks keep it so. The PHPStan rule `ProviderLiteralRule` rejects, anywhere 
 1. The date must be `Y-m-d` and a real calendar day (else 400), from 1995-06-16 to today + 15 days in `APP_TIMEZONE` (else 422). `lat` and `lon` are validated as plain decimal strings, both or neither, and rounded to two decimals; weather is stored per day and that cell.
 2. Each source says whether it covers the date: APOD from 1995-06-16 by New York's publication day; Open-Meteo from 1940-01-01 to today + 14 days, through the archive for days six or more days ago and the forecast API for the rest. Otherwise the source is `not_applicable`, computed per request and never stored.
 3. The aggregator reads the stored snapshots, asks the refresh policy what to fetch, and asks each source's circuit for permission.
-4. Permitted sources are fetched concurrently in one HttpClient `stream()` on the base `http_client`; one `RetryableHttpClient` streams the responses of every scoped client, and `ConcurrentFetcherWiringTest` checks that in dev and prod. Each client has a 3-second `max_duration`, one retry on network errors and 500, 502, 503 or 504, no retry on 429 or with `Retry-After`, and no redirects; the whole fetch ends after 8.5 seconds. Wikipedia gets 8 seconds because its CDN answers a day it has not cached slowly: twelve uncached On This Day lists measured on 2026-11-21 took 1.6 to 5.4 seconds, median about 2.4, and with 3 seconds new dates often came back `unavailable`. After a fast 5xx Wikipedia is still retried; after a timeout or a slow failure the deadline cuts the retry off.
+4. Permitted sources are fetched concurrently in one HttpClient `stream()` on `app.briefing.upstream_stream`, an alias of the base `http_client`; one `RetryableHttpClient` streams the responses of every scoped client, and `ConcurrentFetcherWiringTest` checks that in dev and prod. Each client has a 3-second `max_duration`, one retry on network errors and 500, 502, 503 or 504, no retry on 429 or with `Retry-After`, and no redirects; the whole fetch ends after 8.5 seconds. Wikipedia gets 8 seconds because its CDN answers a day it has not cached slowly: twelve uncached On This Day lists measured on 2026-11-21 took 1.6 to 5.4 seconds, median about 2.4, and with 3 seconds new dates often came back `unavailable`. After a fast 5xx Wikipedia is still retried; after a timeout or a slow failure the deadline cuts the retry off.
 5. Results are mapped into the internal model, discoveries are extracted, and snapshots and discoveries are saved in one transaction.
 6. The response is built from storage: 200 if any source has data, otherwise 502. `sources` holds each source's status (`ok`, `failed` or `not_applicable`, with `stale: true` when old data is served after a failed refresh), and `missing` lists the sources without data.
 
 A failed source is data, not an exception. Each failure has a kind: `unavailable` (timeout, network, 5xx), `rate_limited` (429), `rejected` (another 4xx), `misconfigured` (401, 403, 3xx) or `invalid_payload` (including APOD's "NASA Science" stand-in). The kind sets the log level and whether the breaker counts it.
 
-Text from providers reaches the API as plain text: APOD's HTML through `textContent`, and Wikipedia's titles, texts and descriptions through `PlainText::fromMarkup()`, which decodes entities and then removes tags and comments. Provider addresses must use `https`; any other scheme counts as an unusable address.
-
-</details>
-
-<details>
-<summary><strong>Storage and schema</strong></summary>
-
-Five tables, each owned by one module and created only by Doctrine Migrations, which the `php` container runs on start:
-
-- **`briefing_source_snapshot`**: one row per `(source, scope_key)`. The key is `2024-03-15` for APOD, `03-15` for On This Day, and `2024-03-15@52.23,21.01` for weather. `status` and `error` describe the last attempt; `payload` (JSONB) is the last good data as our internal model, never the upstream body.
-- **`briefing_discovery`**: what can be bookmarked. The id is a UUIDv5 of a stable key (`apod:{date}`, `event:{year}-{mm-dd}:{text hash}`, `person:{Wikidata item}`), so a briefing knows every `discoveryId` without a query. Rows are inserted once and never changed.
-- **`identity_user`** and **`identity_access_token`**: users with a unique email, and tokens stored only as sha256 with an expiry; revoking a token deletes its row.
-- **`bookmark`**: unique `(user_id, discovery_id)`, an index on `(user_id, created_at DESC, id DESC)` for newest-first pages, offset pagination.
-
-Users, tokens and bookmarks have UUIDv7 ids; the user, bookmark and discovery ids have their own Doctrine types. Instants are UTC. A new migration starts from `doctrine:migrations:diff`, or from `doctrine:migrations:generate` when the change is one the mapping cannot express, so every version number is the generator's timestamp and two branches cannot pick the same one.
-
-**Rules in PHP, not in CHECKs.** The database holds the types, keys and unique indexes; the other rules live where the rows are built, so they fail in the code that broke them, with a test, and the schema stays what the mapping describes. `DiscoveryRecord` refuses an empty title, a key that does not name something after its type and a picture of the day without a date. `SnapshotScope` refuses a date for On This Day and requires one for the other sources. Enums limit sources, statuses, errors and types; the id classes fix the UUID versions. `SourceResult` can only be ok with a payload or failed with an error, `saveResult()` refuses a not-applicable result, and the two snapshot upserts write those columns together. A native write that skips these classes is not checked.
-
-**Native upserts.** Doctrine handles all entities, reads and the schema, and every entity has its own `ServiceEntityRepository`. Three writes use `INSERT … ON CONFLICT` on the repository's connection: snapshots, discoveries and bookmarks. The API and the worker write the same keys at once; a read-then-write is not atomic, `MERGE` still fails on a concurrent insert, and a unique violation closes the EntityManager. The snapshot upsert is guarded: a success replaces the payload only if it was fetched later, a failure never touches the payload, and `last_attempt_at` never moves back. Discoveries are inserted sorted by key, so parallel batches lock in the same order, and a batch carries each key once: when a day lists the same person or event twice, the first record wins. Snapshots are re-read with `Query::HINT_REFRESH`, because the identity map would return the state from before the native write.
+Text from providers reaches the API as plain text: APOD's HTML through `textContent`, and Wikipedia's titles, texts and descriptions through `PlainText::fromMarkup()`, which decodes entities and then removes tags and comments, so a vandalised description cannot carry markup into a briefing or a bookmark. Each On This Day list is capped at `ALMANAC_OTD_LIMIT` (20) items. Provider addresses must use `https`; any other scheme counts as an unusable address.
 
 </details>
 
@@ -284,8 +412,8 @@ The past-date rule comes first, so a stored forecast for a day whose last refres
 The refresh policy protects one snapshot; the breaker protects an upstream, so that an outage or `DEMO_KEY`'s limit is not hit again by every new date and queued message.
 
 - There is one circuit per source in Redis, shared by `php` and `worker`. One `open_until` key holds the state: missing means closed, a future instant open, a past one half-open.
-- Only outages count (`unavailable`, `rate_limited`). Three of them, each within 30 minutes of the last and with no successful call in between, open the circuit for 60 seconds. A failure that is not an outage (`rejected`, `misconfigured`, `invalid_payload`) neither counts nor resets the count, so a 503, a 400 and a 503 still add up. A 429 opens it until `Retry-After`, or for 15 minutes without it.
-- Half-open allows one trial, claimed with `SET NX PX`; only the trial closes or reopens the circuit. Opening and claiming are single Lua calls, safe between processes.
+- Only outages count (`unavailable`, `rate_limited`). Three of them, each within 30 minutes of the last and with no successful call in between, open the circuit for 60 seconds. A failure that is not an outage (`rejected`, `misconfigured`, `invalid_payload`) neither counts nor resets the count, so a 503, a 400 and a 503 still add up. A 429 opens it until `Retry-After`, but for at least 60 seconds, or for 15 minutes without it.
+- Half-open allows one trial, claimed with `SET NX PX` for 30 seconds; only the trial closes or reopens the circuit. Opening and claiming are single Lua calls, safe between processes.
 - A refused source makes no request and saves nothing. It serves stored data as stale, or is `failed` with `error: unavailable`.
 - If Redis fails, the breaker fails open and logs one warning per request or message. Lost Redis data only closes circuits. `/api/health` shows each circuit and always answers 200.
 
@@ -294,21 +422,31 @@ The refresh policy protects one snapshot; the breaker protects an upstream, so t
 </details>
 
 <details>
-<summary><strong>Prefetch and Messenger</strong></summary>
+<summary><strong>Storage and schema</strong></summary>
 
-```sh
-docker compose exec php bin/console almanac:prefetch 2024-03-01 2024-03-07
-docker compose exec php bin/console almanac:prefetch 2024-03-01 2024-03-07 --lat=48.86 --lon=2.35
-docker compose exec php bin/console almanac:prefetch 2024-03-01 2024-03-31 --async
-docker compose logs -f worker
-docker compose exec php bin/console messenger:failed:show
-```
+Five tables, each owned by one module and created only by Doctrine Migrations, which the `php` container runs on start:
 
-The synchronous run shows a progress bar and a table of problems at the end, and exits with 1 if any date had a problem. Its input is validated with `#[MapInput]`: strict `Y-m-d`, the same window as the API, `to >= from`, at most 366 days. `Prefetcher` calls the same aggregator as the controller, one transaction per date. `--delay=120000` (milliseconds) waits after each date that called upstream, which keeps `DEMO_KEY` under its hourly limit; it sleeps through `ClockInterface`, so tests do not wait.
+- **`briefing_source_snapshot`**: one row per `(source, scope_key)`. The key is `2024-03-15` for APOD, `03-15` for On This Day, and `2024-03-15@52.23,21.01` for weather. `status` and `error` describe the last attempt; `payload` (JSONB) is the last good data as our internal model, never the upstream body.
+- **`briefing_discovery`**: what can be bookmarked. The id is a UUIDv5 of a stable key (`apod:{date}`, `event:{year}-{mm-dd}:{text hash}`, `person:{Wikidata item}`), so a briefing knows every `discoveryId` without a query. Rows are inserted once and never changed.
+- **`identity_user`** and **`identity_access_token`**: users with a unique email, and tokens stored only as sha256 with an expiry; revoking a token deletes its row.
+- **`bookmark`**: unique `(user_id, discovery_id)`, an index on `(user_id, created_at DESC, id DESC)` for newest-first pages, offset pagination.
 
-`--async` sends one scalar-only message per date to `doctrine://default` and returns; with `--delay`, date number n becomes available n × delay after queueing. The table comes from a migration, and LISTEN/NOTIFY wakes the `worker` service. Upstream failures are stored as snapshots, as in the synchronous run. A date that waits for a 10-minute pause, a `Retry-After` or an open circuit is redelivered at that moment, plus up to 30 seconds of jitter, for up to a day. Failures that waiting cannot fix are acknowledged with the source missing. Bugs and database errors are retried after 1, 4 and 16 seconds, then go to the `failed` queue.
+Users, tokens and bookmarks have UUIDv7 ids; the user, bookmark and discovery ids have their own Doctrine types. Instants are UTC. A new migration starts from `doctrine:migrations:diff`, or from `doctrine:migrations:generate` when the change is one the mapping cannot express, so every version number is the generator's timestamp and two branches cannot pick the same one.
 
-`Prefetcher` queues dates through the `PrefetchQueue` port; `Messenger\MessengerPrefetchQueue` and `Messenger\PrefetchDateMessageMapper` hold both directions of the queue format, and `MessageHandler` keeps the handler, the retry strategy and its listener next to `CodeFailureStamp`, whose class name is stored with queued envelopes.
+**Rules in PHP, not in CHECKs.** The database holds the types, keys and unique indexes; the other rules live where the rows are built, so they fail in the code that broke them, with a test, and the schema stays what the mapping describes; a migration dropped the earlier CHECK constraints. `DiscoveryRecord` refuses an empty title, a key that does not name something after its type and a picture of the day without a date. `SnapshotScope` refuses a date for On This Day and requires one for the other sources. Enums limit sources, statuses, errors and types; the id classes fix the UUID versions. `SourceResult` can only be ok with a payload or failed with an error, `saveResult()` refuses a not-applicable result, and the two snapshot upserts write those columns together. A native write that skips these classes is not checked.
+
+**Native upserts.** Doctrine handles all entities, reads and the schema, and every entity has its own `ServiceEntityRepository`. Three writes use `INSERT … ON CONFLICT` on the repository's connection: snapshots, discoveries and bookmarks. The API and the worker write the same keys at once; a read-then-write is not atomic, `MERGE` still fails on a concurrent insert, and a unique violation closes the EntityManager. The snapshot upsert is guarded: a success replaces the payload only if it was fetched later, a failure never touches the payload, and `last_attempt_at` never moves back. Discoveries are inserted sorted by key, so parallel batches lock in the same order, and a batch carries each key once: when a day lists the same person or event twice, the first record wins. Snapshots are re-read with `Query::HINT_REFRESH`, because the identity map would return the state from before the native write.
+
+</details>
+
+<details>
+<summary><strong>Errors and Problem Details</strong></summary>
+
+The status codes are in the table under Endpoints. Every response has an `X-Request-Id` header.
+
+Every error from the app is `application/problem+json` from Symfony's `ProblemNormalizer`, whatever the `Accept` header: 404 and 405 from routing, 401 from the firewall, and `violations[]` for validation. A validation error (400 or 422) keeps Symfony's `type: https://symfony.com/errors/validation` and `title: Validation Failed` with one entry in `violations[]` per invalid field. For every other error a decorator sets `type: about:blank` with the status name as `title` (RFC 9457 §4.2.1) instead of the obsolete RFC 2616 link and "An error occurred". `detail` is the message of our own exceptions, written for the client; framework errors get one fixed sentence per status, and a 500 only asks to quote `X-Request-Id`, so no internal message reaches the client, in dev either. Someone else's bookmark is a 404, so the API does not reveal that it exists. Client errors are logged at `notice`.
+
+nginx answers its own errors in the same format from named locations: 413 for a body over 16 KB, 400 for headers it cannot read, 503 when php-fpm does not answer. Only a URL nginx cannot parse, such as `/api/%`, still gets its HTML 400.
 
 </details>
 
@@ -331,106 +469,23 @@ Logs:
 </details>
 
 <details>
-<summary><strong>Monitoring and metrics</strong></summary>
-
-```sh
-docker compose --profile monitoring up -d
-```
-
-Grafana opens at http://127.0.0.1:3000 with one dashboard and no login (viewer only), and Prometheus at http://127.0.0.1:9090 with five alerts.
-
-The metrics answer questions that lead to a decision; a metric with no such question is left out.
-
-| Question | Decision |
-|---|---|
-| How many upstream calls do snapshots save, per source, for past days and for today and later? | Whether the weather `refreshAfter` (1 h) fits and whether prefetch pays off. Past days should be 100% from storage. |
-| How fast do we use the providers' limits? | When to move from `DEMO_KEY` to an own NASA key, and which `--delay` to give prefetch. |
-| How often do we serve `stale` or `missing`? | Whether the 10-minute pause and the breaker thresholds fit. |
-| Does the breaker open again and again, or not at all? | The 60 s and 15 min openings; how reliable a provider is. |
-| How long does each source take against its limit and the 8.5 s deadline? | Whether `max_duration` (3 s, Wikipedia 8 s) and the deadline fit. |
-
-Prefix `almanac_`, the unit in the name, `_total` for counters. Every label has a fixed, short list of values, well under 300 series in all.
-
-| Metric | Type | Labels | Recorded in |
-|---|---|---|---|
-| `http_requests_total` | counter | `route` (or `unmatched`), `method`, `code` (unknown ones as `other`) | a `kernel.terminate` listener, after the response is sent |
-| `http_request_duration_seconds` | histogram | `route` | the same listener, from `REQUEST_TIME_FLOAT` |
-| `snapshot_decisions_total` | counter | `source`, `decision` (`final`, `fresh`, `wait`, `fetch`), `day` (`past`, `today`, `future`) | the aggregator, for each refresh decision |
-| `upstream_fetches_total` | counter | `source`, `result` (`ok` or the failure kind) | the aggregator, for each settled fetch |
-| `upstream_fetch_duration_seconds` | histogram | `source` | the same place, retries included |
-| `briefing_source_status_total` | counter | `source`, `status` (`ok`, `stale`, `missing`, `not_applicable`) | the briefing controller, also before a 502 |
-| `circuit_transitions_total` | counter | `source`, `to` (`open`, `half_open`, `closed`) | `CircuitLog`, next to the log line |
-| `messenger_failed_messages` | gauge | none | read from the `failed` transport at scrape time |
-
-Upstream buckets are `0.1, 0.25, 0.5, 1, 1.5, 2, 3, 5, 8, 8.5` seconds: 1 s is the connect limit, 3 s `max_duration`, 5 s splits Wikipedia's uncached answers, 8 s its `max_duration` and 8.5 s the deadline, so a fetch above 8.5 s means the deadline did not work. HTTP buckets run from 25 ms to 30 s, with 1 s and 9 s for the SLO and 30 s for `request_terminate_timeout`. There are no summaries, because they cannot be added up across processes.
-
-Dates, coordinates, `scope_key`, user and token ids, IP addresses, request ids, bookmark ids, raw paths, the upstream HTTP status and exception messages never become labels: each would add a series per value, and coordinates and addresses are personal data the logs already mask. Those details are in the JSON logs. An e2e test sends requests with dates, coordinates, UUIDs and a request id, then checks that every label on `/metrics` is a catalogue name with a bounded value.
-
-Modules record through the `App\Shared\Metrics\Metrics` port (`increment`, `observe`); a phpat rule keeps `promphp/prometheus_client_php` and its adapter inside `Shared\Metrics`. The values live in Redis, which `php` and the worker share; APCu would not be shared across containers. The store uses the app's connection and database under the library's `PROMETHEUS_` prefix: a second persistent connection that selected another database came back from phpredis's pool to the app on a later request, and the breaker then wrote into the metrics database. Any failure of the store drops the write and logs one warning; metrics then rest for 30 seconds, which under php-fpm means the rest of the request and in the worker half a minute. Redis evicts only keys with a TTL (`volatile-lru`), so a full Redis drops cache entries and rate-limit windows, never an open circuit or a metric.
-
-`/metrics` is served by a second nginx server on port 9100, which compose does not publish and which allows only private networks. It passes the FastCGI parameter `ALMANAC_METRICS_SCRAPE`, which no HTTP header can set; without it the controller answers 404, and the public port answers 404 before reaching PHP. The route is not part of the public API, so `openapi.yaml` leaves it out.
-
-**SLOs, over 28 days.**
-
-- Availability of briefings: responses other than 5xx among all except 4xx, target 99.5% (an error budget of about 3.4 hours). The three providers have no SLA, and stale data and partial 200s hide outages, so 99.9% would be fiction.
-- Response time: 95% under 1 s, the stored path, and 99% under 9 s, which shows whether the 8.5 s deadline really cuts the wait; only a day not yet stored can take that long, and prefetch keeps those out of the user's way.
-- Completeness: `ok` and `stale` among `ok`, `stale` and `missing`, target 99%. It is the only SLI that sees one source failing behind a 200.
-
-**Alerts** (`docker/prometheus/alerts.yml`, each with `promtool` tests for when it fires and when it stays quiet):
-
-1. The scrape of `nginx:9100` fails for 2 minutes: nginx or php-fpm is down, and then the app counts nothing.
-2. The briefing error budget burns 14.4 times too fast in both the last hour and the last 5 minutes, with at least 20 requests an hour that are not 4xx.
-3. Any `misconfigured` or `invalid_payload` answer within 15 minutes: a bad key or User-Agent, or a changed format.
-4. A circuit opens at least three times in an hour.
-5. Failed prefetch messages wait for 15 minutes.
-
-The library creates a series at its first count, with no zero before it, and Redis restarts with none, so the counter alerts compare with the value 15 minutes or an hour ago, or with 0 when the series did not exist then, instead of `increase()`, which would miss the first event. Status codes outside the known list are labelled by class (`5xx`), so they still count as errors. Prometheus keeps 30 days, which covers the 28-day window. Refresh decisions and fetches include prefetch, which runs the same aggregator; the served status counts only briefing responses. There is no alert on an open circuit: without traffic a circuit stays half-open until the next request, so it would ring all night.
-
-Not chosen: a Prometheus bundle (a second dependency with its own names), the OpenTelemetry SDK (about ten packages, a PECL extension and a collector; the way forward once there is tracing), statsd (an exporter container).
-
-</details>
-
-<details>
-<summary><strong>Checks, CI, release and deploy</strong></summary>
-
-```sh
-docker compose exec php composer check:fast   # composer validate, env keys, YAML lint, CS-Fixer, container lint, schema mapping, PHPStan level 9 with the phpat rules, composer audit, unit tests
-docker compose exec php composer cs-fix       # fixes the style
-docker compose exec php composer test:live    # calls the real APIs; run by hand, not part of the other suites or CI
-docker compose exec php vendor/bin/phpunit --testsuite phpstan    # the custom PHPStan and architecture rules against their fixtures
-docker compose run --rm --no-deps redocly lint docs/openapi.yaml  # OpenAPI lint, as in CI
-docker compose run --rm --no-deps php composer test:unit          # unit tests without starting the database
-```
-
-`bin/smoke-test` takes `COMPOSE='podman compose'` for Podman and leaves a smoke-test user and discovery behind. Git hooks, once per clone: `git config core.hooksPath .githooks`; `commit-msg` checks the Conventional Commits format and length, and `pre-push` runs `check:fast` in the container (Docker only).
-
-CI (`.github/workflows/ci.yaml`) runs `check:fast`, the Redocly lint, a build and check of the prod image, a clean `docker compose up --wait` with all tests and `bin/check-php-restart`, `promtool` checks and alert tests for the monitoring profile, the same stack under Podman with `bin/smoke-test`, a check of the commit subjects, gitleaks on the history and hadolint. A tag such as `v1.0.0` runs `release.yaml`, which publishes the prod image to GHCR with an SBOM. After CI passes on `main`, `deploy.yaml` builds the prod image of that commit, checks it, gates it on Trivy, attests it, pushes it to GHCR and deploys it by digest to a test server over SSH, with a key the server restricts to that one deploy command.
-
-In day-to-day team work I would squash-merge feature branches. Here the history is the deliverable, so each slice has its own branch (`type/NN-description`) and PR, merged with a merge commit, and each commit is one green step. Commits follow Conventional Commits with a fixed list of scopes; the `commit-msg` hook and CI check them.
-
-Symfony is used as a set of components: only what the code calls is required, one package at a time, without packs, so there is no Twig, forms, profiler or maker. `composer show --direct` lists the whole dependency surface.
-
-</details>
-
-<details>
 <summary><strong>Security</strong></summary>
 
 - Tokens are 32 random bytes; only their sha256 is stored. They expire (30 days by default), and running the user command again for the same address deletes the old ones. `--ttl` sets the lifetime (`12h`, `30d`). Unknown, expired and revoked tokens get the same 401.
 - The token is a Bearer secret, so outside localhost the API must sit behind a reverse proxy that terminates TLS and sends HSTS. Only nginx is published, on `127.0.0.1`, with security headers and a 16 KB body limit.
 - PHPStan level 9 with strict and deprecation rules, phpat, and a rule that requires `declare(strict_types=1)`; PHP-CS-Fixer with the Symfony rule sets. `composer audit` runs in every check; CI adds gitleaks on the full history, hadolint and a commit-subject check.
 - The prod image has no dev tools, its files are owned by root, and it runs as uid 82. It is checked in CI, and a release is published only after Trivy and Grype pass.
-- nginx finds php by name at request time, not once at start: `fastcgi_pass` takes the address from a variable, and the `resolver` is the container DNS that the nginx image reads from `/etc/resolv.conf` (`NGINX_ENTRYPOINT_LOCAL_RESOLVERS`): 127.0.0.11 under Docker and the network's aardvark-dns under Podman. Each worker keeps an answer for 10 seconds and waits at most 2 seconds for the DNS, so after php restarts at a new address the API answers again within about that time. `bin/check-php-restart` checks it in CI under Docker and Podman by connecting php again at a free address with the alias `php`; the Docker job adds `compose.ci.yaml`, which declares the subnet 10.210.0.0/24 that `--ip` needs there. The resolver list holds every nameserver in `/etc/resolv.conf`, so the container DNS must stay the only one, and only `NGINX_` variables are substituted into the template.
+- nginx finds php by name at request time, not once at start: `fastcgi_pass` takes the address from a variable, and the `resolver` is the container DNS that the nginx image reads from `/etc/resolv.conf` (`NGINX_ENTRYPOINT_LOCAL_RESOLVERS`): 127.0.0.11 under Docker and the network's aardvark-dns under Podman. Each worker keeps an answer for 10 seconds and waits at most 2 seconds for the DNS, so after php restarts at a new address the API answers again within about that time. `bin/check-php-restart` checks it in CI under Docker and Podman: it disconnects php from its network and connects it again at a free address with the alias `php`, then expects health and `/metrics` to answer 200 while nginx keeps running. Some Docker versions accept `--ip` only on a network with a declared subnet, so the Docker job adds `compose.ci.yaml` with 10.210.0.0/24; Podman needs no subnet. The resolver list holds every nameserver in `/etc/resolv.conf`, so the container DNS must stay the only one, and only `NGINX_` variables are substituted into the template.
 
 </details>
 
 <details>
 <summary><strong>Known limits</strong></summary>
 
-- Two parallel first requests for one scope both call upstream; the guarded upsert keeps the newer data. A lock per scope would need `symfony/lock`, a new dependency.
+- Two parallel first requests for one scope both call upstream; the guarded upsert keeps the newer data. A lock per scope would need `symfony/lock`.
 - Days stored before discoveries existed have no discovery rows; past days are not fetched again.
 - Forecast and archive share the weather circuit, and the breaker honours `Retry-After` only on 429.
 - A past day that has only a forecast keeps it: fetching observed weather once would need an agreed exception to the rule that stored past days never call upstream.
-- Behind a proxy, `SYMFONY_TRUSTED_PROXIES` must be set, or all clients share one rate limit.
-- More ideas: a separate circuit for each Open-Meteo address and a manual reset command; Redis and PostgreSQL probes in `/api/health` and the request id passed into Messenger messages; a PostgreSQL schema per module with its own database user, the step before splitting `Briefing` into a service behind `DiscoveryCatalog`.
+- Further ideas: a separate circuit for each Open-Meteo address, and a manual reset command instead of restarting Redis; the request id passed into Messenger messages, so a queued date can be traced to its command; a PostgreSQL schema per module with its own database user, so the boundaries hold in the database too, the step before splitting `Briefing` into a service behind `DiscoveryCatalog`.
 
 </details>
