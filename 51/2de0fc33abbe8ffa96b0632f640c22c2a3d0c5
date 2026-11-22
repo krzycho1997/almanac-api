@@ -1,0 +1,42 @@
+docs/SPEC.md
+  s_4da5374f6e605f::t_42e07fcf33618d 28,30-31,33
+  s_4da5374f6e605f::t_c3f504b93e19ad 39
+  s_4da5374f6e605f::t_5922146568ec4f 27,29,32
+tools/phpstan/tests/Rule/ProviderLiteralRuleTest.php
+  s_4da5374f6e605f::t_be8a3012d46665 42
+  s_4da5374f6e605f::t_90e58b0f09cd93 29,41,43,67-74
+tools/phpstan/tests/Rule/Fixtures/ProviderLiteral/src/Briefing/Discovery/ProbeBuildsAddresses.php
+  s_4da5374f6e605f::t_90e58b0f09cd93 1-27
+tools/phpstan/src/Rule/ProviderLiteralRule.php
+  s_4da5374f6e605f::t_90e58b0f09cd93 8-10,22,36-40,45,51,57,59-66,68-71,77-92,96,98-99,131,133
+  s_4da5374f6e605f::t_449ed098e2b69c 18
+tools/phpstan/tests/Rule/Fixtures/ProviderLiteral/src/Shared/ProbeAllowedLiterals.php
+  s_4da5374f6e605f::t_90e58b0f09cd93 12
+src/Briefing/Discovery/PersonIdentity.php
+  s_4da5374f6e605f::t_e3c5ac0647a69f 12
+tests/Briefing/Unit/Source/OnThisDay/WikipediaPersonIdentityTest.php
+  s_4da5374f6e605f::t_e3c5ac0647a69f 37
+tests/Briefing/Unit/DependencyInjection/ProviderClientsConfigTest.php
+  s_4da5374f6e605f::t_8994f287a97442 13,31-32,35-36,38-39,41-42,46,64,67-70,71-75,77,90-93,95-97
+  s_4da5374f6e605f::t_6981cdd5e99d8f 76,79-89
+  s_4da5374f6e605f::t_cb517a57a1bd45 14-17,21,24,30,33-34,37,40,43,49,56,60-63,65-66,78,94,99-108
+  s_4da5374f6e605f::t_a0e5e03507ee40 109
+config/packages/framework.yaml
+  s_4da5374f6e605f::t_1cd3e99cf8354c 21-23,29,31,35-36,39-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "512de0fc33abbe8ffa96b0632f640c22c2a3d0c5",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
