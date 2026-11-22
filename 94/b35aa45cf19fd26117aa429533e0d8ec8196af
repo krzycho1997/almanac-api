@@ -1,0 +1,19 @@
+README.md
+  s_3e9c56607c4bf5::t_50887a3fdf76e3 170-252,265-295,438,440
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "94b35aa45cf19fd26117aa429533e0d8ec8196af",
+  "prompts": {},
+  "sessions": {
+    "s_3e9c56607c4bf5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "262804b0-a97f-4fd0-a61b-66add3b102bb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
