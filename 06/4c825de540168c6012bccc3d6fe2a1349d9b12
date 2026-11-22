@@ -1,0 +1,57 @@
+README.md
+  s_4da5374f6e605f::t_c6e2cad098eb85 210
+tests/Briefing/Unit/Message/QueuedPrefetchDateMessageTest.php
+  s_4da5374f6e605f::t_1d46cda03079fd 10,19,22,29,33-49,53-54
+tests/Briefing/Functional/PrefetchCommandTest.php
+  s_4da5374f6e605f::t_8b7644dd0f1793 176
+tests/Briefing/Unit/Dto/Validator/ValidPrefetchRangeTest.php
+  s_4da5374f6e605f::t_8b7644dd0f1793 48-49,53-54,63-69
+  s_4da5374f6e605f::t_129adbd7991885 70-71
+tests/Identity/Unit/TokenLifetimeTest.php
+  s_4da5374f6e605f::t_8b7644dd0f1793 63,66
+  s_4da5374f6e605f::t_a3b1f23b51818d 34-57
+tools/phpstan/tests/Rule/DataCarrierRuleTest.php
+  s_4da5374f6e605f::t_2a8d14743199fa 32-35,44
+  s_4da5374f6e605f::t_fe77dfcfd5040d 38
+  s_4da5374f6e605f::t_c91fa8d4d3efab 23,48
+  s_4da5374f6e605f::t_fa1d692a97bd78 36-37
+  s_4da5374f6e605f::t_4fe6cf8d1f5ddf 39-42
+tools/phpstan/tests/Rule/Fixtures/DataCarrier/allowed.php
+  s_4da5374f6e605f::t_5f49eeb054cbc2 34-52
+  s_4da5374f6e605f::t_958fdd27484bd7 53-56,58-64,66-91,98-102,106-107
+  s_4da5374f6e605f::t_fa1d692a97bd78 57,65,92-97,103-105
+tools/phpstan/src/Rule/DataCarrierRule.php
+  s_4da5374f6e605f::t_5f49eeb054cbc2 19,22-23,37-38,57,75,79-104,110-114,128-130,132-135,215-228,230-236,238,240
+  s_4da5374f6e605f::t_7352b3c156256c 21
+  s_4da5374f6e605f::t_5c62cc804d0ef7 15,29,42-43,65,105-109,115-127,131,136-137,148-157
+  s_4da5374f6e605f::t_958fdd27484bd7 8-12,45,141,158-162,169,171-176,181-182,184-190,193-197,199,213-214,229
+  s_4da5374f6e605f::t_fa1d692a97bd78 13-14,16-18,39,140,142,163-168,170,177-180,183,191-192,198,200-212
+  s_4da5374f6e605f::t_afaced07503bf6 139
+tools/phpstan/tests/Rule/Fixtures/DataCarrier/carriers.php
+  s_4da5374f6e605f::t_5f49eeb054cbc2 41-76
+  s_4da5374f6e605f::t_958fdd27484bd7 77-106
+  s_4da5374f6e605f::t_fa1d692a97bd78 107-125
+src/Identity/Dto/Input/Validator/ValidTokenLifetimeValidator.php
+  s_4da5374f6e605f::t_a3b1f23b51818d 32,40,42-43,45,47-49
+src/Identity/TokenLifetime.php
+  s_4da5374f6e605f::t_a3b1f23b51818d 24,30-34,40-47
+  s_4da5374f6e605f::t_f6ffed7e97d54b 10,48
+tests/Briefing/Unit/MessageHandler/MessengerPrefetchQueueTest.php
+  s_4da5374f6e605f::t_fa1d692a97bd78 18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "064c825de540168c6012bccc3d6fe2a1349d9b12",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
