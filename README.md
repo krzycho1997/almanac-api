@@ -167,6 +167,89 @@ If you want one place to start, the briefing tests with a failing, mocked source
 - Short-lived tokens with refresh, or an OIDC provider through Symfony's `access_token` handlers, because a 30-day Bearer token is a long-lived secret.
 - Redis and PostgreSQL probes in `/api/health`, so an outage shows up before users report it.
 
+## Architecture
+
+The app is a modular monolith with three modules: `Briefing`, `Identity` and `Bookmark`. Each module has its own directory, its own tables and a small `Contract` namespace. Other modules can use only that contract, never the inside of the module. `Shared` holds technical parts that every module uses, like errors and logs. PHPStan checks these rules on every commit.
+
+```mermaid
+flowchart LR
+  subgraph Bookmark
+    bsvc[BookmarkService]
+    btab[("bookmark")]
+  end
+  subgraph Briefing
+    bc{{"Contract: DiscoveryCatalog, DiscoveryView, DiscoveryId, DiscoveryType"}}
+    brin["sources, snapshots, refresh policy, circuit breaker, discoveries, prefetch"]
+    brtab[("briefing_source_snapshot, briefing_discovery")]
+  end
+  subgraph Identity
+    ic{{"Contract: AuthenticatedUser, UserId"}}
+    iin["users, tokens, Bearer auth"]
+    itab[("identity_user, identity_access_token")]
+  end
+  subgraph Shared
+    sh["Problem Details, request id, logging, health, OpenAPI"]
+  end
+  bsvc --> bc
+  bsvc --> ic
+  bsvc --- btab
+  brin --- brtab
+  iin --- itab
+  Bookmark -.-> Shared
+  Briefing -.-> Shared
+  Identity -.-> Shared
+```
+
+There are no foreign keys between modules. A bookmark stores the user id and the discovery id as plain values, and `Bookmark` asks `DiscoveryCatalog` if the discovery exists. Because of this, `Briefing` could become a separate service later without changes in `Bookmark`.
+
+```text
+src/
+├── Briefing/                 # briefing for a date: sources, snapshots, refresh, discoveries
+│   ├── Contract/             # what other modules may use (DiscoveryCatalog, DiscoveryId…)
+│   ├── Controller/           # GET /api/briefings/{date}
+│   ├── Command/              # almanac:prefetch
+│   ├── Message/              # queued prefetch message
+│   ├── MessageHandler/       # worker side of the prefetch, retry strategy
+│   ├── Messenger/            # queue adapter and message mapper
+│   ├── Source/               # shared HTTP fetching (parallel, timeouts)
+│   │   ├── Apod/             # NASA APOD: client, response, mapper
+│   │   ├── OnThisDay/        # Wikipedia On This Day
+│   │   └── OpenMeteo/        # weather
+│   ├── CircuitBreaker/       # breaker state in Redis
+│   ├── Discovery/            # discoveries that can be bookmarked
+│   ├── Model/                # normalised data of each source
+│   ├── Entity/ Repository/   # snapshots and discoveries in PostgreSQL
+│   ├── Dto/ Mapper/          # API request/response shapes and their mappers
+│   └── Validator/ ValueResolver/ Health/ Exception/ DependencyInjection/
+├── Bookmark/                 # bookmarks of single discoveries, per user
+│   ├── Controller/           # /api/bookmarks
+│   ├── Entity/ Repository/ Doctrine/
+│   └── Dto/ Mapper/ Exception/
+├── Identity/                 # users, tokens, Bearer auth
+│   ├── Contract/             # AuthenticatedUser, UserId
+│   ├── Command/              # almanac:user:create
+│   ├── Security/             # token handler, 401 responses
+│   ├── Entity/ Repository/ Doctrine/
+│   └── Dto/ Mapper/ Validator/ Exception/
+└── Shared/                   # technical parts used by every module, no module logic
+    ├── ErrorHandler/         # Problem Details
+    ├── Logging/ RequestId/   # JSON logs, redaction, request id
+    ├── Metrics/ Health/      # Prometheus metrics, /api/health
+    └── Controller/ Serializer/ Contract/
+```
+
+Inside a module the layout is plain Symfony: controllers and commands at the edge, services in the module root, Doctrine entities and repositories, and DTOs with mappers for the API.
+
+### Why not full DDD
+
+I really wanted to use DDD here, because I like it and use it in my work. But in my opinion this project is not the right case for it, for three reasons:
+
+1. **There is almost no business logic.** The app fetches data from three APIs, normalises it and stores it. The only rules are that a bookmark is unique and belongs to one user, and the refresh policy. A unique index, an owner filter and one `RefreshPolicy` class are enough for them.
+2. **It is integration and CRUD, not a core domain.** In Vlad Khononov's terms these are generic and supporting subdomains, and for them he recommends a simple pattern. Eric Evans also says that the modelling effort should go to the core domain.
+3. **I wanted to avoid over-engineering.** Aggregates, domain events and an application layer would add classes and layers that protect nothing here.
+
+So I took only the parts of DDD that help: modules with clear borders, contracts between them, and value objects like `Location`, `DateRange` and `Email`. I would move to full DDD when the domain grows, for example with rules that cover several entities at once, like shared bookmarks or limits on collections.
+
 ## Code map
 
 If you want to read the code, these are good places to start:
@@ -178,6 +261,37 @@ If you want to read the code, these are good places to start:
 - On naming: `Model` is a source's stored data, `Contract` is what other modules may use, `Dto` holds the API's request and response shapes, and `Entity` holds the Doctrine rows.
 
 Adding a fourth source is described under Design notes, in "Modules, layers and providers".
+
+The briefing request in more detail:
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant C as Client
+  participant Ctrl as BriefingController
+  participant Agg as BriefingAggregator
+  participant Ref as SnapshotRefresher
+  participant DB as PostgreSQL
+  participant CB as CircuitBreaker (Redis)
+  participant F as ConcurrentFetcher
+  participant API as NASA / Wikipedia / Open-Meteo
+  C->>Ctrl: GET /api/briefings/{date}?lat=&lon=
+  Ctrl->>Agg: briefingFor(date, location)
+  Agg->>Ref: storedFor(scopes)
+  Ref->>DB: read stored snapshots
+  Note over Agg: RefreshPolicy decides what is due
+  opt a source is missing or due for a refresh
+    Agg->>CB: tryAcquire(source)
+    Agg->>F: settleAll(fetches)
+    F->>API: fetch in parallel (timeouts, 8.5 s deadline)
+    API-->>F: data or error per source
+    Agg->>CB: record(result)
+    Agg->>Ref: saveAndReread(results)
+    Ref->>DB: upsert snapshots and discoveries
+  end
+  Agg-->>Ctrl: BriefingResult
+  Ctrl-->>C: 200 JSON, status per source and missing[] (502 if no source has data)
+```
 
 ## Use of AI
 
@@ -321,16 +435,9 @@ Symfony is used as a set of components: only what the code calls is required, on
 <details>
 <summary><strong>Modules, layers and providers</strong></summary>
 
-| Module | Owns | Tables | Contract |
-|---|---|---|---|
-| `Briefing` | sources, snapshots, refresh policy, circuit breaker, discoveries, prefetch | `briefing_source_snapshot`, `briefing_discovery` | `DiscoveryCatalog`, `DiscoveryView`, `DiscoveryId`, `DiscoveryType` |
-| `Identity` | users, tokens, Bearer authentication | `identity_user`, `identity_access_token` | `AuthenticatedUser`, `UserId` |
-| `Bookmark` | bookmarks | `bookmark` | none |
-| `Shared` | Problem Details, request id, logging, health, API document | none | `HealthCheck` port, uid base type |
+The module diagram is in Architecture. More precisely: a module uses only its own classes, `Shared`, the `Contract` namespace of any module, and code outside `App`; `Shared` uses no module, and `config/` is the composition root. `bookmark.user_id` and `bookmark.discovery_id` are plain `uuid` columns, `DiscoveryCatalog::find()` runs before the insert, and users and discoveries are never deleted. A bookmark whose discovery the catalog does not know breaks an invariant, so listing throws a `LogicException` (a logged 500) instead of leaving the entry out while `total` still counts it. Account deletion would need an event from Identity that Bookmark handles.
 
-A module uses only its own classes, `Shared`, the `Contract` namespace of any module, and code outside `App`; `Shared` uses no module. `config/` is the composition root. Foreign keys exist only inside a module: `bookmark.user_id` and `bookmark.discovery_id` are plain `uuid` columns, `DiscoveryCatalog::find()` runs before the insert, and users and discoveries are never deleted. A bookmark whose discovery the catalog does not know breaks an invariant, so listing throws a `LogicException` (a logged 500) instead of leaving the entry out while `total` still counts it. Account deletion would need an event from Identity that Bookmark handles. In return, `Briefing` could become a separate service by turning `DiscoveryCatalog` into an HTTP client, with no change in `Bookmark`.
-
-Inside a module the layout is plain Symfony, with no separate domain layer:
+The layers inside a module:
 
 - **Edge** (controllers, commands, message handlers, queue adapters in `Messenger`, value resolvers, security, health checks, HTTP listeners): input and output only, with no repositories, Doctrine or upstream clients. `AccessTokenHandler` is the one exception.
 - **Services** in the module root (`BriefingAggregator`, `Prefetcher`, `AccessTokenIssuer`, `BookmarkService`) know nothing about HTTP. Status codes come from `framework.exceptions`, bodies from mappers.
