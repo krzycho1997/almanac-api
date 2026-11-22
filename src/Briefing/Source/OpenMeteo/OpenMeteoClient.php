@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Briefing\Source\Weather;
+namespace App\Briefing\Source\OpenMeteo;
 
 use App\Briefing\BriefingDay;
 use App\Briefing\Location;
@@ -21,7 +21,7 @@ final readonly class OpenMeteoClient implements SourceClient
 {
     private const string FORECAST_PATH = 'v1/forecast';
     private const string ARCHIVE_PATH = 'v1/archive';
-    public const string COORDINATE = '%.2F';
+    private const string COORDINATE = '%.2F';
     private const string QUERY = 'query';
     private const array FIXED_QUERY = [
         'daily' => 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,sunrise,sunset,daylight_duration',

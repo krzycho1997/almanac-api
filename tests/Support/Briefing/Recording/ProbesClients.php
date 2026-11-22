@@ -6,7 +6,7 @@ namespace App\Tests\Support\Briefing\Recording;
 
 use App\Briefing\Source\Apod\ApodSource;
 use App\Briefing\Source\OnThisDay\OnThisDaySource;
-use App\Briefing\Source\Weather\WeatherSource;
+use App\Briefing\Source\OpenMeteo\WeatherSource;
 use App\Tests\Support\Briefing\UpstreamMockResponseFactory;
 use App\Tests\Support\InteractsWithTestServices;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;

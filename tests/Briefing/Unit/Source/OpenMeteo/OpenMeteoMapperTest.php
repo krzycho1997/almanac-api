@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Briefing\Unit\Source\Weather;
+namespace App\Tests\Briefing\Unit\Source\OpenMeteo;
 
 use App\Briefing\Exception\InvalidUpstreamPayloadException;
 use App\Briefing\Exception\PayloadDefect;
@@ -10,9 +10,9 @@ use App\Briefing\Model\Attribution;
 use App\Briefing\Model\DailyWeather;
 use App\Briefing\Model\WeatherKind;
 use App\Briefing\Model\WmoCode;
-use App\Briefing\Source\Weather\OpenMeteoApiResponse;
-use App\Briefing\Source\Weather\OpenMeteoDaily;
-use App\Briefing\Source\Weather\OpenMeteoMapper;
+use App\Briefing\Source\OpenMeteo\OpenMeteoApiResponse;
+use App\Briefing\Source\OpenMeteo\OpenMeteoDaily;
+use App\Briefing\Source\OpenMeteo\OpenMeteoMapper;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

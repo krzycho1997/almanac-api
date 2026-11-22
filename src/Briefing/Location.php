@@ -9,6 +9,7 @@ use App\Briefing\Exception\InvalidLocationException;
 final readonly class Location
 {
     private const int PRECISION = 2;
+    private const string KEY = '%.2F,%.2F';
     public const float MAX_LATITUDE = 90.0;
     public const float MAX_LONGITUDE = 180.0;
 
@@ -18,6 +19,11 @@ final readonly class Location
         public ?string $name,
         public bool $isDefault,
     ) {
+    }
+
+    public function key(): string
+    {
+        return \sprintf(self::KEY, $this->latitude, $this->longitude);
     }
 
     public static function fromCoordinates(float $latitude, float $longitude): self

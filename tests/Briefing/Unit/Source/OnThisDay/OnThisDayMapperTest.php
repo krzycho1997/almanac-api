@@ -50,7 +50,7 @@ final class OnThisDayMapperTest extends TestCase
         $feed = self::mapper()->map(self::selected($selected), self::births([self::born()]), self::deaths([self::born()]));
 
         // Then
-        self::assertSame($expected, $feed->events[0]->pages[0]->wikidataId);
+        self::assertSame($expected, $feed->events[0]->pages[0]->catalogueId);
     }
 
     /**

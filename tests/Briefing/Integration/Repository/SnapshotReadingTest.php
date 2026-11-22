@@ -13,7 +13,8 @@ use App\Briefing\SourceFailure;
 use App\Briefing\SourceName;
 use App\Briefing\SourcePayloadCodec;
 use App\Briefing\SourceResult;
-use App\Tests\Support\Briefing\SourcePayloads;
+use App\Tests\Support\Briefing\ApodPayloads;
+use App\Tests\Support\Briefing\OpenMeteoPayloads;
 use App\Tests\Support\ExposingKernel;
 use Doctrine\DBAL\Connection;
 use Doctrine\Persistence\ManagerRegistry;
@@ -48,22 +49,22 @@ final class SnapshotReadingTest extends TestCase
     public function testReadsAStoredSuccessBackAsFinalData(): void
     {
         // Given
-        $this->repository()->saveResult(SourceResult::ok(SourceName::Apod, SourcePayloads::apodPicture()), self::apod(), self::at(self::TEN));
+        $this->repository()->saveResult(SourceResult::ok(SourceName::Apod, ApodPayloads::picture()), self::apod(), self::at(self::TEN));
 
         // When
         $snapshot = $this->repository()->findForScopes([self::apod()])[SourceName::Apod->value];
 
         // Then
-        self::assertEquals(SourcePayloads::apodPicture(), $snapshot->payload);
+        self::assertEquals(ApodPayloads::picture(), $snapshot->payload);
         self::assertEquals([self::at(self::TEN), self::at(self::TEN), null], [$snapshot->fetchedAt, $snapshot->lastAttemptAt, $snapshot->lastError]);
         self::assertEquals(SnapshotState::fetchedAt(self::at(self::TEN)), $snapshot->state());
-        self::assertEquals(SourceEntry::fresh(SourceName::Apod, SourcePayloads::apodPicture(), self::at(self::TEN)), $snapshot->entry(false));
+        self::assertEquals(SourceEntry::fresh(SourceName::Apod, ApodPayloads::picture(), self::at(self::TEN)), $snapshot->entry(false));
     }
 
     public function testReadsAFailureAfterASuccessWithTheOldData(): void
     {
         // Given
-        $this->repository()->saveResult(SourceResult::ok(SourceName::Apod, SourcePayloads::apodPicture()), self::apod(), self::at(self::TEN));
+        $this->repository()->saveResult(SourceResult::ok(SourceName::Apod, ApodPayloads::picture()), self::apod(), self::at(self::TEN));
         $this->repository()->saveResult(SourceResult::failed(SourceName::Apod, FailureKind::RateLimited), self::apod(), self::at(self::ELEVEN));
 
         // When
@@ -73,8 +74,8 @@ final class SnapshotReadingTest extends TestCase
         self::assertEquals(SnapshotState::failedAt(self::at(self::ELEVEN), true), $snapshot->state());
         self::assertSame(FailureKind::RateLimited, $snapshot->lastError);
         self::assertEquals(self::at(self::TEN), $snapshot->fetchedAt);
-        self::assertEquals(SourceEntry::stale(SourceName::Apod, SourcePayloads::apodPicture(), self::at(self::TEN), new SourceFailure(FailureKind::RateLimited), self::at(self::ELEVEN)), $snapshot->entry(false));
-        self::assertEquals(SourceEntry::fresh(SourceName::Apod, SourcePayloads::apodPicture(), self::at(self::TEN)), $snapshot->entry(true));
+        self::assertEquals(SourceEntry::stale(SourceName::Apod, ApodPayloads::picture(), self::at(self::TEN), new SourceFailure(FailureKind::RateLimited), self::at(self::ELEVEN)), $snapshot->entry(false));
+        self::assertEquals(SourceEntry::fresh(SourceName::Apod, ApodPayloads::picture(), self::at(self::TEN)), $snapshot->entry(true));
     }
 
     public function testReadsAFailureWithoutDataAsMissing(): void
@@ -135,32 +136,32 @@ final class SnapshotReadingTest extends TestCase
     public function testReadsOnlyTheRequestedScopes(): void
     {
         // Given
-        $weather = new SnapshotScope(SourceName::Weather, '2024-03-15@52.23,21.01', new \DateTimeImmutable('2024-03-15'));
-        $otherDay = new SnapshotScope(SourceName::Apod, '2024-03-16', new \DateTimeImmutable('2024-03-16'));
-        $this->repository()->saveResult(SourceResult::ok(SourceName::Apod, SourcePayloads::apodPicture()), $otherDay, self::at(self::TEN));
-        $this->repository()->saveResult(SourceResult::ok(SourceName::Weather, SourcePayloads::dailyWeather()), $weather, self::at(self::TEN));
-        $this->repository()->saveResult(SourceResult::ok(SourceName::Apod, SourcePayloads::apodPicture()), new SnapshotScope(SourceName::Apod, '2024-03-15@52.23,21.01', new \DateTimeImmutable('2024-03-15')), self::at(self::TEN));
+        $weather = SnapshotScope::dated(SourceName::Weather, '2024-03-15@52.23,21.01', new \DateTimeImmutable('2024-03-15'));
+        $otherDay = SnapshotScope::dated(SourceName::Apod, '2024-03-16', new \DateTimeImmutable('2024-03-16'));
+        $this->repository()->saveResult(SourceResult::ok(SourceName::Apod, ApodPayloads::picture()), $otherDay, self::at(self::TEN));
+        $this->repository()->saveResult(SourceResult::ok(SourceName::Weather, OpenMeteoPayloads::dailyWeather()), $weather, self::at(self::TEN));
+        $this->repository()->saveResult(SourceResult::ok(SourceName::Apod, ApodPayloads::picture()), SnapshotScope::dated(SourceName::Apod, '2024-03-15@52.23,21.01', new \DateTimeImmutable('2024-03-15')), self::at(self::TEN));
 
         // When
         $stored = $this->repository()->findForScopes([self::apod(), $weather]);
 
         // Then
         self::assertSame([SourceName::Weather->value], array_keys($stored));
-        self::assertEquals(SourcePayloads::dailyWeather(), $stored[SourceName::Weather->value]->payload);
+        self::assertEquals(OpenMeteoPayloads::dailyWeather(), $stored[SourceName::Weather->value]->payload);
     }
 
     public function testSavesSeveralResultsTogether(): void
     {
         // Given
-        $weather = new SnapshotScope(SourceName::Weather, '2024-03-15@52.23,21.01', new \DateTimeImmutable('2024-03-15'));
-        $results = [SourceResult::ok(SourceName::Apod, SourcePayloads::apodPicture()), SourceResult::failed(SourceName::Weather, FailureKind::Rejected)];
+        $weather = SnapshotScope::dated(SourceName::Weather, '2024-03-15@52.23,21.01', new \DateTimeImmutable('2024-03-15'));
+        $results = [SourceResult::ok(SourceName::Apod, ApodPayloads::picture()), SourceResult::failed(SourceName::Weather, FailureKind::Rejected)];
 
         // When
         $this->repository()->saveResults($results, [SourceName::Apod->value => self::apod(), SourceName::Weather->value => $weather], self::at(self::TEN));
 
         // Then
         $stored = $this->repository()->findForScopes([self::apod(), $weather]);
-        self::assertEquals([SourcePayloads::apodPicture(), FailureKind::Rejected], [$stored[SourceName::Apod->value]->payload, $stored[SourceName::Weather->value]->lastError]);
+        self::assertEquals([ApodPayloads::picture(), FailureKind::Rejected], [$stored[SourceName::Apod->value]->payload, $stored[SourceName::Weather->value]->lastError]);
     }
 
     public function testRefusesToSaveAResultWithoutItsScope(): void
@@ -173,7 +174,7 @@ final class SnapshotReadingTest extends TestCase
     public function testFindsNothingWithoutScopes(): void
     {
         // Given
-        $this->repository()->saveResult(SourceResult::ok(SourceName::Apod, SourcePayloads::apodPicture()), self::apod(), self::at(self::TEN));
+        $this->repository()->saveResult(SourceResult::ok(SourceName::Apod, ApodPayloads::picture()), self::apod(), self::at(self::TEN));
 
         // When / Then
         self::assertSame([], $this->repository()->findForScopes([]));
@@ -182,7 +183,7 @@ final class SnapshotReadingTest extends TestCase
     public function testReadsTheRowAgainAfterItChangedInTheDatabase(): void
     {
         // Given
-        $this->repository()->saveResult(SourceResult::ok(SourceName::Apod, SourcePayloads::apodPicture()), self::apod(), self::at(self::TEN));
+        $this->repository()->saveResult(SourceResult::ok(SourceName::Apod, ApodPayloads::picture()), self::apod(), self::at(self::TEN));
         $this->repository()->findForScopes([self::apod()]);
         $this->repository()->saveResult(SourceResult::failed(SourceName::Apod, FailureKind::Unavailable), self::apod(), self::at(self::ELEVEN));
 
@@ -240,7 +241,7 @@ final class SnapshotReadingTest extends TestCase
 
     private static function apod(): SnapshotScope
     {
-        return new SnapshotScope(SourceName::Apod, '2024-03-15', new \DateTimeImmutable('2024-03-15'));
+        return SnapshotScope::dated(SourceName::Apod, '2024-03-15', new \DateTimeImmutable('2024-03-15'));
     }
 
     private static function at(string $moment): \DateTimeImmutable

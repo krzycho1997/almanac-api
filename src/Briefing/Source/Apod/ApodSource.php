@@ -32,7 +32,7 @@ final readonly class ApodSource implements Source
 
     public function scopeFor(\DateTimeImmutable $date, Location $location): SnapshotScope
     {
-        return new SnapshotScope(self::NAME, $date->format(BriefingDay::FORMAT), $date);
+        return SnapshotScope::dated(self::NAME, $date->format(BriefingDay::FORMAT), $date);
     }
 
     public function client(): SourceClient

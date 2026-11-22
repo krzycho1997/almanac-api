@@ -19,8 +19,8 @@ trait KeepsFinalSnapshotsByDate
     public function scopeFor(\DateTimeImmutable $date, Location $location): SnapshotScope
     {
         return match ($this->name()) {
-            SourceName::OnThisDay => new SnapshotScope($this->name(), $date->format('m-d'), null),
-            SourceName::Apod, SourceName::Weather => new SnapshotScope($this->name(), $date->format(BriefingDay::FORMAT), $date),
+            SourceName::OnThisDay => SnapshotScope::undated($this->name(), $date->format('m-d')),
+            SourceName::Apod, SourceName::Weather => SnapshotScope::dated($this->name(), $date->format(BriefingDay::FORMAT), $date),
         };
     }
 }

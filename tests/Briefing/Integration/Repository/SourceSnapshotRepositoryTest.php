@@ -171,7 +171,7 @@ final class SourceSnapshotRepositoryTest extends TestCase
     public function testStoresAFailureOfEverySource(SourceName $source): void
     {
         // Given
-        $scope = new SnapshotScope($source, 'key-of-'.$source->value, self::dateFor($source));
+        $scope = self::scopeFor($source, 'key-of-'.$source->value);
 
         // When
         $this->repository()->saveResult(SourceResult::failed($source, FailureKind::Unavailable), $scope, self::at(self::TEN));
@@ -255,7 +255,7 @@ final class SourceSnapshotRepositoryTest extends TestCase
         $feed = new OnThisDayFeed([new HistoricalEvent(-44, 'Julius Caesar is assassinated.', [])], [], [], self::attribution());
 
         // When
-        $this->repository()->saveResult(SourceResult::ok(SourceName::OnThisDay, $feed), new SnapshotScope(SourceName::OnThisDay, '03-15', null), self::at(self::TEN));
+        $this->repository()->saveResult(SourceResult::ok(SourceName::OnThisDay, $feed), SnapshotScope::undated(SourceName::OnThisDay, '03-15'), self::at(self::TEN));
 
         // Then
         $snapshot = $this->stored(SourceName::OnThisDay, '03-15');
@@ -305,17 +305,17 @@ final class SourceSnapshotRepositoryTest extends TestCase
         return $this->container->get($id);
     }
 
-    private static function dateFor(SourceName $source): ?\DateTimeImmutable
+    private static function scopeFor(SourceName $source, string $key): SnapshotScope
     {
         return match ($source) {
-            SourceName::OnThisDay => null,
-            SourceName::Apod, SourceName::Weather => new \DateTimeImmutable(self::DAY),
+            SourceName::OnThisDay => SnapshotScope::undated($source, $key),
+            SourceName::Apod, SourceName::Weather => SnapshotScope::dated($source, $key, new \DateTimeImmutable(self::DAY)),
         };
     }
 
     private static function scope(): SnapshotScope
     {
-        return new SnapshotScope(SourceName::Weather, self::KEY, new \DateTimeImmutable(self::DAY));
+        return SnapshotScope::dated(SourceName::Weather, self::KEY, new \DateTimeImmutable(self::DAY));
     }
 
     private static function success(float $temperatureMax): SourceResult

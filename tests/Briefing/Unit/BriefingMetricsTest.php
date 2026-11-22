@@ -11,8 +11,9 @@ use App\Briefing\Source\SettledFetch;
 use App\Briefing\SourceName;
 use App\Briefing\SourceResult;
 use App\Shared\Metrics\Metric;
+use App\Tests\Support\Briefing\ApodPayloads;
 use App\Tests\Support\Briefing\BriefingResultBuilder;
-use App\Tests\Support\Briefing\SourcePayloads;
+use App\Tests\Support\Briefing\OnThisDayPayloads;
 use App\Tests\Support\Metrics\RecordingMetrics;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -63,7 +64,7 @@ final class BriefingMetricsTest extends TestCase
         $recorded = new RecordingMetrics();
 
         // When
-        new BriefingMetrics($recorded)->fetched(new SettledFetch(SourceResult::ok(SourceName::OnThisDay, SourcePayloads::onThisDayFeed()), 80));
+        new BriefingMetrics($recorded)->fetched(new SettledFetch(SourceResult::ok(SourceName::OnThisDay, OnThisDayPayloads::feed()), 80));
 
         // Then
         self::assertSame([[Metric::UpstreamFetches, ['source' => 'on_this_day', 'result' => 'ok']]], $recorded->increments);
@@ -74,7 +75,7 @@ final class BriefingMetricsTest extends TestCase
         // Given
         $recorded = new RecordingMetrics();
         $briefing = BriefingResultBuilder::create()
-            ->stale(SourceName::Apod, SourcePayloads::apodPicture(), '2026-11-21T09:00:00Z', FailureKind::Unavailable)
+            ->stale(SourceName::Apod, ApodPayloads::picture(), '2026-11-21T09:00:00Z', FailureKind::Unavailable)
             ->failed(SourceName::OnThisDay, FailureKind::Unavailable)
             ->notApplicable(SourceName::Weather)
             ->build();

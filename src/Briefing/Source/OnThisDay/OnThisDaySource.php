@@ -32,7 +32,7 @@ final readonly class OnThisDaySource implements Source
 
     public function scopeFor(\DateTimeImmutable $date, Location $location): SnapshotScope
     {
-        return new SnapshotScope(self::NAME, $date->format(self::MONTH_AND_DAY), null);
+        return SnapshotScope::undated(self::NAME, $date->format(self::MONTH_AND_DAY));
     }
 
     public function client(): SourceClient

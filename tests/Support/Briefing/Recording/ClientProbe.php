@@ -6,8 +6,8 @@ namespace App\Tests\Support\Briefing\Recording;
 
 use App\Briefing\Source\Apod\ApodSource;
 use App\Briefing\Source\OnThisDay\OnThisDaySource;
+use App\Briefing\Source\OpenMeteo\WeatherSource;
 use App\Briefing\Source\Source;
-use App\Briefing\Source\Weather\WeatherSource;
 use App\Briefing\SourceName;
 use App\Briefing\SourceResult;
 use App\Tests\Support\Briefing\UpstreamMock;

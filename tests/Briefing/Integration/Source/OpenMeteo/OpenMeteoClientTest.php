@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Briefing\Integration\Source\Weather;
+namespace App\Tests\Briefing\Integration\Source\OpenMeteo;
 
 use App\Briefing\Exception\PayloadDefect;
 use App\Briefing\FailureCause;
@@ -11,7 +11,7 @@ use App\Briefing\Location;
 use App\Briefing\Model\Attribution;
 use App\Briefing\Model\DailyWeather;
 use App\Briefing\Model\WeatherKind;
-use App\Briefing\Source\Weather\WeatherSource;
+use App\Briefing\Source\OpenMeteo\WeatherSource;
 use App\Briefing\SourceResult;
 use App\Briefing\SourceStatus;
 use App\Tests\Support\Briefing\UpstreamMock;
