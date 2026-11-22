@@ -9,7 +9,8 @@
 ## Decisions and trade-offs
 
 <!-- Anything a reviewer might question. If this PR introduces or changes a
-decision, add 2–5 sentences about it to docs/SPEC.md as well. -->
+decision, add 2–5 sentences about it to the README as well (Decisions, or
+the matching block under Details). -->
 
 ## Out of scope
 
@@ -21,4 +22,4 @@ decision, add 2–5 sentences about it to docs/SPEC.md as well. -->
 - [ ] Tests cover the new path and its failure path
 - [ ] No secrets or personal data in logs, fixtures or `.env`
 - [ ] `.env.example` is updated (same keys as `.env`)
-- [ ] `docs/SPEC.md` is updated if this PR introduces a decision
+- [ ] The README is updated if this PR introduces a decision
