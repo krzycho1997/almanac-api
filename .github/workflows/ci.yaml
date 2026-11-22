@@ -47,6 +47,8 @@ jobs:
   tests:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    env:
+      COMPOSE_FILE: compose.yaml:compose.ci.yaml
     steps:
       - name: Check out the code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -124,7 +126,6 @@ jobs:
         run: bin/smoke-test http://127.0.0.1:8080
       - name: Check that nginx finds php again after php moves
         env:
-          COMPOSE: podman compose
           ENGINE: podman
         run: bin/check-php-restart http://127.0.0.1:8080
       - name: Show container state and logs
