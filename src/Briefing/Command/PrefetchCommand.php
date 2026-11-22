@@ -10,6 +10,7 @@ use App\Briefing\BriefingResult;
 use App\Briefing\DateRange;
 use App\Briefing\Dto\Input\PrefetchInput;
 use App\Briefing\Location;
+use App\Briefing\Mapper\PrefetchInputMapper;
 use App\Briefing\Prefetcher;
 use App\Briefing\ProblemTiming;
 use Psr\Clock\ClockInterface;
@@ -31,6 +32,7 @@ final readonly class PrefetchCommand
 
     public function __construct(
         private Prefetcher $prefetcher,
+        private PrefetchInputMapper $inputMapper,
         private ClockInterface $clock,
         #[Target('defaultLocation')]
         private Location $defaultLocation,
@@ -39,7 +41,7 @@ final readonly class PrefetchCommand
 
     public function __invoke(#[MapInput] PrefetchInput $input, SymfonyStyle $io): int
     {
-        $range = $input->toRange($this->clock->now()->getTimezone());
+        $range = $this->inputMapper->convertToRange($input, $this->clock->now()->getTimezone());
 
         if ($input->async) {
             return $this->enqueue($input, $range, $io);
@@ -52,7 +54,7 @@ final readonly class PrefetchCommand
 
     private function enqueue(PrefetchInput $input, DateRange $range, SymfonyStyle $io): int
     {
-        $queued = $this->prefetcher->enqueue($range, $input->locationOr($this->defaultLocation), $input->delayMs());
+        $queued = $this->prefetcher->enqueue($range, $this->inputMapper->convertToLocation($input, $this->defaultLocation), $this->inputMapper->convertToDelayMs($input));
         $io->success(\sprintf(self::QUEUED, $queued));
 
         return Command::SUCCESS;
@@ -63,7 +65,7 @@ final readonly class PrefetchCommand
      */
     private function briefingsOf(PrefetchInput $input, DateRange $range, SymfonyStyle $io): iterable
     {
-        $briefings = $this->prefetcher->prefetch($range, $input->locationOr($this->defaultLocation), $input->delayMs());
+        $briefings = $this->prefetcher->prefetch($range, $this->inputMapper->convertToLocation($input, $this->defaultLocation), $this->inputMapper->convertToDelayMs($input));
 
         return $io->progressIterate($briefings, \count($range));
     }

@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Briefing\Dto\Input;
 
-use App\Briefing\BriefingDay;
-use App\Briefing\DateRange;
 use App\Briefing\Dto\Input\Validator\ValidPrefetchRange;
 use App\Briefing\Exception\InvalidLocationException;
-use App\Briefing\Location;
 use App\Briefing\Validator\BriefingDayText;
 use App\Briefing\Validator\Latitude;
 use App\Briefing\Validator\Longitude;
@@ -58,34 +55,4 @@ final class PrefetchInput
 
     #[Option(description: 'Queue one message per date for the worker instead of fetching now')]
     public bool $async = false;
-
-    public function toRange(\DateTimeZone $timezone): DateRange
-    {
-        return DateRange::between(self::dayIn($this->from, $timezone), self::dayIn($this->to, $timezone));
-    }
-
-    public function locationOr(Location $default): Location
-    {
-        return Location::fromOptional(self::coordinate($this->lat), self::coordinate($this->lon), $default);
-    }
-
-    public function delayMs(): int
-    {
-        return (int) $this->delay;
-    }
-
-    private static function dayIn(string $value, \DateTimeZone $timezone): \DateTimeImmutable
-    {
-        return BriefingDay::startOf($value, $timezone)
-            ?? throw new \LogicException('The dates are read only after the input passed validation.');
-    }
-
-    private static function coordinate(?string $value): ?float
-    {
-        if (null === $value) {
-            return null;
-        }
-
-        return (float) $value;
-    }
 }

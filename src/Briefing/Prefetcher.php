@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Briefing;
 
-use App\Briefing\Message\PrefetchDateMessage;
 use App\Shared\Logging\LogContextKey;
 use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
@@ -24,6 +23,7 @@ final readonly class Prefetcher
         private ClockInterface $clock,
         private LoggerInterface $logger,
         private MessageBusInterface $bus,
+        private PrefetchDateMessageMapper $messageMapper,
     ) {
     }
 
@@ -73,7 +73,7 @@ final readonly class Prefetcher
     private function dispatchOnePerDate(DateRange $range, Location $location, int $delayMs): void
     {
         foreach ($range as $index => $date) {
-            $this->bus->dispatch(PrefetchDateMessage::of($date, $location), [new DelayStamp($index * $delayMs)]);
+            $this->bus->dispatch($this->messageMapper->convertToMessage($date, $location), [new DelayStamp($index * $delayMs)]);
         }
     }
 
