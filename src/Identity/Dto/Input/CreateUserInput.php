@@ -27,15 +27,4 @@ final class CreateUserInput
     #[Assert\NotBlank(message: self::TTL_FORMAT_MESSAGE)]
     #[Assert\Regex(TokenLifetime::FORMAT, message: self::TTL_FORMAT_MESSAGE)]
     public string $ttl = self::DEFAULT_TTL;
-
-    public function toEmail(): Email
-    {
-        return Email::fromString($this->email);
-    }
-
-    public function toTtl(): \DateInterval
-    {
-        return TokenLifetime::parse($this->ttl)?->interval()
-            ?? throw new \LogicException('The lifetime is read only after the input passed validation.');
-    }
 }

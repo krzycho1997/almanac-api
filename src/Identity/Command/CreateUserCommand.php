@@ -7,6 +7,7 @@ namespace App\Identity\Command;
 use App\Identity\AccessTokenIssuer;
 use App\Identity\Dto\Input\CreateUserInput;
 use App\Identity\IssuedToken;
+use App\Identity\Mapper\CreateUserInputMapper;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\MapInput;
 use Symfony\Component\Console\Command\Command;
@@ -19,13 +20,14 @@ final readonly class CreateUserCommand
 {
     public function __construct(
         private AccessTokenIssuer $issuer,
+        private CreateUserInputMapper $inputMapper,
     ) {
     }
 
     public function __invoke(#[MapInput] CreateUserInput $input, SymfonyStyle $io): int
     {
         self::refuseToDiscardTheToken($io);
-        $issued = $this->issuer->issueFor($input->toEmail(), $input->toTtl());
+        $issued = $this->issuer->issueFor($this->inputMapper->convertToEmail($input), $this->inputMapper->convertToTtl($input));
         self::print($issued, $io);
 
         return Command::SUCCESS;
