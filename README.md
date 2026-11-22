@@ -172,7 +172,7 @@ If you want one place to start, the briefing tests with a failing, mocked source
 The app is a modular monolith with three modules: `Briefing`, `Identity` and `Bookmark`. Each module has its own directory, its own tables and a small `Contract` namespace. Other modules can use only that contract, never the inside of the module. `Shared` holds technical parts that every module uses, like errors and logs. PHPStan checks these rules on every commit.
 
 ```mermaid
-flowchart TB
+flowchart LR
   subgraph Bookmark
     bsvc[BookmarkService]
     btab[("bookmark")]
@@ -246,7 +246,7 @@ I really wanted to use DDD here, because I like it and use it in my work. But in
 
 1. **There is almost no business logic.** The app fetches data from three APIs, normalises it and stores it. The only rules are that a bookmark is unique and belongs to one user, and the refresh policy. A unique index, an owner filter and one `RefreshPolicy` class are enough for them.
 2. **It is integration and CRUD, not a core domain.** In Vlad Khononov's terms these are generic and supporting subdomains, and for them he recommends a simple pattern. Eric Evans also says that the modelling effort should go to the core domain.
-3. **The brief asks not to over-engineer.** Aggregates, domain events and an application layer would add classes and layers that protect nothing here.
+3. **I wanted to avoid over-engineering.** Aggregates, domain events and an application layer would add classes and layers that protect nothing here.
 
 So I took only the parts of DDD that help: modules with clear borders, contracts between them, and value objects like `Location`, `DateRange` and `Email`. I would move to full DDD when the domain grows, for example with rules that cover several entities at once, like shared bookmarks or limits on collections.
 
