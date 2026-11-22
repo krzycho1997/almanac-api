@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Briefing;
+namespace App\Briefing\MessageHandler;
 
+use App\Briefing\BriefingDay;
+use App\Briefing\Location;
 use App\Briefing\Message\PrefetchDateMessage;
 
 final readonly class PrefetchDateMessageMapper

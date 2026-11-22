@@ -8,8 +8,6 @@ use App\Shared\Logging\LogContextKey;
 use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\ClockInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Stamp\DelayStamp;
 
 #[WithMonologChannel(self::CHANNEL)]
 final readonly class Prefetcher
@@ -22,8 +20,7 @@ final readonly class Prefetcher
         private BriefingAggregator $aggregator,
         private ClockInterface $clock,
         private LoggerInterface $logger,
-        private MessageBusInterface $bus,
-        private PrefetchDateMessageMapper $messageMapper,
+        private PrefetchQueue $queue,
     ) {
     }
 
@@ -73,7 +70,7 @@ final readonly class Prefetcher
     private function dispatchOnePerDate(DateRange $range, Location $location, int $delayMs): void
     {
         foreach ($range as $index => $date) {
-            $this->bus->dispatch($this->messageMapper->convertToMessage($date, $location), [new DelayStamp($index * $delayMs)]);
+            $this->queue->enqueue($date, $location, $index * $delayMs);
         }
     }
 

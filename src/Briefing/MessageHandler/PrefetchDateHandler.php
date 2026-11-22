@@ -9,7 +9,6 @@ use App\Briefing\Exception\DateNotReadyException;
 use App\Briefing\Exception\InvalidLocationException;
 use App\Briefing\Location;
 use App\Briefing\Message\PrefetchDateMessage;
-use App\Briefing\PrefetchDateMessageMapper;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
