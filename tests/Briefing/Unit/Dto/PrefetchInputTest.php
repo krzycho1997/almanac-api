@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Briefing\Unit\Dto;
 
 use App\Briefing\Dto\Input\PrefetchInput;
+use App\Briefing\Dto\Input\Validator\ValidPrefetchRange;
 use App\Tests\Support\ValidatorWithClock;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
@@ -23,6 +24,6 @@ final class PrefetchInputTest extends TestCase
 
         // Then
         self::assertCount(0, $violations);
-        self::assertCount(PrefetchInput::MAX_DAYS, $input->toRange(new \DateTimeZone('UTC')));
+        self::assertCount(ValidPrefetchRange::MAX_DAYS, $input->toRange(new \DateTimeZone('UTC')));
     }
 }

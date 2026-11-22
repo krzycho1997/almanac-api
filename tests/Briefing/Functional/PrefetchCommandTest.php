@@ -173,6 +173,7 @@ final class PrefetchCommandTest extends KernelTestCase
         yield 'negative delay' => [['from' => '2024-03-01', 'to' => '2024-03-01', '--delay' => '-1'], '--delay: The delay must be a whole number of milliseconds.'];
         yield 'fractional delay' => [['from' => '2024-03-01', 'to' => '2024-03-01', '--delay' => '1.5'], '--delay: The delay must be a whole number of milliseconds.'];
         yield 'delay over ten minutes' => [['from' => '2024-03-01', 'to' => '2024-03-01', '--delay' => '600001'], '--delay: This value should be between 0 and 600000.'];
+        yield 'end before a start out of the window' => [['from' => '2026-12-06', 'to' => '2026-12-05'], "to: The last date must not be before the first.\nfrom: The date must be between 1995-06-16 and 15 days after today."];
         yield 'both dates out of the window' => [['from' => '1995-06-14', 'to' => '1995-06-15'], "from: The date must be between 1995-06-16 and 15 days after today.\nto: The date must be between 1995-06-16 and 15 days after today."];
     }
 

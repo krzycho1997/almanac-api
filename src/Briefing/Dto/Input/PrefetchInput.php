@@ -6,7 +6,7 @@ namespace App\Briefing\Dto\Input;
 
 use App\Briefing\BriefingDay;
 use App\Briefing\DateRange;
-use App\Briefing\Exception\InvalidDateRangeException;
+use App\Briefing\Dto\Input\Validator\ValidPrefetchRange;
 use App\Briefing\Exception\InvalidLocationException;
 use App\Briefing\Location;
 use App\Briefing\Validator\BriefingDayText;
@@ -15,17 +15,13 @@ use App\Briefing\Validator\Longitude;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+#[ValidPrefetchRange]
 final class PrefetchInput
 {
-    public const int MAX_DAYS = 366;
     public const int MAX_DELAY_MS = 600_000;
-    private const string UTC = 'UTC';
     private const string WHOLE_NUMBER = '/^\d+$/';
     private const string NOT_WHOLE_MILLISECONDS = 'The delay must be a whole number of milliseconds.';
-    private const string TO = 'to';
-    private const string TOO_LONG = 'The range may span at most '.self::MAX_DAYS.' days.';
 
     #[Argument(description: 'First date to prefetch, Y-m-d')]
     #[Assert\NotBlank]
@@ -62,28 +58,6 @@ final class PrefetchInput
 
     #[Option(description: 'Queue one message per date for the worker instead of fetching now')]
     public bool $async = false;
-
-    #[Assert\Callback]
-    public function validateRange(ExecutionContextInterface $context): void
-    {
-        if (null === BriefingDay::startOf($this->from, new \DateTimeZone(self::UTC))) {
-            return;
-        }
-
-        if (null === BriefingDay::startOf($this->to, new \DateTimeZone(self::UTC))) {
-            return;
-        }
-
-        if ($this->to < $this->from) {
-            $context->buildViolation(InvalidDateRangeException::ENDS_BEFORE_IT_STARTS)->atPath(self::TO)->addViolation();
-
-            return;
-        }
-
-        if (\count($this->toRange(new \DateTimeZone(self::UTC))) > self::MAX_DAYS) {
-            $context->buildViolation(self::TOO_LONG)->atPath(self::TO)->addViolation();
-        }
-    }
 
     public function toRange(\DateTimeZone $timezone): DateRange
     {
