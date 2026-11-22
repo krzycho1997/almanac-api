@@ -1,0 +1,39 @@
+phpstan.dist.neon
+  s_4da5374f6e605f::t_e66581a064c4f8 28
+tools/phpstan/tests/Rule/DataCarrierRuleTest.php
+  s_4da5374f6e605f::t_e66581a064c4f8 1-22,24-31,43,45-47,49-56
+tools/phpstan/tests/Rule/Fixtures/DataCarrier/allowed.php
+  s_4da5374f6e605f::t_e66581a064c4f8 1-33
+tools/phpstan/src/Rule/DataCarrierRule.php
+  s_4da5374f6e605f::t_e66581a064c4f8 1-7,20,24-28,30-36,40-41,44,46-56,58-64,66-72,73-74,76-78,138,143-147,237,239,241-244
+tools/phpstan/tests/Rule/Fixtures/DataCarrier/carriers.php
+  s_4da5374f6e605f::t_e66581a064c4f8 1-40
+tests/Briefing/Unit/MessageHandler/MessengerPrefetchQueueTest.php
+  s_4da5374f6e605f::t_d18bc3adbd0d88 1-17,19-42
+tests/Briefing/Unit/MessageHandler/PrefetchDateMessageMapperTest.php
+  s_4da5374f6e605f::t_d18bc3adbd0d88 1-59
+src/Briefing/MessageHandler/MessengerPrefetchQueue.php
+  s_4da5374f6e605f::t_d18bc3adbd0d88 1-26
+src/Briefing/MessageHandler/PrefetchDateMessageMapper.php
+  s_4da5374f6e605f::t_d18bc3adbd0d88 1-31
+src/Briefing/PrefetchQueue.php
+  s_4da5374f6e605f::t_d18bc3adbd0d88 1-10
+src/Briefing/Prefetcher.php
+  s_4da5374f6e605f::t_d18bc3adbd0d88 23,73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d1f83e283ac5bf8ee5f06180111b2c60aefceec1",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
