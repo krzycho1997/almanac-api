@@ -69,7 +69,7 @@ final readonly class OnThisDayMapper
 
     private static function event(OnThisDayEntry $entry): ?HistoricalEvent
     {
-        $text = PlainText::tidy($entry->text);
+        $text = PlainText::fromMarkup($entry->text);
         $year = $entry->wholeYear();
 
         if (self::EMPTY === $text) {
@@ -101,7 +101,7 @@ final readonly class OnThisDayMapper
 
     private static function pageRef(OnThisDayPage $page): ?PageRef
     {
-        $title = PlainText::tidy($page->title);
+        $title = PlainText::fromMarkup($page->title);
 
         if (self::EMPTY === $title) {
             return null;
@@ -137,7 +137,7 @@ final readonly class OnThisDayMapper
 
     private static function person(OnThisDayEntry $entry): ?NotablePerson
     {
-        $text = PlainText::tidy($entry->text);
+        $text = PlainText::fromMarkup($entry->text);
         $year = $entry->wholeYear();
 
         if (self::EMPTY === $text) {
@@ -225,7 +225,7 @@ final readonly class OnThisDayMapper
 
     private static function nameIn(string $text): string
     {
-        return PlainText::tidy(explode(self::COMMA, $text, 2)[0]);
+        return PlainText::fromMarkup(explode(self::COMMA, $text, 2)[0]);
     }
 
     private static function descriptionIn(string $text): ?string
@@ -235,7 +235,7 @@ final readonly class OnThisDayMapper
 
     private static function description(?string $description): ?string
     {
-        $text = PlainText::tidy((string) $description);
+        $text = PlainText::fromMarkup((string) $description);
 
         if (self::EMPTY === $text) {
             return null;
@@ -264,7 +264,7 @@ final readonly class OnThisDayMapper
 
     private static function withoutDisambiguation(string $title): string
     {
-        return PlainText::tidy((string) preg_replace(self::DISAMBIGUATION, self::EMPTY, $title));
+        return PlainText::fromMarkup((string) preg_replace(self::DISAMBIGUATION, self::EMPTY, $title));
     }
 
     /**
