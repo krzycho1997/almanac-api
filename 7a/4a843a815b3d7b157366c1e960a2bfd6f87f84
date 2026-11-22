@@ -1,0 +1,31 @@
+tools/phpstan/tests/Rule/Fixtures/ProviderLiteral/src/Briefing/Source/Shared/ProbeSharedHelper.php
+  s_4da5374f6e605f::t_9a860568a6c81e 1-10
+tools/phpstan/tests/Rule/Fixtures/ProviderLiteral/src/Briefing/Source/OnThisDay/ProbeSource.php
+  s_4da5374f6e605f::t_9a860568a6c81e 1-9
+tools/phpstan/tests/Rule/Fixtures/ProviderLiteral/src/Shared/ProbeAllowedLiterals.php
+  s_4da5374f6e605f::t_425e0ebb58a5ac 16-17
+tools/phpstan/src/Rule/ProviderLiteralRule.php
+  s_4da5374f6e605f::t_9a860568a6c81e 25,36-45,47,58,75-88,92,98-108,128,130,137,145,148,153
+tools/phpstan/tests/Rule/Fixtures/ProviderLiteral/src/Briefing/Discovery/ProbeKnowsWikipedia.php
+  s_4da5374f6e605f::t_425e0ebb58a5ac 10
+phpstan.dist.neon
+  s_4da5374f6e605f::t_9a860568a6c81e 35-39
+tools/phpstan/tests/Rule/ProviderLiteralRuleTest.php
+  s_4da5374f6e605f::t_425e0ebb58a5ac 17,21,31,37,46,55-58,78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7a4a843a815b3d7b157366c1e960a2bfd6f87f84",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
