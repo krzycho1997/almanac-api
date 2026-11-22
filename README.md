@@ -41,6 +41,8 @@ The first start builds the image, runs `composer install`, waits for PostgreSQL 
 
 `NASA_API_KEY` is empty in `.env`. The dev environment uses `DEMO_KEY` from `.env.dev`. `DEMO_KEY` allows about 30 requests an hour and 50 a day per IP. When NASA answers 429, the APOD circuit opens until `Retry-After`, or for 15 minutes without it. Until then the briefing shows APOD as missing (or serves stored data as stale), and `/api/health` shows `"apod": "open"`.
 
+As of 22.11.2026, `api.nasa.gov/planetary/apod` answers every date, with a valid key too, with a stand-in entry titled "NASA Science" with the NASA logo instead of the picture of the day. The app recognises it as a placeholder, so the briefing shows APOD as `failed` with `error: invalid_payload` while the other sources answer. That is the upstream's answer, not an app error.
+
 To use your own key, put it in `.env.dev.local`. It must be this file and not `.env.local`, because `.env.dev` is loaded after `.env.local` and would override it.
 
 ```sh
@@ -175,6 +177,15 @@ Everything else goes beyond the brief, and each piece can go on its own:
 
 If I had to cut, the release pipeline and the monitoring profile go first, then phpat; the breaker is the last bonus I would drop.
 
+## Code map
+
+- **How is a briefing built?** `Briefing/Controller/BriefingController` calls `BriefingAggregator::briefingFor()`, which reads stored snapshots through `SnapshotRefresher` and `Repository/SourceSnapshotRepository`, fetches what is due in one stream with `Source/ConcurrentFetcher`, saves the results through `SnapshotRefresher::saveAndReread()`, and `Mapper/BriefingResponseMapper` builds the response.
+- **When is a source fetched again?** `Briefing/RefreshPolicy::decide()` with each source's `refreshAfter()` (`Source/Source.php`); the upserts in `SourceSnapshotRepository` change a row only when the new data or attempt is newer, so a slower parallel request cannot overwrite it.
+- **How do I add a fourth source?** Implement `Source/Source.php` in a new `Source/<Name>/` directory, following `Source/OpenMeteo/` (client, response, mapper, definition); its scoped HTTP client goes into `config/packages/framework.yaml`, and the other places are listed under "With more time". Provider knowledge stays in that directory (PHPStan's `ProviderLiteralRule` rejects provider hosts elsewhere); where shared code needs it, a port lies outside, as `Discovery/PersonIdentity` with `Source/OnThisDay/WikipediaPersonIdentity`, and `Discovery/PersonReference` owns the person key formats.
+- **Who may see or delete a bookmark?** `Bookmark/BookmarkService` with `Bookmark/Repository/BookmarkRepository`, whose reads and deletes always filter by the owner, so someone else's bookmark is a 404.
+- **Where is a circuit's state?** `Briefing/CircuitBreaker/RedisCircuitBreakerStore`: per source, the instant until which it is open and the count of recent failures.
+- **Model, Contract, Dto, Entity?** `Model` is the internal data of a source as stored in a snapshot, `Contract` is what other modules may use, `Dto` is the shape of API requests and responses, and `Entity` is what Doctrine stores.
+
 ## Decisions and trade-offs
 
 - **Sources.** Each source has its own client that maps the answer into our internal model; raw payloads are never proxied. On This Day is three calls (`selected`, `births`, `deaths`) instead of `/all/`: for 15 March `/all/` is 1.4 MB, a third of it events and holidays we never show. The calls run in parallel, 3 seconds each (8 for Wikipedia, whose uncached answers take up to about 5.5 s) and 8.5 seconds in all; a network error or a 500, 502, 503 or 504 is retried once (for Wikipedia only if the first attempt failed fast enough to leave time before the deadline); a 429, or any answer with `Retry-After`, never is.
@@ -215,7 +226,7 @@ Tokens are 32 random bytes; only their sha256 is stored. They expire (30 days by
 
 ## With more time
 
-- Wikipedia Page Summary as a fourth source, if a briefing should carry more than On This Day's summaries. It touches about a dozen places: a `Source/` directory (client, response DTO, mapper, definition), a payload model, cases in `SourceName`, `SourceKey` and `SourcePayloadCodec`, the briefing's response DTOs and mappers, `SnapshotScope` if the source is not dated, the discovery extractor if its items can be bookmarked, `openapi.yaml`, and fixtures with tests. The schema does not change, and the breaker, health check and metrics pick the source up from `SourceName`.
+- Wikipedia Page Summary as a fourth source, if a briefing should carry more than On This Day's summaries. It touches about a dozen places: a `Source/` directory (client, response DTO, mapper, definition), a payload model, cases in `SourceName`, `SourceKey` and `SourcePayloadCodec`, the briefing's response DTOs and mappers, the discovery extractor if its items can be bookmarked, `openapi.yaml`, and fixtures with tests. The schema does not change, and the breaker, health check and metrics pick the source up from `SourceName`.
 - A lock per scope, so parallel first requests call upstream once (it needs `symfony/lock`), and `Cache-Control` derived from the refresh policy, so clients can cache final days.
 - A separate circuit for each Open-Meteo address, because an archive outage now also stops forecasts, and a manual reset command instead of restarting Redis.
 - A one-off fetch of observed weather for a past day that has only a forecast. Stored past days must not call upstream again, so this needs an agreed exception to that rule.
@@ -223,6 +234,7 @@ Tokens are 32 random bytes; only their sha256 is stored. They expire (30 days by
 - Short-lived tokens with refresh, or an OIDC provider through Symfony's `access_token` handlers, because a 30-day Bearer token is a long-lived secret.
 - Redis and PostgreSQL probes in `/api/health` and the request id passed into Messenger messages, so an outage shows up before users report it and a queued date can be traced to its command.
 - A stable event key (year and linked pages instead of a text hash), because an edit on Wikipedia now creates a new discovery and old bookmarks keep pointing at the old text.
+- Splitting the root of `src/Briefing` (27 files) into `Snapshot/`, `Failure/` and `Messenger/`, because `MessageHandler/` also holds a stamp, a listener and a retry strategy that are not handlers.
 - A PostgreSQL schema per module with its own database user, so the boundaries hold in the database too; it is the step before splitting `Briefing` into a service behind `DiscoveryCatalog`.
 
 ## Use of AI
