@@ -24,6 +24,7 @@ tests/Identity/Unit/Validator/ValidTokenLifetimeTest.php
   s_bdae402778e20a::t_b020676a5d210f 8
 tools/phpstan/tests/Rule/DataCarrierRuleTest.php
   s_bdae402778e20a::t_cddcda1f233123 49
+  s_bdae402778e20a::t_4377270d1c1ccb 43
 src/Identity/Dto/Input/CreateUserInput.php
   s_bdae402778e20a::t_2389751029846a 9
 src/Briefing/Validator/ValidPrefetchRangeValidator.php
