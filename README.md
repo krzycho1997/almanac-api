@@ -23,7 +23,7 @@ curl http://127.0.0.1:8080/api/health
 
 Get a free NASA key (by email, at https://api.nasa.gov) before the first briefing and put it in `.env.dev.local`, as described below. Without it the dev stack uses `DEMO_KEY`, whose quota is shared by everyone on your IP and is often used up already.
 
-The first start builds the image, runs `composer install`, waits for PostgreSQL and runs the migrations. Three migrations were renamed to generated version numbers, so a database volume created before that stops `php` with "relation already exists": run `docker compose down -v` once. Then it starts these services:
+The first start builds the image, runs `composer install`, waits for PostgreSQL and runs the migrations. It then starts these services:
 
 | Service | What it does |
 |---|---|
@@ -63,7 +63,7 @@ In dev, error bodies also carry `class` and `trace`, because debug is on; add `|
 | `GET /api/health` | public | liveness and the state of each source's circuit |
 | `GET /api/docs.json` | public | the OpenAPI 3.0.3 document as JSON |
 
-Status codes: 400 for a date that is not `YYYY-MM-DD` or a malformed JSON body, 401 without a valid token, 404 for an unknown discovery or someone else's bookmark, 409 for a discovery already bookmarked, 415 for a body that is not JSON, 422 for a date outside the window, bad coordinates, a missing or invalid `discoveryId` or a body field the request does not define, 429 over the rate limit (with `Retry-After`), 502 only when no source has data. Every error from the app is `application/problem+json` (RFC 9457) with `type: about:blank`, the status name as `title` and a `detail` that says what to change, and every response has an `X-Request-Id` header. nginx answers its own errors in the same format: 413 for a body over 16 KB, 400 for headers it cannot read, 503 when php-fpm does not answer. A URL nginx itself cannot parse, such as `/api/%`, still gets nginx's HTML 400.
+Status codes: 400 for a date that is not `YYYY-MM-DD` or a malformed JSON body, 401 without a valid token, 404 for an unknown discovery or someone else's bookmark, 409 for a discovery already bookmarked, 415 for a body that is not JSON, 422 for a date outside the window, bad coordinates, a missing or invalid `discoveryId` or a body field the request does not define, 429 over the rate limit (with `Retry-After`), 502 only when no source has data. Every error from the app is `application/problem+json` (RFC 9457) with a `detail` that says what to change. A validation error (400 or 422 with `violations[]`, one per invalid field) has Symfony's `type: https://symfony.com/errors/validation` and `title: Validation Failed`; every other error has `type: about:blank` and the status name as `title`, and every response has an `X-Request-Id` header. nginx answers its own errors in the same format: 413 for a body over 16 KB, 400 for headers it cannot read, 503 when php-fpm does not answer. A URL nginx itself cannot parse, such as `/api/%`, still gets nginx's HTML 400.
 
 ### curl examples
 
@@ -183,7 +183,7 @@ If I had to cut, the release pipeline and the monitoring profile go first, then 
 - **Location.** APOD and On This Day are one row per day for everyone; weather one per day and 0.01° cell (about 1 km). A coarser grid would store less but describe another place: Open-Meteo fits its data to the elevation of the exact point, and 0.1° put Tromsø 690 m higher, in polar day, on a night the sun set at 00:22. The monitoring profile counts the upstream calls that new places cause.
 - **Native upserts.** Doctrine maps everything, but three writes use `INSERT … ON CONFLICT`, because the API and the worker write the same rows at once and neither ORM nor DBAL has an atomic upsert. A `WHERE` guard keeps newer data, and a duplicate bookmark is a clean 409.
 - **Circuit breaker.** Three outages within 30 minutes of each other, with no success between, open a source for 60 seconds; a 429 until `Retry-After`. A 400 or an invalid payload neither counts nor resets the count, and one trial call closes the circuit. It fails open when Redis is down.
-- **Errors.** Problem Details with `about:blank` and the status name, and a `detail` that says what to change. OpenAPI is written by hand and every functional test is validated against it.
+- **Errors.** Problem Details with a `detail` that says what to change: validation errors keep Symfony's validation type with `violations[]`, every other error has `about:blank` and the status name. OpenAPI is written by hand and every functional test is validated against it.
 - **Rate limit.** 60 briefings a minute per client network (IPv4 address or IPv6 /64).
 - **Logs.** One-line JSON; listed context keys only; tokens, keys, emails and coordinates masked.
 
