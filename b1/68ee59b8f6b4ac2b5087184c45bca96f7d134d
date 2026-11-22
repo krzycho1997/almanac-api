@@ -1,0 +1,44 @@
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Messenger/ProbeQueueUsesDoctrine.php
+  s_bdae402778e20a::t_08636d813af04d 1-14
+src/Briefing/Messenger/MessengerPrefetchQueue.php
+  s_bdae402778e20a::t_634e921773efae 1-26
+src/Briefing/MessageHandler/PrefetchDateHandler.php
+  s_bdae402778e20a::t_fa253b9ac59793 12
+tools/phpstan/tests/Architecture/Fixtures/Briefing/ProbeServiceUsesQueueAdapter.php
+  s_bdae402778e20a::t_08636d813af04d 1-14
+tools/phpstan/tests/Architecture/ArchitectureRulesTest.php
+  s_bdae402778e20a::t_08636d813af04d 24,27
+tools/phpstan/tests/Architecture/Fixtures/Briefing/Messenger/ProbeQueueUsesBus.php
+  s_bdae402778e20a::t_08636d813af04d 1-14
+CLAUDE.md
+  s_bdae402778e20a::t_90bffa8001f83a 33
+tests/Architecture/LayerTest.php
+  s_bdae402778e20a::t_08636d813af04d 40,226
+tests/Briefing/Unit/Messenger/MessengerPrefetchQueueTest.php
+  s_bdae402778e20a::t_fa253b9ac59793 9-10
+  s_bdae402778e20a::t_634e921773efae 1-8,11-42
+src/Briefing/Messenger/PrefetchDateMessageMapper.php
+  s_bdae402778e20a::t_634e921773efae 1-31
+tests/Briefing/Unit/Messenger/PrefetchDateMessageMapperTest.php
+  s_bdae402778e20a::t_fa253b9ac59793 9
+  s_bdae402778e20a::t_634e921773efae 1-8,10-59
+docs/SPEC.md
+  s_bdae402778e20a::t_90bffa8001f83a 93
+  s_bdae402778e20a::t_15fc49045dd105 20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b168ee59b8f6b4ac2b5087184c45bca96f7d134d",
+  "prompts": {},
+  "sessions": {
+    "s_bdae402778e20a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3bb23781-d3f6-4dc7-a022-7b473b0b2a34",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
