@@ -30,7 +30,7 @@ Everything runs in the `php` container.
 
 ## Layers
 
-- Edge (`Controller`, `Command`, `MessageHandler`, `ValueResolver`, `Security`, `ErrorHandler`, `RequestId`, `Health`): input and output only, no repositories, Doctrine or upstream clients. Exception: `AccessTokenHandler`.
+- Edge (`Controller`, `Command`, `MessageHandler`, `Messenger`, `ValueResolver`, `Security`, `ErrorHandler`, `RequestId`, `Health`): input and output only, no repositories, Doctrine or upstream clients. Exception: `AccessTokenHandler`.
 - Services in the module root, `Briefing\CircuitBreaker`, `Briefing\Discovery` and every module's `Exception` know nothing about HTTP or the edge; status codes come from `framework.exceptions`, response bodies from `Mapper`.
 - Contracts depend only on contracts. `Briefing\Model` and contracts stay free of Doctrine (including `Symfony\Bridge\Doctrine`), HTTP, entities and sources; Doctrine `*IdType` classes in `Contract` are the exception. Every `*IdType` extends `Shared\Contract\UidIdType`, which refuses ids of another class on write; `Shared\Contract` counts as a contract, so any module's contract may build on it.
 - Every class in `App` is `final`, except entities, abstract classes, interfaces, enums, traits and `Kernel`.

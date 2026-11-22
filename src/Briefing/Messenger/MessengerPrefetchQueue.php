@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Briefing\MessageHandler;
+namespace App\Briefing\Messenger;
 
 use App\Briefing\Location;
 use App\Briefing\PrefetchQueue;

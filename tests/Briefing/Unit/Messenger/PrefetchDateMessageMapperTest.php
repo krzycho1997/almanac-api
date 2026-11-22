@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Briefing\Unit\MessageHandler;
+namespace App\Tests\Briefing\Unit\Messenger;
 
 use App\Briefing\Location;
 use App\Briefing\Message\PrefetchDateMessage;
-use App\Briefing\MessageHandler\PrefetchDateMessageMapper;
+use App\Briefing\Messenger\PrefetchDateMessageMapper;
 use PHPUnit\Framework\TestCase;
 
 final class PrefetchDateMessageMapperTest extends TestCase
