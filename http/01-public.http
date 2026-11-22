@@ -1,0 +1,51 @@
+# Requests that need no token. Run this file first: the briefing stores a discovery id for 02-bookmarks.http.
+
+### Health
+# @name health
+GET {{baseUrl}}/api/health
+
+> {%
+    client.test("health answers 200", () => client.assert(response.status === 200));
+%}
+
+### OpenAPI document
+# @name docs
+GET {{baseUrl}}/api/docs.json
+
+> {%
+    client.test("docs answer 200", () => client.assert(response.status === 200));
+%}
+
+### Briefing at the default place; keeps the first event for the bookmark requests
+# @name briefing
+GET {{baseUrl}}/api/briefings/2024-03-15
+
+> {%
+    client.test("briefing answers 200", () => client.assert(response.status === 200));
+    client.test("briefing has an event to bookmark", () => client.assert(response.body.events.length > 0));
+    client.global.set("discoveryId", response.body.events[0].discoveryId);
+%}
+
+### Briefing at a given place
+# @name briefingInParis
+GET {{baseUrl}}/api/briefings/2024-03-15?lat=48.86&lon=2.35
+
+> {%
+    client.test("briefing in Paris answers 200", () => client.assert(response.status === 200));
+%}
+
+### Not a calendar date: 400 with violations
+# @name invalidDate
+GET {{baseUrl}}/api/briefings/2024-02-30
+
+> {%
+    client.test("invalid date answers 400", () => client.assert(response.status === 400));
+%}
+
+### Before the first APOD picture: 422 with violations
+# @name dateOutOfRange
+GET {{baseUrl}}/api/briefings/1995-06-15
+
+> {%
+    client.test("date out of range answers 422", () => client.assert(response.status === 422));
+%}

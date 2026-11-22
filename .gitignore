@@ -21,3 +21,4 @@
 /phpunit.xml
 /.phpunit.cache/
 ###< phpunit/phpunit ###
+/http/http-client.private.env.json

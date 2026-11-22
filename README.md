@@ -107,6 +107,10 @@ curl -s -i -X DELETE "http://127.0.0.1:8080/api/bookmarks/$BOOKMARK" -H "Authori
 
 The `POST` answers 201 with the bookmark, the delete answers 204.
 
+### HTTP client files
+
+`http/` has the same requests for the HTTP client of PhpStorm and other JetBrains IDEs: `01-public.http` (health, the API document, briefings and two validation errors) and `02-bookmarks.http` (add, list, delete, and a request without a token). Copy `http/http-client.private.env.json.dist` to `http/http-client.private.env.json` (ignored by git), paste a token from `almanac:user:create`, pick the `dev` environment and run `01-public.http`, then `02-bookmarks.http`: the briefing stores a discovery id that the bookmark requests use. In VS Code, the httpYac extension reads the same files and environments.
+
 ### Prefetch
 
 Synchronous, with a progress bar and a table of problems at the end. The exit code is 1 if any date had a problem.
