@@ -1,0 +1,23 @@
+.github/workflows/ci.yaml
+  s_4da5374f6e605f::t_ef2575b6c2927d 50-51
+compose.ci.yaml
+  s_4da5374f6e605f::t_ef2575b6c2927d 1-5
+docs/SPEC.md
+  s_4da5374f6e605f::t_7e9518ec611f2c 167
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1ef00ef04ed3e7e3b7ae20ceb50378ab8ea86801",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
