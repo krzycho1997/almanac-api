@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Shop\Dto\Input\Validator;
+namespace App\Shop\Validator;
 
 final class ValidImport
 {
@@ -64,15 +64,6 @@ final class RestockInput
 
     #[AskMore]
     public function askForTheAmount(SymfonyStyle $io): void
-    {
-    }
-}
-
-namespace App\Shop\Dto\Request\Validator;
-
-final class ValidSearchValidator
-{
-    public function validate(): void
     {
     }
 }

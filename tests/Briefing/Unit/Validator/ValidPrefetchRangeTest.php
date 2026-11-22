@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Briefing\Unit\Dto\Validator;
+namespace App\Tests\Briefing\Unit\Validator;
 
 use App\Briefing\Dto\Input\PrefetchInput;
-use App\Briefing\Dto\Input\Validator\ValidPrefetchRange;
+use App\Briefing\Validator\ValidPrefetchRange;
 use App\Tests\Support\ValidatorWithClock;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

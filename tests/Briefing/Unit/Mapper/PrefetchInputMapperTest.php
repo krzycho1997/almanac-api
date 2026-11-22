@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Tests\Briefing\Unit\Mapper;
 
 use App\Briefing\Dto\Input\PrefetchInput;
-use App\Briefing\Dto\Input\Validator\ValidPrefetchRange;
 use App\Briefing\Location;
 use App\Briefing\Mapper\CoordinateMapper;
 use App\Briefing\Mapper\PrefetchInputMapper;
+use App\Briefing\Validator\ValidPrefetchRange;
 use App\Tests\Support\ValidatorWithClock;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;

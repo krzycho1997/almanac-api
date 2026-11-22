@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Briefing\Dto\Input;
 
-use App\Briefing\Dto\Input\Validator\ValidPrefetchRange;
 use App\Briefing\Exception\InvalidLocationException;
 use App\Briefing\Validator\BriefingDayText;
 use App\Briefing\Validator\Latitude;
 use App\Briefing\Validator\Longitude;
+use App\Briefing\Validator\ValidPrefetchRange;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Validator\Constraints as Assert;

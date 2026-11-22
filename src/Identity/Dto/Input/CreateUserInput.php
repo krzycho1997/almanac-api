@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Identity\Dto\Input;
 
-use App\Identity\Dto\Input\Validator\ValidTokenLifetime;
 use App\Identity\Email;
 use App\Identity\TokenLifetime;
+use App\Identity\Validator\ValidTokenLifetime;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Validator\Constraints as Assert;

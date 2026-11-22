@@ -40,12 +40,13 @@ final class DataCarrierRuleTest extends RuleTestCase
             [121, 'App\Shop\Dto\Response\LabelDto carries data only; its constructor may only assign a parameter, a constant or a literal to a property.'],
             [122, 'App\Shop\Dto\Response\LabelDto carries data only; its constructor may only assign a parameter, a constant or a literal to a property.'],
             [123, 'App\Shop\Dto\Response\LabelDto carries data only; its constructor may only assign a parameter, a constant or a literal to a property.'],
+            [131, 'App\Shop\Dto\Request\Validator\ValidSearchValidator carries data only; move validate() to a mapper or a validator.'],
         ], array_map(static fn ($error): array => [$error->getLine(), $error->getMessage()], $errors));
         self::assertSame(['almanac.dataCarrier'], array_values(array_unique(array_map(static fn ($error): ?string => $error->getIdentifier(), $errors))));
         self::assertFalse($errors[0]->canBeIgnored());
     }
 
-    public function testAcceptsDtoValidatorsInteractMethodsMappersHandlersAndServices(): void
+    public function testAcceptsValidatorsInteractMethodsMappersHandlersAndServices(): void
     {
         // When
         $errors = $this->gatherAnalyserErrors([self::FIXTURES.'allowed.php']);

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Identity\Unit\Dto\Validator;
+namespace App\Tests\Identity\Unit\Validator;
 
 use App\Identity\Dto\Input\CreateUserInput;
-use App\Identity\Dto\Input\Validator\ValidTokenLifetime;
+use App\Identity\Validator\ValidTokenLifetime;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolationInterface;

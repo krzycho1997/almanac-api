@@ -39,7 +39,6 @@ final class DataCarrierRule implements Rule
     private const string CONSTRUCTOR_BODY_MESSAGE = '%s carries data only; its constructor may only assign a parameter, a constant or a literal to a property.';
     private const string IDENTIFIER = 'almanac.dataCarrier';
     private const string CARRIER = '/^App\\\\[^\\\\]+\\\\(?:Dto|Message)\\\\/';
-    private const string DTO_VALIDATOR = '/^App\\\\[^\\\\]+\\\\Dto\\\\(?:[^\\\\]+\\\\)*Validator\\\\/';
     private const string INTERACT = Interact::class;
     private const string CONSTRUCTOR = '__construct';
     private const string THIS = 'this';
@@ -53,20 +52,11 @@ final class DataCarrierRule implements Rule
     {
         $class = $node->getClassReflection()->getName();
 
-        if (self::isADataCarrier($class)) {
+        if (1 === preg_match(self::CARRIER, $class)) {
             return self::errorsFor($class, $node->getOriginalNode());
         }
 
         return [];
-    }
-
-    private static function isADataCarrier(string $class): bool
-    {
-        if (1 === preg_match(self::DTO_VALIDATOR, $class)) {
-            return false;
-        }
-
-        return 1 === preg_match(self::CARRIER, $class);
     }
 
     /**

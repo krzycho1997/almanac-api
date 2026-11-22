@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Identity\Dto\Input\Validator;
+namespace App\Identity\Validator;
 
 use App\Identity\Dto\Input\CreateUserInput;
 use App\Identity\TokenLifetime;

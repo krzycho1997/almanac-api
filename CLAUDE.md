@@ -33,6 +33,7 @@ Everything runs in the `php` container.
 - Edge (`Controller`, `Command`, `MessageHandler`, `Messenger`, `ValueResolver`, `Security`, `ErrorHandler`, `RequestId`, `Health`): input and output only, no repositories, Doctrine or upstream clients. Exception: `AccessTokenHandler`.
 - Services in the module root, `Briefing\CircuitBreaker`, `Briefing\Discovery` and every module's `Exception` know nothing about HTTP or the edge; status codes come from `framework.exceptions`, response bodies from `Mapper`.
 - Contracts depend only on contracts. `Briefing\Model` and contracts stay free of Doctrine (including `Symfony\Bridge\Doctrine`), HTTP, entities and sources; Doctrine `*IdType` classes in `Contract` are the exception. Every `*IdType` extends `Shared\Contract\UidIdType`, which refuses ids of another class on write; `Shared\Contract` counts as a contract, so any module's contract may build on it.
+- DTOs (`Dto\`) and queued messages (`Message\`) only carry fields, enforced by `DataCarrierRule`: a rule across fields is a class constraint in the module's `Validator\`, and conversion to domain objects is a `convertTo…()` method of a `Mapper\` class.
 - Every class in `App` is `final`, except entities, abstract classes, interfaces, enums, traits and `Kernel`.
 - The rules cover `src/`; `App\Tests` and `App\PHPStan` are outside them.
 

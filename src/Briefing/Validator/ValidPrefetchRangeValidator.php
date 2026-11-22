@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Briefing\Dto\Input\Validator;
+namespace App\Briefing\Validator;
 
 use App\Briefing\BriefingDay;
 use App\Briefing\DateRange;

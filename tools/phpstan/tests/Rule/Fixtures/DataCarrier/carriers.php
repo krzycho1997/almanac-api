@@ -123,3 +123,12 @@ final class LabelDto
         $this->kind = $text::KIND;
     }
 }
+
+namespace App\Shop\Dto\Request\Validator;
+
+final class ValidSearchValidator
+{
+    public function validate(): void
+    {
+    }
+}
