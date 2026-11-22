@@ -60,6 +60,8 @@ jobs:
         run: bin/check-request-id-in-logs http://127.0.0.1:8080
       - name: Run all tests
         run: docker compose exec -T php composer test
+      - name: Check that nginx finds php again after php moves
+        run: bin/check-php-restart http://127.0.0.1:8080
       - name: Show container state and logs
         if: ${{ !success() }}
         run: |
@@ -120,10 +122,16 @@ jobs:
         env:
           COMPOSE: podman compose
         run: bin/smoke-test http://127.0.0.1:8080
+      - name: Check that nginx finds php again after php moves
+        env:
+          COMPOSE: podman compose
+          ENGINE: podman
+        run: bin/check-php-restart http://127.0.0.1:8080
       - name: Show container state and logs
         if: ${{ !success() }}
         run: |
           podman ps --all
+          podman compose exec -T nginx cat /etc/resolv.conf || true
           podman compose logs
       - name: Stop the stack and remove its volumes
         if: ${{ always() }}

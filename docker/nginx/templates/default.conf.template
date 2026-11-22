@@ -11,6 +11,9 @@ log_format almanac escape=json '{"time":"$time_iso8601","method":"$request_metho
                                '"status":$status,"bytes":$body_bytes_sent,"duration":$request_time,'
                                '"request_id":"$almanac_request_id"}';
 
+resolver ${NGINX_LOCAL_RESOLVERS} valid=10s ipv6=off;
+resolver_timeout 2s;
+
 map $request_uri $almanac_cache_control {
     ~^/api/bookmarks no-store;
     default "";
@@ -63,7 +66,8 @@ server {
     }
 
     location ~ ^/index\.php(/|$) {
-        fastcgi_pass php:9000;
+        set $php_upstream php:9000;
+        fastcgi_pass $php_upstream;
         fastcgi_split_path_info ^(.+\.php)(/.*)$;
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
@@ -94,7 +98,8 @@ server {
     deny all;
 
     location = /metrics {
-        fastcgi_pass php:9000;
+        set $php_upstream php:9000;
+        fastcgi_pass $php_upstream;
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME $realpath_root/index.php;
         fastcgi_param SCRIPT_NAME /index.php;
