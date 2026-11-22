@@ -1,0 +1,22 @@
+.github/workflows/deploy.yaml
+  s_dda0d3966f5bac::t_697fb4c95ac630 1-66,70-103
+  s_dda0d3966f5bac::t_a54150808bc43b 67-69
+README.md
+  s_dda0d3966f5bac::t_a54150808bc43b 165
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "546120fce0e4ca1a9b7a13802dd5981e8bc5ee25",
+  "prompts": {},
+  "sessions": {
+    "s_dda0d3966f5bac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "74ea541f-2442-453b-b02e-88d7f3c095ad",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
