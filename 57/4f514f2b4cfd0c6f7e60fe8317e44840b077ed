@@ -1,0 +1,27 @@
+tools/phpstan/src/Rule/DataCarrierRule.php
+  s_4da5374f6e605f::t_fa1d692a97bd78 13-14,16-18,39,140,142,163-168,170,177-180,183,191-192,198,200-212
+  s_4da5374f6e605f::t_afaced07503bf6 139
+tools/phpstan/tests/Rule/Fixtures/DataCarrier/allowed.php
+  s_4da5374f6e605f::t_fa1d692a97bd78 57,65,92-97,103-105
+tools/phpstan/tests/Rule/Fixtures/DataCarrier/carriers.php
+  s_4da5374f6e605f::t_fa1d692a97bd78 107-125
+tools/phpstan/tests/Rule/DataCarrierRuleTest.php
+  s_4da5374f6e605f::t_fa1d692a97bd78 36-37
+  s_4da5374f6e605f::t_4fe6cf8d1f5ddf 39-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "574f514f2b4cfd0c6f7e60fe8317e44840b077ed",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
