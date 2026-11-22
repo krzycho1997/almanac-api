@@ -1,0 +1,49 @@
+src/Briefing/Dto/Input/PrefetchInput.php
+  s_bdae402778e20a::t_2389751029846a 11
+tests/Briefing/Unit/Mapper/PrefetchInputMapperTest.php
+  s_bdae402778e20a::t_2389751029846a 11
+tools/phpstan/src/Rule/DataCarrierRule.php
+  s_bdae402778e20a::t_2a1a45dc8a60e4 55
+src/Briefing/Validator/ValidPrefetchRange.php
+  s_bdae402778e20a::t_e629abcc8a6788 1-29
+tools/phpstan/tests/Rule/Fixtures/DataCarrier/allowed.php
+  s_bdae402778e20a::t_7a33ca1bebe8bd 5
+src/Identity/Validator/ValidTokenLifetimeValidator.php
+  s_bdae402778e20a::t_e629abcc8a6788 1-53
+tests/Briefing/Unit/Validator/ValidPrefetchRangeTest.php
+  s_bdae402778e20a::t_e629abcc8a6788 1-7,9-79
+  s_bdae402778e20a::t_b020676a5d210f 8
+CLAUDE.md
+  s_bdae402778e20a::t_769770a8a7c578 36
+tools/phpstan/tests/Rule/Fixtures/DataCarrier/carriers.php
+  s_bdae402778e20a::t_7a33ca1bebe8bd 126-134
+docs/SPEC.md
+  s_bdae402778e20a::t_e8a28387a83a1d 93
+tests/Identity/Unit/Validator/ValidTokenLifetimeTest.php
+  s_bdae402778e20a::t_e629abcc8a6788 1-7,9-55
+  s_bdae402778e20a::t_b020676a5d210f 8
+tools/phpstan/tests/Rule/DataCarrierRuleTest.php
+  s_bdae402778e20a::t_cddcda1f233123 43,49
+src/Identity/Dto/Input/CreateUserInput.php
+  s_bdae402778e20a::t_2389751029846a 9
+src/Briefing/Validator/ValidPrefetchRangeValidator.php
+  s_bdae402778e20a::t_e629abcc8a6788 1-70
+src/Identity/Validator/ValidTokenLifetime.php
+  s_bdae402778e20a::t_e629abcc8a6788 1-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c2d0fde47b7d93326ed254d47fd45cf4fa39ffb3",
+  "prompts": {},
+  "sessions": {
+    "s_bdae402778e20a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3bb23781-d3f6-4dc7-a022-7b473b0b2a34",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
