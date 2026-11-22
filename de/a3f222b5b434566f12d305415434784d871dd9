@@ -1,0 +1,23 @@
+tests/Briefing/Unit/Mapper/BriefingQueryMapperTest.php
+  s_4da5374f6e605f::t_4532de19a63636 1-48
+src/Briefing/Mapper/BriefingQueryMapper.php
+  s_4da5374f6e605f::t_4532de19a63636 1-25
+src/Briefing/Controller/BriefingController.php
+  s_4da5374f6e605f::t_4532de19a63636 13,31,48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "dea3f222b5b434566f12d305415434784d871dd9",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
