@@ -25,6 +25,7 @@ parameters:
         reportUnknownTypes: true
 
 rules:
+    - App\PHPStan\Rule\DataCarrierRule
     - App\PHPStan\Rule\DeclareStrictTypesRule
 
 services:

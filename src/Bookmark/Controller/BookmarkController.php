@@ -10,6 +10,7 @@ use App\Bookmark\Dto\Request\BookmarkListQuery;
 use App\Bookmark\Dto\Request\CreateBookmarkRequest;
 use App\Bookmark\Dto\Response\BookmarkListResponse;
 use App\Bookmark\Dto\Response\BookmarkResponse;
+use App\Bookmark\Mapper\BookmarkRequestMapper;
 use App\Bookmark\Mapper\BookmarkResponseMapper;
 use App\Identity\Contract\AuthenticatedUser;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,6 +36,7 @@ final readonly class BookmarkController
 
     public function __construct(
         private BookmarkService $bookmarks,
+        private BookmarkRequestMapper $requestMapper,
         private BookmarkResponseMapper $mapper,
     ) {
     }
@@ -47,7 +49,7 @@ final readonly class BookmarkController
         #[MapQueryString(validationFailedStatusCode: Response::HTTP_UNPROCESSABLE_ENTITY)]
         BookmarkListQuery $query = new BookmarkListQuery(),
     ): BookmarkListResponse {
-        return $this->mapper->mapPage($this->bookmarks->page($user->id, $query->pageRequest()));
+        return $this->mapper->mapPage($this->bookmarks->page($user->id, $this->requestMapper->convertToPageRequest($query)));
     }
 
     #[Route(self::COLLECTION, name: 'bookmark_create', methods: [Request::METHOD_POST])]
@@ -58,7 +60,7 @@ final readonly class BookmarkController
         #[MapRequestPayload(acceptFormat: JsonEncoder::FORMAT, serializationContext: self::STRICT_PAYLOAD, mapWhenEmpty: true)]
         CreateBookmarkRequest $request,
     ): BookmarkResponse {
-        return $this->mapper->map($this->bookmarks->add($user->id, $request->discoveryId()));
+        return $this->mapper->map($this->bookmarks->add($user->id, $this->requestMapper->convertToDiscoveryId($request)));
     }
 
     #[Route(self::ITEM, name: 'bookmark_delete', requirements: ['id' => Requirement::UUID_V7], methods: [Request::METHOD_DELETE])]

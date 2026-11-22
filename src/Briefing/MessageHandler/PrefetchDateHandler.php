@@ -9,6 +9,7 @@ use App\Briefing\Exception\DateNotReadyException;
 use App\Briefing\Exception\InvalidLocationException;
 use App\Briefing\Location;
 use App\Briefing\Message\PrefetchDateMessage;
+use App\Briefing\Messenger\PrefetchDateMessageMapper;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -23,6 +24,7 @@ final readonly class PrefetchDateHandler
     public function __construct(
         private BriefingAggregator $aggregator,
         private ClockInterface $clock,
+        private PrefetchDateMessageMapper $messageMapper,
         #[Target('defaultLocation')]
         private Location $defaultLocation,
     ) {
@@ -41,7 +43,7 @@ final readonly class PrefetchDateHandler
     private function locationOf(PrefetchDateMessage $message): Location
     {
         try {
-            return $message->locationOr($this->defaultLocation);
+            return $this->messageMapper->convertToLocation($message, $this->defaultLocation);
         } catch (InvalidLocationException $invalid) {
             throw new UnrecoverableMessageHandlingException(self::NOT_A_PLACE, previous: $invalid);
         }
@@ -49,7 +51,7 @@ final readonly class PrefetchDateHandler
 
     private function dayOf(PrefetchDateMessage $message): \DateTimeImmutable
     {
-        return $message->dayIn($this->clock->now()->getTimezone())
+        return $this->messageMapper->convertToDay($message, $this->clock->now()->getTimezone())
             ?? throw new UnrecoverableMessageHandlingException(self::NOT_A_DAY);
     }
 }

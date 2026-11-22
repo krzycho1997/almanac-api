@@ -26,18 +26,4 @@ final readonly class BookmarkListQuery
         public mixed $limit = null,
     ) {
     }
-
-    public function pageRequest(): PageRequest
-    {
-        return new PageRequest(self::number($this->page, PageRequest::FIRST_PAGE), self::number($this->limit, PageRequest::DEFAULT_LIMIT));
-    }
-
-    private static function number(mixed $value, int $default): int
-    {
-        if (\is_string($value)) {
-            return (int) $value;
-        }
-
-        return $default;
-    }
 }
