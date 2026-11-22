@@ -1,0 +1,44 @@
+# Requests that need a token. Create one and paste it into http-client.private.env.json:
+#   docker compose exec php bin/console almanac:user:create reviewer@example.com -q
+# Run 01-public.http first, so {{discoveryId}} holds a discovery from the briefing.
+
+### Add a bookmark; keeps its id for the delete
+# @name addBookmark
+POST {{baseUrl}}/api/bookmarks
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "discoveryId": "{{discoveryId}}"
+}
+
+> {%
+    client.test("bookmark is created", () => client.assert(response.status === 201));
+    client.global.set("bookmarkId", response.body.id);
+%}
+
+### List my bookmarks
+# @name listBookmarks
+GET {{baseUrl}}/api/bookmarks?page=1&limit=20
+Authorization: Bearer {{token}}
+
+> {%
+    client.test("list answers 200", () => client.assert(response.status === 200));
+%}
+
+### Delete the bookmark created above
+# @name deleteBookmark
+DELETE {{baseUrl}}/api/bookmarks/{{bookmarkId}}
+Authorization: Bearer {{token}}
+
+> {%
+    client.test("delete answers 204", () => client.assert(response.status === 204));
+%}
+
+### Without a token: 401
+# @name listWithoutToken
+GET {{baseUrl}}/api/bookmarks
+
+> {%
+    client.test("missing token answers 401", () => client.assert(response.status === 401));
+%}
