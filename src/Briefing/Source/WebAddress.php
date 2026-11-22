@@ -6,7 +6,7 @@ namespace App\Briefing\Source;
 
 final class WebAddress
 {
-    private const array WEB_SCHEMES = ['http', 'https'];
+    private const string SECURE_SCHEME = 'https';
 
     public static function isUsable(string $url): bool
     {
@@ -14,6 +14,6 @@ final class WebAddress
             return false;
         }
 
-        return \in_array(parse_url($url, \PHP_URL_SCHEME), self::WEB_SCHEMES, true);
+        return self::SECURE_SCHEME === parse_url($url, \PHP_URL_SCHEME);
     }
 }
