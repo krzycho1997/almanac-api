@@ -95,7 +95,21 @@ final class SourcePayloadCodecTest extends TestCase
 
         // Then
         self::assertInstanceOf(OnThisDayFeed::class, $feed);
-        self::assertNull($feed->events[0]->pages[0]->wikidataId);
+        self::assertNull($feed->events[0]->pages[0]->catalogueId);
+    }
+
+    public function testKeepsTheStoredNameOfTheCatalogueId(): void
+    {
+        // Given
+        $data = self::recorded(SourceName::OnThisDay);
+
+        // When
+        $feed = self::codec()->decode(SourceName::OnThisDay, $data);
+
+        // Then
+        self::assertInstanceOf(OnThisDayFeed::class, $feed);
+        self::assertSame('Q1048', $feed->events[0]->pages[0]->catalogueId);
+        self::assertSame($data, self::codec()->encode($feed));
     }
 
     public function testWritesADateInUtc(): void

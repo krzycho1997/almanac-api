@@ -28,8 +28,8 @@ final readonly class WikipediaPersonIdentity implements PersonIdentity
      */
     private static function wikidataItemOf(NotablePerson $person): array
     {
-        if (\is_string($person->wikidataId)) {
-            return [PersonReference::catalogued($person->wikidataId)];
+        if (\is_string($person->catalogueId)) {
+            return [PersonReference::catalogued($person->catalogueId)];
         }
 
         return [];

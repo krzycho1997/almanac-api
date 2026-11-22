@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Briefing\Model;
 
+use Symfony\Component\Serializer\Attribute\SerializedName;
+
 final readonly class NotablePerson
 {
     public function __construct(
@@ -12,7 +14,8 @@ final readonly class NotablePerson
         public ?string $description,
         public ?string $url,
         public ?string $thumbnail,
-        public ?string $wikidataId = null,
+        #[SerializedName('wikidataId')]
+        public ?string $catalogueId = null,
     ) {
     }
 }

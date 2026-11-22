@@ -212,7 +212,7 @@ final readonly class OnThisDayMapper
         $linked = self::linkedPage(self::withoutDisambiguation($page->title), $page);
 
         if ($linked instanceof PageRef) {
-            return new NotablePerson($year, $linked->title, self::description($page->description), $linked->url, $linked->thumbnail, $linked->wikidataId);
+            return new NotablePerson($year, $linked->title, self::description($page->description), $linked->url, $linked->thumbnail, $linked->catalogueId);
         }
 
         return self::unlinkedPerson($year, $text);
