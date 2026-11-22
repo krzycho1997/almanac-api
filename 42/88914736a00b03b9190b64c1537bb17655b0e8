@@ -1,0 +1,25 @@
+tests/Briefing/Unit/Source/Apod/ApodMapperTest.php
+  s_4da5374f6e605f::t_656d7110ba7d77 99-100
+tests/Briefing/Unit/Source/WebAddressTest.php
+  s_4da5374f6e605f::t_8cce5ab27a83e9 1-35
+src/Briefing/Source/WebAddress.php
+  s_4da5374f6e605f::t_656d7110ba7d77 9,17
+docs/SPEC.md
+  s_4da5374f6e605f::t_8837feece900e9 166
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4288914736a00b03b9190b64c1537bb17655b0e8",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
