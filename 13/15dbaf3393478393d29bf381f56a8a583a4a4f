@@ -1,0 +1,20 @@
+tests/Briefing/Unit/DependencyInjection/ProviderClientsConfigTest.php
+  s_4da5374f6e605f::t_cb517a57a1bd45 14-17,21,24,30,33-34,37,40,43,49,56,60-63,65-66,78,94,99-108
+  s_4da5374f6e605f::t_a0e5e03507ee40 109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1315dbaf3393478393d29bf381f56a8a583a4a4f",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
