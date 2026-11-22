@@ -11,6 +11,11 @@ use App\Briefing\Location;
 
 final readonly class PrefetchInputMapper
 {
+    public function __construct(
+        private CoordinateMapper $coordinates,
+    ) {
+    }
+
     public function convertToRange(PrefetchInput $input, \DateTimeZone $timezone): DateRange
     {
         return DateRange::between(self::dayIn($input->from, $timezone), self::dayIn($input->to, $timezone));
@@ -18,7 +23,7 @@ final readonly class PrefetchInputMapper
 
     public function convertToLocation(PrefetchInput $input, Location $default): Location
     {
-        return Location::fromOptional(self::coordinate($input->lat), self::coordinate($input->lon), $default);
+        return $this->coordinates->convertToLocation($input->lat, $input->lon, $default);
     }
 
     public function convertToDelayMs(PrefetchInput $input): int
@@ -30,14 +35,5 @@ final readonly class PrefetchInputMapper
     {
         return BriefingDay::startOf($value, $timezone)
             ?? throw new \LogicException('The dates are read only after the input passed validation.');
-    }
-
-    private static function coordinate(?string $value): ?float
-    {
-        if (null === $value) {
-            return null;
-        }
-
-        return (float) $value;
     }
 }

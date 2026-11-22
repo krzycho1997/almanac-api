@@ -9,17 +9,13 @@ use App\Briefing\Location;
 
 final readonly class BriefingQueryMapper
 {
-    public function convertToLocation(BriefingQuery $query, Location $default): Location
-    {
-        return Location::fromOptional(self::coordinate($query->lat), self::coordinate($query->lon), $default);
+    public function __construct(
+        private CoordinateMapper $coordinates,
+    ) {
     }
 
-    private static function coordinate(mixed $value): ?float
+    public function convertToLocation(BriefingQuery $query, Location $default): Location
     {
-        if (\is_string($value)) {
-            return (float) $value;
-        }
-
-        return null;
+        return $this->coordinates->convertToLocation($query->lat, $query->lon, $default);
     }
 }

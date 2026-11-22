@@ -7,6 +7,7 @@ namespace App\Tests\Briefing\Unit\Mapper;
 use App\Briefing\Dto\Input\PrefetchInput;
 use App\Briefing\Dto\Input\Validator\ValidPrefetchRange;
 use App\Briefing\Location;
+use App\Briefing\Mapper\CoordinateMapper;
 use App\Briefing\Mapper\PrefetchInputMapper;
 use App\Tests\Support\ValidatorWithClock;
 use PHPUnit\Framework\TestCase;
@@ -26,7 +27,7 @@ final class PrefetchInputMapperTest extends TestCase
 
         // Then
         self::assertCount(0, $violations);
-        self::assertCount(ValidPrefetchRange::MAX_DAYS, new PrefetchInputMapper()->convertToRange($input, new \DateTimeZone('UTC')));
+        self::assertCount(ValidPrefetchRange::MAX_DAYS, new PrefetchInputMapper(new CoordinateMapper())->convertToRange($input, new \DateTimeZone('UTC')));
     }
 
     public function testConvertsTheDatesToDaysInTheGivenTimezone(): void
@@ -37,7 +38,7 @@ final class PrefetchInputMapperTest extends TestCase
         $input->to = '2024-03-16';
 
         // When
-        $range = new PrefetchInputMapper()->convertToRange($input, new \DateTimeZone('Europe/Warsaw'));
+        $range = new PrefetchInputMapper(new CoordinateMapper())->convertToRange($input, new \DateTimeZone('Europe/Warsaw'));
 
         // Then
         self::assertEquals(new \DateTimeImmutable('2024-03-15 00:00', new \DateTimeZone('Europe/Warsaw')), $range->from);
@@ -54,7 +55,7 @@ final class PrefetchInputMapperTest extends TestCase
         // Then / When
         $this->expectException(\LogicException::class);
 
-        new PrefetchInputMapper()->convertToRange($input, new \DateTimeZone('UTC'));
+        new PrefetchInputMapper(new CoordinateMapper())->convertToRange($input, new \DateTimeZone('UTC'));
     }
 
     public function testConvertsThePlaceOrFallsBackToTheDefault(): void
@@ -64,9 +65,10 @@ final class PrefetchInputMapperTest extends TestCase
         $somewhere = new PrefetchInput();
         $somewhere->lat = '50.06';
         $somewhere->lon = '19.94';
+        $mapper = new PrefetchInputMapper(new CoordinateMapper());
 
         // When
-        $locations = [new PrefetchInputMapper()->convertToLocation($somewhere, $default), new PrefetchInputMapper()->convertToLocation(new PrefetchInput(), $default)];
+        $locations = [$mapper->convertToLocation($somewhere, $default), $mapper->convertToLocation(new PrefetchInput(), $default)];
 
         // Then
         self::assertEquals([Location::fromCoordinates(50.06, 19.94), $default], $locations);
@@ -79,7 +81,7 @@ final class PrefetchInputMapperTest extends TestCase
         $input->delay = '250';
 
         // When
-        $delay = new PrefetchInputMapper()->convertToDelayMs($input);
+        $delay = new PrefetchInputMapper(new CoordinateMapper())->convertToDelayMs($input);
 
         // Then
         self::assertSame(250, $delay);
