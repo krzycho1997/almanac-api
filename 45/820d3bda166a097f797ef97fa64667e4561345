@@ -1,0 +1,19 @@
+tools/phpstan/tests/Rule/DataCarrierRuleTest.php
+  s_bdae402778e20a::t_be9e2ce253919e 43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "45820d3bda166a097f797ef97fa64667e4561345",
+  "prompts": {},
+  "sessions": {
+    "s_bdae402778e20a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3bb23781-d3f6-4dc7-a022-7b473b0b2a34",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
