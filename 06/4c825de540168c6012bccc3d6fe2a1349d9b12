@@ -38,6 +38,8 @@ src/Identity/TokenLifetime.php
   s_4da5374f6e605f::t_f6ffed7e97d54b 10,48
 tests/Briefing/Unit/MessageHandler/MessengerPrefetchQueueTest.php
   s_4da5374f6e605f::t_fa1d692a97bd78 18
+docs/SPEC.md
+  s_bdae402778e20a::t_5edee1474dc5e0 93
 ---
 {
   "schema_version": "authorship/3.0.0",
@@ -49,6 +51,14 @@ tests/Briefing/Unit/MessageHandler/MessengerPrefetchQueueTest.php
       "agent_id": {
         "tool": "claude",
         "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    },
+    "s_bdae402778e20a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3bb23781-d3f6-4dc7-a022-7b473b0b2a34",
         "model": "claude-opus-5-5"
       },
       "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
