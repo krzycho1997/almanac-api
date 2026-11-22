@@ -1,0 +1,23 @@
+tools/phpstan/tests/Rule/ProviderLiteralRuleTest.php
+  s_4da5374f6e605f::t_8b10ca87c18ca8 17
+tools/phpstan/tests/Rule/Fixtures/ProviderLiteral/src/Briefing/Source/OnThisDay/ProbeProviderCode.php
+  s_4da5374f6e605f::t_8b10ca87c18ca8 10
+tools/phpstan/src/Rule/ProviderLiteralRule.php
+  s_4da5374f6e605f::t_8b10ca87c18ca8 39-41,45-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8ba64641acd720c9f79b10184c9da306504b6080",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
