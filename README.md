@@ -6,6 +6,16 @@ Almanac API builds a briefing for any date from 1995-06-16 to 15 days after toda
 
 It runs on PHP 8.5, Symfony 8.1, Doctrine ORM 3, PostgreSQL 18, Redis 8 and nginx with php-fpm, all started by Docker Compose.
 
+## Features
+
+- A briefing for any date from three sources, each normalised into one JSON format, with a status per source and a list of what is missing when a source fails.
+- Snapshots in PostgreSQL: a stored past day never calls upstream again, and today and later follow a refresh policy.
+- Users with Bearer tokens created from the console, and bookmarks of single discoveries, paginated, private to their owner and never duplicated.
+- A prefetch command for a range of dates, run directly or queued for a worker through Symfony Messenger.
+- Problem Details errors, rate limiting, and an OpenAPI document that every functional test is checked against.
+- A circuit breaker in Redis that stops calling a provider that is down or out of quota.
+- Optional extras that stay out of the way: a monitoring profile with Prometheus and Grafana (off unless started with `--profile monitoring`), architecture rules that run inside PHPStan, and release and deploy workflows that run only in GitHub Actions.
+
 ## Quick start
 
 You need Docker with Compose v2, or Podman 5 with podman-compose, and `curl` and `jq` on the host for the examples.
@@ -146,7 +156,7 @@ If you want one place to start, the briefing tests with a failing, mocked source
 
 - Warsaw is the default place; `lat` and `lon` pick another one.
 - Dates run from the first APOD picture (1995-06-16) to 15 days after today. Weather only reaches 14 days ahead, so beyond that it is `not_applicable`.
-- I kept the paths the brief gave. A breaking change would go under `/api/v2`, with `Deprecation` and `Sunset` headers on the old paths, and `info.version` in the OpenAPI document follows SemVer.
+- The paths have no version prefix. A breaking change would go under `/api/v2`, with `Deprecation` and `Sunset` headers on the old paths, and `info.version` in the OpenAPI document follows SemVer.
 
 ## With more time
 
@@ -156,33 +166,6 @@ If you want one place to start, the briefing tests with a failing, mocked source
 - A stable event key (the year and linked pages instead of a text hash), because a Wikipedia edit now creates a new discovery and old bookmarks keep pointing at the old text.
 - Short-lived tokens with refresh, or an OIDC provider through Symfony's `access_token` handlers, because a 30-day Bearer token is a long-lived secret.
 - Redis and PostgreSQL probes in `/api/health`, so an outage shows up before users report it.
-
-## What the brief asked for
-
-Everything the brief requires is in place, including the three bonuses (Messenger prefetch, RateLimiter and OpenAPI).
-
-<details>
-<summary><strong>Requirement by requirement</strong></summary>
-
-| Requirement | How it is met |
-|---|---|
-| A briefing from 3+ sources in our own format | APOD, On This Day and Open-Meteo, mapped to an internal model |
-| A failing source is reported and the rest still answers | `sources` and `missing`; 502 only when no source has data |
-| Invalid or out-of-range dates | 400 if malformed, 422 if outside the window |
-| PostgreSQL, past dates never refetched, a refresh policy | a snapshot table (JSONB) and `RefreshPolicy` |
-| Doctrine Migrations only | the `php` container runs them on start |
-| A Bearer token from a console command | `almanac:user:create` |
-| Bookmarks: create, paginated list, delete, own only, no duplicates | unique `(user_id, discovery_id)`; someone else's bookmark is a 404 |
-| `almanac:prefetch <from> <to>` with progress and failures | a progress bar, a table of problems and exit code 1 |
-| JSON, Problem Details, Validator, status codes | RFC 9457, checked against OpenAPI in every functional test |
-| Stack, `strict_types`, Docker and Podman | PHP 8.5, Symfony 8.1, PostgreSQL 18; CI runs both Docker and Podman |
-| PHPUnit for the aggregation (failing source, mocked) and bookmarks, against PostgreSQL | unit, integration, functional and e2e suites |
-| PHPStan 6+, PHP-CS-Fixer | level 9, no baseline |
-| Bonus: Messenger prefetch, RateLimiter, OpenAPI | all three |
-
-</details>
-
-I added a few things the brief did not ask for. The one that matters at runtime is a circuit breaker in Redis: without it, `DEMO_KEY`'s limit or a provider outage is hit again by every new date and queued message. The rest stays out of your way when you evaluate the core: architecture rules that run only inside PHPStan, OpenAPI validation that runs only in the tests, a monitoring profile (Prometheus and Grafana) that is off unless started with `--profile monitoring`, and release and deploy workflows that run only in GitHub Actions.
 
 ## Code map
 
@@ -198,7 +181,7 @@ Adding a fourth source is described under Design notes, in "Modules, layers and 
 
 ## Use of AI
 
-I planned, designed and reviewed every change, and Claude Code wrote most of the code. Review mattered: one bug I caught was a snapshot query that matched sources and keys as a cross product instead of exact pairs, so a briefing could read another day's row. I'm happy to walk through any line of it, or change it, live.
+I planned and designed the project and reviewed every change; Claude Code wrote most of the code.
 
 ## Running and operating
 
