@@ -1,0 +1,33 @@
+src/Briefing/Source/OnThisDay/WikipediaPersonIdentity.php
+  s_4da5374f6e605f::t_74eaf5e5d5d95e 31-32
+src/Briefing/Source/OnThisDay/OnThisDayMapper.php
+  s_4da5374f6e605f::t_74eaf5e5d5d95e 215
+src/Briefing/Model/PageRef.php
+  s_4da5374f6e605f::t_74eaf5e5d5d95e 7-8,15-16
+src/Briefing/Model/NotablePerson.php
+  s_4da5374f6e605f::t_74eaf5e5d5d95e 7-8,17-18
+tests/Briefing/Integration/SourcePayloadCodecTest.php
+  s_4da5374f6e605f::t_74eaf5e5d5d95e 98
+  s_4da5374f6e605f::t_27393fa5d65952 101-112
+  s_4da5374f6e605f::t_a6ae7b7ff42ce1 99-100
+tests/Briefing/Unit/Source/OnThisDay/OnThisDayMapperTest.php
+  s_4da5374f6e605f::t_74eaf5e5d5d95e 53
+tests/Briefing/Integration/Source/SourceDefinitionsTest.php
+  s_4da5374f6e605f::t_9212f31fa2e6b9 81-123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "96fb4a6fc68fc174fb004b5498041a46ef71a99b",
+  "prompts": {},
+  "sessions": {
+    "s_4da5374f6e605f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "008b2e7b-7722-4723-872b-8ff08be3b6ba",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "krzysztofpiorkowski <kriz4@o2.pl>"
+    }
+  }
+}
