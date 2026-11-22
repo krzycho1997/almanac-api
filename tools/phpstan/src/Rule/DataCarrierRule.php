@@ -64,13 +64,7 @@ final class DataCarrierRule implements Rule
      */
     private static function errorsFor(string $class, ClassLike $declaration): array
     {
-        $errors = [];
-
-        foreach ($declaration->stmts as $statement) {
-            $errors = [...$errors, ...self::errorsOf($class, $statement)];
-        }
-
-        return $errors;
+        return array_merge(...array_map(static fn (Node $statement): array => self::errorsOf($class, $statement), $declaration->stmts));
     }
 
     /**
@@ -120,19 +114,12 @@ final class DataCarrierRule implements Rule
      */
     private static function constructorErrors(string $class, ClassMethod $constructor): array
     {
-        $errors = [];
+        $parameters = array_map(static fn (Param $parameter): string => self::nameOf($parameter->var), $constructor->params);
 
-        foreach ($constructor->params as $parameter) {
-            $errors = [...$errors, ...self::parameterErrors($class, $parameter)];
-        }
-
-        $parameters = array_values(array_map(static fn (Param $parameter): string => self::nameOf($parameter->var), $constructor->params));
-
-        foreach ($constructor->stmts ?? [] as $statement) {
-            $errors = [...$errors, ...self::statementErrors($class, $statement, $parameters)];
-        }
-
-        return $errors;
+        return array_merge(
+            ...array_map(static fn (Param $parameter): array => self::parameterErrors($class, $parameter), $constructor->params),
+            ...array_map(static fn (Node\Stmt $statement): array => self::statementErrors($class, $statement, $parameters), $constructor->stmts ?? []),
+        );
     }
 
     /**
@@ -148,10 +135,7 @@ final class DataCarrierRule implements Rule
     }
 
     /**
-     * @return list<IdentifierRuleError>
-     */
-    /**
-     * @param list<string> $parameters
+     * @param array<string> $parameters
      *
      * @return list<IdentifierRuleError>
      */
@@ -165,7 +149,7 @@ final class DataCarrierRule implements Rule
     }
 
     /**
-     * @param list<string> $parameters
+     * @param array<string> $parameters
      */
     private static function isAPlainAssignment(Node\Stmt $statement, array $parameters): bool
     {
@@ -191,7 +175,7 @@ final class DataCarrierRule implements Rule
     }
 
     /**
-     * @param list<string> $parameters
+     * @param array<string> $parameters
      */
     private static function isPlainValue(Node\Expr $value, array $parameters): bool
     {
