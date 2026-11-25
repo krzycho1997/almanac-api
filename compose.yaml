@@ -55,7 +55,7 @@ services:
     security_opt:
       - no-new-privileges:true
     profiles: [tools]
-    image: docker.io/redocly/cli:2.76.0@sha256:bd2a1637e39de2d7fc403b3a114b6f8ecbb7edcb6f814516c79b38be409747e9
+    image: docker.io/redocly/cli:2.82.0@sha256:18f9991c467e8ac74e3df035aef788a20e1aa0b44df374fef840a1230835e8d6
     working_dir: /spec
     volumes:
       - .:/spec:ro,z
