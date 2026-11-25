@@ -1,7 +1,7 @@
 FROM docker.io/mlocati/php-extension-installer:2.13@sha256:4fd45396c16685266d32bf147a24ecd5e81029d3820295895bf4a90131190ac9 AS php-extension-installer
 FROM docker.io/library/composer:2.11@sha256:919efe8e62179c71dfd31fad035fd671fe7454211c6b2aa30a10af0ab4acedba AS composer
 
-FROM docker.io/library/php:8.5.13-fpm-alpine@sha256:51414d5291758fe27f58a64c7e8a078465d32cc7dcef7bda803f5b36019802e0 AS runtime
+FROM docker.io/library/php:8.6.0RC7-fpm-alpine@sha256:008e80d23e87070347017eb8e400f7322dc8b5f4b99fa90220336b9ce3c16c3b AS runtime
 
 COPY --from=php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 RUN apk upgrade --no-cache libxml2 \
